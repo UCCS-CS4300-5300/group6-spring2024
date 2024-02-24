@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <!--Styling for index template-->
+  
+  
+  <!--Start of html content-->
+  <head>
+    
+    <title>{% block title %}{% endblock %}</title>
+    {% load bootstrap5 %}  
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+  </head>
+  
+  <body>
+    <div class="container-fluid p-5 bg-primary text-white text-center">
+      <h1>Hello, Foodies!</h1>
+      <p>Here you can find restaurants, snacks and more!</p>
+    </div>
+
+  <div class = "containter">
+    <div class = "d-flex align-items-center flex-column" style = "width: 100%">
+      <div class = "row">
+        <div class = "col" >Restaurants</div>
+        <div class = "col">Snacks</div>
+        <div class = "w-100"></div>
+        <div class = "col">Photos Restaurant</div>
+        <div class = "col">Photos Snacks</div>
+      </div>
+    </div>
+  </div>
+
+  <div class = "container" >
+    <div class = "row align-items-end" style = "width: 100%">
+      <div class = "row">
+        <a class = "btn btn-primary" href = "#" role = "button">Trending Items</a>
+      </div>
+    </div>
+  </div>
+  </body>
+</html>
+

@@ -1,0 +1,75 @@
+{% load static %}
+<!--This document contains some not bootstrap CSS and HTML!-->
+<!DOCTYPE html>
+<style>
+
+  h1 {
+  }
+
+  p {
+    
+  }
+
+  body {
+    background-color: #534293;
+    
+    text-shadow:
+    0.03em 0 #05bba,
+    0 0.03em #05bba,
+    -0.03em 0 #05bba,
+    0 -0.03em #05bba,
+    -0.03em -0.03em #05bba,
+    -0.03em 0.03em #05bba,
+    0.03em -0.03em #05bba,
+    0.03em 0.03em #05bba;
+  }
+  
+  .intro {
+  border-radius: 25px;
+  background-color: #eb5921;
+  color: #000;
+  font: 1.2em / 1.5 Helvetica Neue, Helvetica, Arial, sans-serif;
+  margin: auto;
+  text-align: center;
+  }
+
+  .grid-container{
+    
+    margin: 10px;
+    width: 350px;
+    display:grid;
+    padding: 10px;
+    grid-template-columns: 200px 200px;
+    grid-row: auto auto;
+    text-align: center;
+    grid-column-gap: 210px
+  }
+
+  .grid-item {
+    background-color: #94d8ff;
+    padding: 10px; 
+    font: 1.2em / 1.5 Helvetica Neue, Helvetica, Arial, sans-serif;
+    text-align: center;
+    border-radius: 10px;
+  }
+
+  
+</style>
+
+
+<html>
+  <body>
+    <div class="intro">
+    <h1>Hello, Foodie!</h1>
+    <p>Here you can find restaurants, snacks and more!</p>
+    </div>
+
+    <div class = "grid-container">
+      <div class = "grid-item">Restaurants</div>
+      <div class = "grid-item">Stores</div>
+     
+    </div>
+
+   
+</html>
+
