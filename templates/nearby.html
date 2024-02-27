@@ -1,0 +1,77 @@
+
+{% extends 'templates/base_template.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<!-- Why is the body content INSIDE the navbar????? -->
+<!-- I want to use extends base_template but its doing goofy things-->
+<!-- https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar -->
+
+
+<head>
+  <style>
+    .custom-scrollbar {
+      display: block;
+      /* overflow-y:scroll; */  /* Forces scroller to show even if content doesnt overflow */
+      overflow: auto;
+      height: 10em;
+      padding: 1em;
+      margin: 1em auto;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 15px;
+      height: 8px;
+      background-color: #E5E4E2;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #36454F;
+    }
+  </style>
+</head>
+
+<!-- iterate over stores here (data passed from view) to duplicate cards -->
+<!--  -->
+<body>
+  {% block content %}
+  <div style="margin-top: 65px;">
+  </div>
+  <h1 style="text-align: center">Locations Near You!</h1>
+  
+  <div class="container-lg">
+    <div class="custom-scrollbar">
+      <!--Box for 'Add Location Button'-->
+      <div class="card">
+        <div class="card-body" style="display:flex; margin-left: auto;">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <button class="btn btn-primary">Add Location</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!--Boxes for each location. Will need to be updated so that for loop is sorted by proximity-->
+      {% for location in locations %}
+      <div class="card">
+        <div class="card-body" style="display:flex;">
+          <div>
+            <h3>{{location.name}}</h3>
+            <p>{{location.description}}</p>
+          </div>
+          <div style="margin-left: auto;">
+            <ul class="navbar-nav" style="gap:.5rem;">
+              <li class="nav-item">
+                <button class="btn btn-primary">View</button>
+              </li>
+              <li class="nav-item">
+                <button class="btn btn-primary">Add</button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      {%endfor%} <!-- Moved so cards are in same container (Tyler) -->
+    </div>
+  </div>
+  {% endblock content %}
+</body>
