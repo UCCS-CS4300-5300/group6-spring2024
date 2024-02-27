@@ -8,26 +8,6 @@ def index(request):
   return render(request, 'templates/index.html')
 
 
-# Debugging: Added for easy viewing
-# Will remove.
-def nav(request):
-  return render(request, 'templates/nav.html')
-
-
-# Debugging: Added for easy viewing
-# Will remove.
-def maybe(request):
-  return render(request, 'templates/maybe.html')
-
-
-# Debugging: Added for easy viewing
-# Will remove.
-def backup(request):
-  return render(request, 'templates/backup.html')
-
-
-# Debugging: Added for easy viewing
-# Will remove.
 def base(request):
   return render(request, 'templates/base_template.html')
 
