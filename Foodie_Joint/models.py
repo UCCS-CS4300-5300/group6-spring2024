@@ -18,7 +18,7 @@ class Item(models.Model):
   description = models.CharField(max_length=500)
   location = models.ForeignKey(Location, on_delete=models.CASCADE, default=None)
   is_recommended = models.BooleanField(default=False, verbose_name="Recommended by Admin")
-
+  # define return string
   def __str__(self):
     return f"{self.name}: {self.description}"
 
@@ -28,7 +28,7 @@ class Review(models.Model):
   #review = models.CharField(max_length=200)
   review = models.TextField()  # Changed this to not limit length (Tyler)
   num_stars = models.IntegerField()
-
+  #define return string
   def __str__(self):
     return f"{self.user} - {self.review} {self.num_stars}"
     # Probably shouldnt have the review in the string representation of obj (Tyler)
