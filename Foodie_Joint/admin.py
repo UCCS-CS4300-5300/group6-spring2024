@@ -11,7 +11,7 @@ from .models import Review
 #                 'https://docs.djangoproject.com/en/5.0/ref/models/querysets/#update'
 #                 'https://docs.djangoproject.com/en/5.0/ref/contrib/admin/#django.contrib.admin.ModelAdmin.list_editable'
 
-# Customize the Admin Interface for the Item Model.
+# Customize the Admin Interface for the Item Model
 class ItemAdmin(admin.ModelAdmin):
   list_display = ["name", "is_recommended",
                   "description"]  # Fields to display in Admin panel
