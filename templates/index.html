@@ -1,11 +1,16 @@
 {% extends 'templates/base_template.html' %} 
 {% load static %} 
-{% load bootstrap5 %}
+{% load bootstrap5 %} 
 {% block title %}Foodie Joint{% endblock %}
 
 <!-- Template specific CSS -->
+<!-- Test comment for commit -->
 {% block additional_styles %}
 <style>
+  #itemRecommendationCard {
+    background-color: #D95A2B;
+  }
+  
   .fade-in {
     animation: fadeIn ease 5s;
     -webkit-animation: fadeIn ease 5s;
@@ -162,16 +167,20 @@
         <div class="col-12">
           <div class="card mb-3" style="max-width: 100%">
             <div class="row g-0">
-              <div class="col-auto bg-primary d-flex align-items-center justify-content-center px-3">
+              <div
+                class="col-auto d-flex align-items-center justify-content-center px-3"
+              id="itemRecommendationCard">
                 <h5 class="text-white m-0">Trending Item</h5>
               </div>
               <div class="col">
                 <div class="card-body">
-                  <h3 class="card-title">Trending Item Name</h3>
-                  <p class="card-text">
-                    Trending Item Review
-                  </p>
+                  {% if recommended_item %}
+                  <h3 class="card-title">{{ recommended_item.name }}</h3>
+                  <p class="card-text">{{ recommended_item.description }}</p>
+                  {% else %}
+                  <p>No recommended items at the moment.</p>
                 </div>
+                {% endif %}
               </div>
             </div>
           </div>

@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-from .models import Location
+from .models import Location, Item
 
 
 def index(request):
-  #return HttpResponse("hello world")
-  return render(request, 'templates/index.html')
+  # Since only one item can be recommended for now, we can just get the first item marked as recommended from the database.
+  recommended_item = Item.objects.filter(is_recommended=True).first()
+  return render(request, 'templates/index.html',
+                {'recommended_item': recommended_item})
 
 
 def base(request):
