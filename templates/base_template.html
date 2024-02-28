@@ -18,8 +18,11 @@
       background-color: #D95A2B;
     }
 
-    .btn {
+    /* Changed this so 'btn' class selector isnt inherited from base_template (Tyler)*/
+    /* To us this button style: `btn btn-primary custom-btn` (orange button)*/
+    .custom-btn {
       background-color: #F27E63;
+      border-color: #F27E63;
     }
 
     #foodieJointText {
@@ -81,7 +84,7 @@
         </ul>
         <ul class="navbar-nav">
           <li class="nav-item">
-            <button class="btn btn-primary">Login</button>
+            <button class="btn btn-primary custom-btn">Login</button>
           </li>
         </ul>
       </div>
