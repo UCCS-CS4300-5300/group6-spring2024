@@ -18,16 +18,26 @@
       background-color: #D95A2B;
     }
 
+    /* https://getbootstrap.com/docs/5.0/components/buttons/ */
     /* Changed this so 'btn' class selector isnt inherited from base_template (Tyler)*/
     /* To us this button style: `btn btn-primary custom-btn` (orange button)*/
     .custom-btn {
       background-color: #F27E63;
-      border-color: #F27E63;
+      border-color: #D6634A;
     }
 
     /* Made hover dark orange instead of blue (Tyler) */
     .custom-btn:hover {
       background-color: #D6634A;
+      border-color: #D6634A;
+    }
+
+    .custom-btn:active {
+      background-color: #FF5733;
+    }
+
+    .custom-btn:focus {
+      background-color: #FF5733;
       border-color: #D6634A;
     }
 
@@ -90,7 +100,7 @@
         </ul>
         <ul class="navbar-nav">
           <li class="nav-item">
-            <button class="btn btn-primary custom-btn">Login</button>
+            <button class="btn btn-success">Login</button>
           </li>
         </ul>
       </div>
