@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login, logout
+#from django.contrib import messages
 from django.http import HttpResponse
 from .models import Location, Item
 
@@ -18,3 +20,6 @@ def nearby(request):
   data = Location.objects.all()
   context = {"locations": data}
   return render(request, 'templates/nearby.html', context)
+
+def login_user(request):
+  return render(request, 'templates/login.html', {})
