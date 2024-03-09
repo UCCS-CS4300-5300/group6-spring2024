@@ -1,0 +1,26 @@
+{% extends 'templates/base_template.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<!-- Resource for scrollbar -->
+<!-- https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar -->
+
+<head>
+</head>
+<body>
+  {% block content %}
+  <div style="margin-top: 65px;">
+  </div>
+  <h1 style="text-align: center">Add Locations!</h1>
+  {% if submitted%}
+    Location Added Successfully
+  {%else%}
+    <form action="" method=POST>
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input type="submit" value="Submit" class="btn btn-secondary">
+    </form>
+  {%endif%}
+  {% endblock content %}
+</body>

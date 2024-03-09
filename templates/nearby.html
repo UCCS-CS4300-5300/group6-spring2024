@@ -7,31 +7,8 @@
 <!-- Resource for scrollbar -->
 <!-- https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar -->
 
-
 <head>
-  <style>
-    .custom-scrollbar {
-      display: block;
-      /* overflow-y:scroll; */  /* Forces scroller to show even if content doesnt overflow */
-      overflow: auto;
-      height: 10em;
-      padding: 1em;
-      margin: 1em auto;
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 15px;
-      height: 8px;
-      background-color: #E5E4E2;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #36454F;
-    }
-  </style>
 </head>
-
-<!-- iterate over stores here (data passed from view) to duplicate cards (Tyler)-->
-<!-- Test comment for commit-->
-
 <body>
   {% block content %}
   <div style="margin-top: 65px;">
@@ -45,7 +22,7 @@
         <div class="card-body" style="display:flex; margin-left: auto;">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <button class="btn custom-btn">Add Location</button>
+              <button class="btn custom-btn" id="addLocationButton">Add Location</button>
             </li>
           </ul>
         </div>
@@ -73,5 +50,28 @@
       {%endfor%} <!-- Moved so cards are in same container (Tyler) -->
     </div>
   </div>
+  <div id="addLocationForm" class="popup">
+      <div class="popup-content">
+        <form action = "/add_location" method = "post">
+          {% csrf_token %}
+          {{ form }}
+          <input type="submit" value="Submit">
+        </form>
+      </div>
+  </div>
+  
+  <script>
+      addLocationButton.addEventListener("click", function () {
+          addLocationForm.classList.add("show");
+      });
+      closeForm.addEventListener("click", function () {
+          addLocationForm.classList.remove("show");
+      });
+      window.addEventListener("click", function (event) {
+          if (event.target == addLocationForm) {
+              addLocationForm.classList.remove("show");
+          }
+      });
+  </script>
   {% endblock content %}
 </body>
