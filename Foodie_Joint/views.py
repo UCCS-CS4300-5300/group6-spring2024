@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 #from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import Location, Item, User, Review, ItemReview, Tag
-from .forms import LocationForm, ItemForm, UserForm, ReviewForm, ItemReviewForm, TagForm
+from .forms import LocationForm, ItemForm, UserForm, ReviewForm, ItemReviewForm, TagForm, ItemTagForm
 
 
 def index(request):
