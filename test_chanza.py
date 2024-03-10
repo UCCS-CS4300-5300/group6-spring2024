@@ -17,6 +17,7 @@ def test_add_location():
   locationForm = LocationForm(data={'name': 'test', 'description': 'test', 'type': 'test', 'address': 'test'})
   assert locationForm.is_valid()
 
+@pytest.mark.django_db
 def test_add_item():
   itemForm = ItemForm(data={'name': 'test', 'description': 'test', 'location': Location.objects.first(), 'is_recommended': False})
   assert itemForm.is_valid()
