@@ -33,4 +33,4 @@ def test_urls():
   urlpatterns = Foodie_Joint.urls.urlpatterns
   assert 'add_location' in [url.name for url in urlpatterns]
   assert 'add_item' in [url.name for url in urlpatterns]
-
+  
