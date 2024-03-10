@@ -34,3 +34,16 @@ def add_location(request):
     if 'submitted' in request.GET:
       submitted = True
   return render(request, 'templates/add_location.html', {'form':form, 'submitted':submitted})
+
+def add_item(request):
+  submitted = False
+  if request.method == 'POST':
+    form = ItemForm(request.POST)
+    if form.is_valid():
+      form.save()
+      return HttpResponseRedirect('/add_item?submitted=True')
+  else:
+    form = ItemForm
+    if 'submitted' in request.GET:
+      submitted = True
+  return render(request, 'templates/add_item.html', {'form':form, 'submitted':submitted})

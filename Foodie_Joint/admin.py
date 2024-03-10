@@ -1,9 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Location
-from .models import Item
-from .models import Review
+from .models import Location, Item, User, Review, ItemReview, Tag, ItemTag
 
 # Create an Item Update Action and Interface for the Admin to Mark an Item as Recommended
 # Resources used: 'https://docs.djangoproject.com/en/5.0/ref/contrib/admin/actions/'
@@ -22,4 +20,8 @@ class ItemAdmin(admin.ModelAdmin):
 
 admin.site.register(Location)
 admin.site.register(Item, ItemAdmin)
+admin.site.register(User)
 admin.site.register(Review)
+admin.site.register(ItemReview)
+admin.site.register(Tag)
+admin.site.register(ItemTag)
