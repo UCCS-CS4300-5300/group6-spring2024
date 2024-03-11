@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import Location, Item, User, Review, ItemReview, Tag
@@ -55,6 +56,7 @@ def register_user(request):
     form = RegisterUserForm()
   return render(request, 'templates/register_user.html', {'form': form,})
 
+@login_required(login_url='/login_user')
 def add_location(request):
   submitted = False
   if request.method == 'POST':
@@ -68,6 +70,7 @@ def add_location(request):
       submitted = True
   return render(request, 'templates/add_location.html', {'form':form, 'submitted':submitted})
 
+@login_required(login_url='/login_user')
 def add_item(request):
   submitted = False
   if request.method == 'POST':

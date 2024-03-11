@@ -1,4 +1,3 @@
-
 {% extends 'templates/base_template.html' %}
 {% load static %}
 {% load bootstrap5 %}
@@ -22,7 +21,7 @@
         <div class="card-body" style="display:flex; margin-left: auto;">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <button class="btn custom-btn"><a href="/add_location">Add Location</a></button>
+              <a button class="btn custom-btn" href="{% url 'add_location' %}">Add Location</a></button>
             </li>
           </ul>
         </div>
@@ -41,7 +40,7 @@
                 <button class="btn custom-btn">View</button>
               </li>
               <li class="nav-item">
-                <button class="btn custom-btn"><a href="/add_item">Add Item</a></button>
+                <a button class="btn custom-btn" href="{% url 'add_item' %}">Add Item</a></button>
               </li>
             </ul>
           </div>
