@@ -1,14 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 #from django.contrib import messages
-
 from django.http import HttpResponse
+from geopy.units import miles
 from .models import Location, Item
-
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import Location, Item, User, Review, ItemReview, Tag
 from .forms import LocationForm, ItemForm, UserForm, ReviewForm, ItemReviewForm, TagForm, ItemTagForm
 
+from django.http import JsonResponse
+import folium
+import requests
+from geopy.distance import distance
 
 
 def index(request):
@@ -54,3 +57,47 @@ def add_item(request):
       submitted = True
   return render(request, 'templates/add_item.html', {'form':form, 'submitted':submitted})
 
+
+
+
+# Reference: https://www.youtube.com/watch?v=AeYxEDM1o2E&ab_channel=BugBytes
+BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json'
+
+def get_distance(address1, address2):
+  response1 = requests.get(f"{BASE_URL}&street={address1}")
+  response2 = requests.get(f"{BASE_URL}&street={address2}")
+
+  data1 = response1.json()
+  data2 = response2.json()
+
+  lat1 = float(data1[0]['lat'])
+  lon1 = float(data1[0]['lon'])
+
+  lat2 = float(data2[0]['lat'])
+  lon2 = float(data2[0]['lon'])
+
+  location1 = (lat1, lon1)
+  location2 = (lat2, lon2)
+
+  return distance(location1, location2).miles
+  
+
+def get_nearby(request):
+  user_address = '1420 Austin Bluffs Pkwy'
+  locations = Location.objects.all()
+
+  sorted_locations = []
+  for location in locations:
+    distance = get_distance(user_address, location.address)
+    sorted_locations.append({'name': location.name, 'distance': distance})
+
+  sorted_locations.sort(key=lambda x: x['distance'])
+
+  context = {
+    'user_address': user_address,
+    'sorted_locations': sorted_locations,
+  }
+  
+  return render(request, 'templates/get_nearby.html', context)
+  #return JsonResponse(response3.json(), safe=False)
+  #return render(request, 'templates/get_nearby.html', response)

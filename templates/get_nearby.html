@@ -1,0 +1,41 @@
+{% extends 'templates/base_template.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+<head>
+</head>
+<body>
+  {% block content %}
+  <div class="container">
+    <!-- {{ m|safe }} -->  <!-- For rendering a folium map object -->
+    <!--
+    
+    <br>
+    <p>Latitude 1: {{lat1}}</p>
+    <br>
+    <p>Longitude 1: {{lon1}}</p>
+    <br>
+    <p>Latitude 2: {{lat2}}</p>
+    <br>
+    <p>Longitude 2: {{lon2}}</p>
+    <br>
+    <p>Distance: {{dist}} miles</p>
+
+    
+    <p>Location 1: {{ address1 }}</p>
+    <br>
+    <p>Location 2: {{ address2 }}</p>
+    <br>
+    <p>Distance: {{ dist }} miles</p>
+    -->
+
+    {% for location in sorted_locations %}
+    <p>{{location.name}} is {{location.distance}} miles away from {{user_address}}</p>
+    <br>
+    {% endfor %}
+    
+  </div>
+  {% endblock content %}
+</body>
