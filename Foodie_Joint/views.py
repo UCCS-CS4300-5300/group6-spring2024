@@ -1,17 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-<<<<<<< HEAD
 from django.contrib import messages
-from django.http import HttpResponse
-from .models import Location, Item
-from django.contrib.auth.forms import UserCreationForm
-from .forms import RegisterUserForm 
-=======
-#from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import Location, Item, User, Review, ItemReview, Tag
-from .forms import LocationForm, ItemForm, UserForm, ReviewForm, ItemReviewForm, TagForm, ItemTagForm
->>>>>>> f0faea1515a2141737845ab5752c8e36effb23d4
+from .forms import LocationForm, ItemForm, ReviewForm, ItemReviewForm, TagForm, ItemTagForm, RegisterUserForm
+from django.contrib.auth.forms import UserCreationForm
+
 
 
 def index(request):
@@ -28,7 +22,38 @@ def nearby(request):
   return render(request, 'templates/nearby.html', context)
 
 def login_user(request):
-  return render(request, 'templates/login.html', {})
+  if request.method == "POST":
+    username = request.POST.get("username")
+    password = request.POST.get("password")
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+      login(request, user)
+      return redirect("index")
+    else:
+      messages.error(request, "Invalid username or password")
+      return redirect("login")
+  else: 
+    return render(request, 'templates/login.html', {})
+
+def logout_user(request):
+  logout(request)
+  messages.success(request, ("Successfully logged out"))
+  return redirect("index")
+
+def register_user(request):
+  if request.method == "POST":
+    form = RegisterUserForm(request.POST)
+    if form.is_valid():
+      form.save()
+      username = form.cleaned_data['username']
+      password = form.cleaned_data['password1']
+      user = authenticate(request, username=username, password=password)
+      login(request, user)
+      messages.success(request, ("Registration successful"))
+      return redirect('index')
+  else:
+    form = RegisterUserForm()
+  return render(request, 'templates/register_user.html', {'form': form,})
 
 def add_location(request):
   submitted = False
