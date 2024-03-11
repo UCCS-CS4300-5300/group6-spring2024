@@ -63,6 +63,10 @@
   <!-- Added navbar-light so the dropdown shows when viewport narrows (Tyler) -->
   <nav class="navbar navbar-expand-sm navbar-light sticky-top" id="navClass">
     <div class="container-fluid align-items-center" id="containerWithinNavClass">
+      
+
+
+      
       <!-- Added link to logo to return home (Tyler) -->
       <a
         class="navbar-brand me-0 d-flex align-items-center"
@@ -97,14 +101,19 @@
           <li class="nav-item">
             <a class="nav-link" href="/nearby">Restaurants</a>
           </li>
-          <li class = "nav-item">
-            <a class="nav-link" href="{% url 'login' %}">Login?</a>
-          </li>
         </ul>
         <ul class="navbar-nav">
+
+
+          {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a button class="btn btn-success" href = "{% url 'logout' %}">Login</a></button>
+            </li>
+          {% else %}
           <li class="nav-item">
-            <button class="btn btn-success" href = "{% url 'login' %}">Login</button>
+            <a button class="btn btn-success" href = "{% url 'login' %}">Login</a></button>
           </li>
+          {% endif %}
         </ul>
       </div>
     </div>
