@@ -9,5 +9,6 @@ urlpatterns = [
     path('logout_user', views.logout_user, name = 'logout'),
     path('register_user', views.register_user, name = 'register'),
     path("add_location", views.add_location, name='add_location'),
-    path("add_item", views.add_item, name='add_item')
+    path("add_item", views.add_item, name='add_item'),
+    path("<str:type>/<int:location_id>/location_details", views.show_location_items, name='location_details')
 ]
