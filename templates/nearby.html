@@ -3,8 +3,8 @@
 {% load bootstrap5 %}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
-<!-- Resource for scrollbar -->
-<!-- https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar -->
+
+<!-- Need to create seperate HTML for store and restaurant pages -->
 
 <head>
 </head>
@@ -12,10 +12,10 @@
   {% block content %}
   <div style="margin-top: 65px;">
   </div>
-  <h1 style="text-align: center">Locations Near You!</h1>
+  <h1 style="text-align: center">Locations Near {{user_address}}!</h1>
   
   <div class="container">
-    <div class="custom-scrollbar">
+    <!--<div class="custom-scrollbar">-->
       <!--Box for 'Add Location Button'-->
       <div class="card">
         <div class="card-body" style="display:flex; margin-left: auto;">
@@ -27,12 +27,14 @@
         </div>
       </div>
       <!--Boxes for each location. Will need to be updated so that for loop is sorted by proximity-->
-      {% for location in locations %}
+      {% for location in sorted_locations %}
+      <!-- Can use name, description, location_type, and address -->
       <div class="card">
         <div class="card-body" style="display:flex;">
           <div>
             <h3>{{location.name}}</h3>
             <p>{{location.description}}</p>
+            <p>{{location.address}} ({{location.distance}} mi)</p>
           </div>
           <div style="margin-left: auto;">
             <ul class="navbar-nav" style="gap:.5rem;">
@@ -47,7 +49,7 @@
         </div>
       </div>
       {%endfor%} <!-- Moved so cards are in same container (Tyler) -->
-    </div>
+    <!--</div>-->
   </div>
   {% endblock content %}
 </body>
