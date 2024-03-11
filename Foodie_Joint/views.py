@@ -19,6 +19,29 @@ def index(request):
 def base(request):
   return render(request, 'templates/base_template.html')
 
+# References:
+# https://geopy.readthedocs.io/en/stable/#module-geopy.distance
+# https://nominatim.org/release-docs/latest/api/Search/
+BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json'
+
+def get_distance(address1, address2):
+  response1 = requests.get(f"{BASE_URL}&street={address1}")
+  response2 = requests.get(f"{BASE_URL}&street={address2}")
+
+  data1 = response1.json()
+  data2 = response2.json()
+
+  lat1 = float(data1[0]['lat'])
+  lon1 = float(data1[0]['lon'])
+
+  lat2 = float(data2[0]['lat'])
+  lon2 = float(data2[0]['lon'])
+
+  location1 = (lat1, lon1)
+  location2 = (lat2, lon2)
+
+  return distance(location1, location2).miles
+  
 #@login_required(login_url='/login_user')
 def nearby(request):
   # Static address as placeholder till User model working
@@ -104,26 +127,4 @@ def add_item(request):
 
 
 
-# References:
-# https://www.youtube.com/watch?v=AeYxEDM1o2E&ab_channel=BugBytes
-# https://geopy.readthedocs.io/en/stable/#module-geopy.distance
-# https://nominatim.org/release-docs/latest/api/Search/
-BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json'
 
-def get_distance(address1, address2):
-  response1 = requests.get(f"{BASE_URL}&street={address1}")
-  response2 = requests.get(f"{BASE_URL}&street={address2}")
-
-  data1 = response1.json()
-  data2 = response2.json()
-
-  lat1 = float(data1[0]['lat'])
-  lon1 = float(data1[0]['lon'])
-
-  lat2 = float(data2[0]['lat'])
-  lon2 = float(data2[0]['lon'])
-
-  location1 = (lat1, lon1)
-  location2 = (lat2, lon2)
-
-  return distance(location1, location2).miles
