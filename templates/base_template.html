@@ -107,11 +107,15 @@
 
           {% if user.is_authenticated %}
             <li class="nav-item">
-              <a button class="btn btn-success" href = "{% url 'logout' %}">Login</a></button>
+              <a button class="btn btn-success" href = "{% url 'logout' %}">Logout</a></button>
             </li>
           {% else %}
-          <li class="nav-item">
+          <li class="nav-item px-2">
             <a button class="btn btn-success" href = "{% url 'login' %}">Login</a></button>
+          </li>
+
+          <li class="nav-item">
+            <a button class="btn btn-success" href = "{% url 'register' %}">Register</a></button>
           </li>
           {% endif %}
         </ul>
