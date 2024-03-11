@@ -2,15 +2,22 @@ from django.db import models
 
 # Create your models here.
 class Location(models.Model):
+  RESTAURANT = "Restaurant"
+  STORE = "Store"
+  LOCATION_CHOICES = {
+    RESTAURANT: "Restaurant",
+    STORE: "Store",
+  }
+  
   name = models.CharField(max_length=50)
   description = models.CharField(max_length=500)
   #Possibly subject to change, if we keep type then we only need 2 classes, 
   #but otherwise we'll need 4 classes. (Store or Restaurant)
-  type = models.CharField(max_length=10)
+  location_type = models.CharField(max_length=10, choices=LOCATION_CHOICES)
   address = models.CharField(max_length=50)
 
   def __str__(self):
-    return f"{self.name}: {self.description} ({self.type}, {self.address})"
+    return f"{self.name}: {self.description} ({self.location_type}, {self.address})"
 
 
 #Based on user stories, the item class will have to be updated
@@ -28,11 +35,9 @@ class User(models.Model):
   firstName = models.CharField(max_length=50)
   lastName = models.CharField(max_length=50)
   email = models.CharField(max_length=50)
-  zipcode = models.CharField(max_length=10)
+  address = models.CharField(max_length=50)
   password = models.CharField(max_length=50)
   
-
-
   def __str__(self):
     return f"{self.username}"
 

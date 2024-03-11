@@ -12,13 +12,13 @@ class RegisterUserForm(UserCreationForm):
       max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
   last_name = forms.CharField(
       max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
-  zipcode = forms.IntegerField(widget=forms.NumberInput(
-      attrs={'class': 'form-control'}))
+  address = forms.CharField(
+    max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
 
   class Meta:
     model = User
     fields = [
-        'username', 'first_name', 'last_name', 'email', 'zipcode', 'password1',
+        'username', 'first_name', 'last_name', 'email', 'address', 'password1',
         'password2'
     ]
 
@@ -34,7 +34,7 @@ class LocationForm(ModelForm):
 
   class Meta:
     model = Location
-    fields = ['name', 'description', 'type', 'address']
+    fields = ['name', 'description', 'location_type', 'address']
 
 
 class ItemForm(forms.ModelForm):

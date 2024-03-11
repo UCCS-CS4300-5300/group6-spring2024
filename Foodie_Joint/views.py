@@ -89,7 +89,10 @@ def add_item(request):
 
 
 
-# Reference: https://www.youtube.com/watch?v=AeYxEDM1o2E&ab_channel=BugBytes
+# References:
+# https://www.youtube.com/watch?v=AeYxEDM1o2E&ab_channel=BugBytes
+# https://geopy.readthedocs.io/en/stable/#module-geopy.distance
+# https://nominatim.org/release-docs/latest/api/Search/
 BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json'
 
 def get_distance(address1, address2):
@@ -111,8 +114,11 @@ def get_distance(address1, address2):
   return distance(location1, location2).miles
   
 
+@login_required(login_url='/login_user')
 def get_nearby(request):
-  user_address = '1420 Austin Bluffs Pkwy'
+  #user_address = '1420 Austin Bluffs Pkwy'
+  user = request.user
+  user_address = user.address
   locations = Location.objects.all()
 
   sorted_locations = []
@@ -128,5 +134,6 @@ def get_nearby(request):
   }
   
   return render(request, 'templates/get_nearby.html', context)
+  
   #return JsonResponse(response3.json(), safe=False)
   #return render(request, 'templates/get_nearby.html', response)
