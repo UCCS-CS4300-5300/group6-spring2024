@@ -12,6 +12,7 @@ class Location(models.Model):
   def __str__(self):
     return f"{self.name}: {self.description} ({self.type}, {self.address})"
 
+
 #Based on user stories, the item class will have to be updated
 class Item(models.Model):
   name = models.CharField(max_length=50)
@@ -22,12 +23,21 @@ class Item(models.Model):
   def __str__(self):
     return f"{self.name}: {self.description}"
 
+class User(models.Model):
+  username = models.CharField(max_length=50)
+  firstName = models.CharField(max_length=50)
+  lastName = models.CharField(max_length=50)
+  password = models.CharField(max_length=50)
+  email = models.CharField(max_length=50)
+  zipcode = models.CharField(max_length=10)
+
 class Review(models.Model):
   user = models.CharField(max_length=50)
   location = models.ForeignKey(Location, on_delete=models.CASCADE)
   #review = models.CharField(max_length=200)
   review = models.TextField()  # Changed this to not limit length (Tyler)
   num_stars = models.IntegerField()
+  date_created = models.DateTimeField(auto_now_add=True)
   #define return string
   def __str__(self):
     return f"{self.user} - {self.review} {self.num_stars}"
