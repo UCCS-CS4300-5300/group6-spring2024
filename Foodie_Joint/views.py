@@ -84,3 +84,10 @@ def add_item(request):
       submitted = True
   return render(request, 'templates/add_item.html', {'form':form, 'submitted':submitted})
 
+# Renders a specific location's details and its associated items.
+def show_location_items(request, location_id, type):
+  # Location better exist, else something's amiss.
+  location = get_object_or_404(Location, pk=location_id)
+  items = Item.objects.filter(location=location)
+  context = {'location' : location, 'items' : items,}
+  return render(request, 'templates/location_item_info.html', context)
