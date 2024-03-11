@@ -8,7 +8,6 @@ from .forms import LocationForm, ItemForm, ReviewForm, ItemReviewForm, TagForm, 
 from django.contrib.auth.forms import UserCreationForm
 from geopy.distance import distance
 from geopy.units import miles
-import folium  # Potentially remove
 import requests  # Used to request info from API
 
 
