@@ -7,31 +7,8 @@
 <!-- Resource for scrollbar -->
 <!-- https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar -->
 
-
 <head>
-  <style>
-    .custom-scrollbar {
-      display: block;
-      /* overflow-y:scroll; */  /* Forces scroller to show even if content doesnt overflow */
-      overflow: auto;
-      height: 10em;
-      padding: 1em;
-      margin: 1em auto;
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 15px;
-      height: 8px;
-      background-color: #E5E4E2;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #36454F;
-    }
-  </style>
 </head>
-
-<!-- iterate over stores here (data passed from view) to duplicate cards (Tyler)-->
-<!-- Test comment for commit-->
-
 <body>
   {% block content %}
   <div style="margin-top: 65px;">
@@ -45,7 +22,7 @@
         <div class="card-body" style="display:flex; margin-left: auto;">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <button class="btn custom-btn">Add Location</button>
+              <button class="btn custom-btn"><a href="/add_location">Add Location</a></button>
             </li>
           </ul>
         </div>
@@ -64,7 +41,7 @@
                 <button class="btn custom-btn">View</button>
               </li>
               <li class="nav-item">
-                <button class="btn custom-btn">Add</button>
+                <button class="btn custom-btn"><a href="/add_item">Add Item</a></button>
               </li>
             </ul>
           </div>

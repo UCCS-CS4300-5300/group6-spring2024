@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "files": {
     "django_project/settings.py": [
       {
@@ -9,4 +10,7 @@
       }
     ]
   }
+=======
+  "files": {}
+>>>>>>> f0faea1515a2141737845ab5752c8e36effb23d4
 }
