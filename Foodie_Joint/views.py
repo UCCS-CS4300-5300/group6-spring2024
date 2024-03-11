@@ -20,9 +20,25 @@ def index(request):
 def base(request):
   return render(request, 'templates/base_template.html')
 
+#@login_required(login_url='/login_user')
 def nearby(request):
-  data = Location.objects.all()
-  context = {"locations": data}
+  # Static address as placeholder till User model working
+  user_address = '1420 Austin Bluffs Pkwy'
+  #user = request.user
+  #user_address = user.address
+  locations = Location.objects.all()
+
+  sorted_locations = []
+  for location in locations:
+    distance = get_distance(user_address, location.address)
+    sorted_locations.append({'name': location.name, 'description':location.description, 'location_type':location.location_type, 'address':location.address, 'distance': distance})
+
+  sorted_locations.sort(key=lambda x: x['distance'])
+
+  context = {
+    'user_address': user_address,
+    'sorted_locations': sorted_locations,
+  }
   return render(request, 'templates/nearby.html', context)
 
 def login_user(request):
@@ -112,28 +128,3 @@ def get_distance(address1, address2):
   location2 = (lat2, lon2)
 
   return distance(location1, location2).miles
-  
-
-@login_required(login_url='/login_user')
-def get_nearby(request):
-  #user_address = '1420 Austin Bluffs Pkwy'
-  user = request.user
-  user_address = user.address
-  locations = Location.objects.all()
-
-  sorted_locations = []
-  for location in locations:
-    distance = get_distance(user_address, location.address)
-    sorted_locations.append({'name': location.name, 'distance': distance})
-
-  sorted_locations.sort(key=lambda x: x['distance'])
-
-  context = {
-    'user_address': user_address,
-    'sorted_locations': sorted_locations,
-  }
-  
-  return render(request, 'templates/get_nearby.html', context)
-  
-  #return JsonResponse(response3.json(), safe=False)
-  #return render(request, 'templates/get_nearby.html', response)
