@@ -54,6 +54,23 @@
     a, .nav-link, .btn {
       color: #fff !important;
     }
+
+    /* Styling used in nearby,html (Zach) */
+    .custom-scrollbar {
+      display: block;
+      /* overflow-y:scroll; */  /* Forces scroller to show even if content doesnt overflow */
+      overflow: auto;
+      height: 20em;
+      margin: auto;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 15px;
+      height: 38px;
+      background-color: #E5E4E2;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #36454F;
+    }
   </style>
   <!-- Added a block to contain custom styling on a per-template basis -->
   {% block additional_styles %}{% endblock %}
