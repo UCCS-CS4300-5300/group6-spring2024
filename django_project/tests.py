@@ -63,6 +63,7 @@ class NearbyViewTest(TestCase):
     response = self.client.get(reverse('nearby'))
     self.assertEqual(response.status_code, 200)
     self.assertContains(response, "No locations found! Please add some locations to get started.")
+
+  # Add test, testing user logged in and gets user address (when implemented)
     
 ############# END OF TYLER CARROLL TESTS #############
-    
