@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User as TrueUser
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # Create your models here.
 class Location(models.Model):
@@ -40,8 +43,22 @@ class User(models.Model):
   def __str__(self):
     return f"{self.username}"
 
-class CustomUser(AbstractUser):
-  address = models.CharField(max_length=50)
+
+class Address(models.Model):
+  user = models.ForeignKey(TrueUser, on_delete=models.CASCADE,
+  address = models.CharField(max_length=50))
+
+@receiver(post_save, sender=TrueUser)
+def create_user_profile(sender, instance, created, **kwargs):
+  if created:
+    Address.objects.create(user=instance)
+
+@receiver(post_save, sender=TrueUser)
+def save_user_profile(sender, instance, **kwargs):
+  instance.address.save()
+
+  
+  
 
 
 class Review(models.Model):
