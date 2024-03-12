@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Location, Item, User, Review, ItemReview, Tag, ItemTag
+from .models import Location, Item, User, Review, ItemReview, Tag, CustomUser, ItemTag
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
@@ -16,7 +16,7 @@ class RegisterUserForm(UserCreationForm):
     max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
 
   class Meta:
-    model = User
+    model = CustomUser
     fields = [
         'username', 'first_name', 'last_name', 'email', 'address', 'password1',
         'password2'
