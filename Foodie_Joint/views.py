@@ -2,11 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .models import Location, Item, User, Review, ItemReview, Tag
 from .forms import LocationForm, ItemForm, ReviewForm, ItemReviewForm, TagForm, ItemTagForm, RegisterUserForm
 from django.contrib.auth.forms import UserCreationForm
-
+from geopy.distance import distance
+from geopy.units import miles
+import requests  # Used to request info from API
 
 
 def index(request):
@@ -17,10 +19,86 @@ def index(request):
 def base(request):
   return render(request, 'templates/base_template.html')
 
+# References:
+# https://geopy.readthedocs.io/en/stable/#module-geopy.distance
+# https://nominatim.org/release-docs/latest/api/Search/
+BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json'
+
+# Potentially move out of views.py
+def get_distance(address1, address2):
+  try:
+    response1 = requests.get(f"{BASE_URL}&street={address1}")
+    response2 = requests.get(f"{BASE_URL}&street={address2}")
+
+    # Error handling: https://requests.readthedocs.io/en/latest/user/quickstart/#errors-and-exceptions
+    response1.raise_for_status()
+    response2.raise_for_status()
+
+    data1 = response1.json()
+    data2 = response2.json()
+
+    lat1 = float(data1[0]['lat'])
+    lon1 = float(data1[0]['lon'])
+
+    lat2 = float(data2[0]['lat'])
+    lon2 = float(data2[0]['lon'])
+
+    location1 = (lat1, lon1)
+    location2 = (lat2, lon2)
+
+    return distance(location1, location2).miles
+
+  # In case request fails an error is printed to console
+  except requests.exceptions.RequestException as err:
+    print(f"An error occured: {err}")
+    return None
+  
+
+#@login_required(login_url='/login_user')
 def nearby(request):
-  data = Location.objects.all()
-  context = {"locations": data}
-  return render(request, 'templates/nearby.html', context)
+  context = {}
+  # Static address as placeholder till User model working
+  user_address = '1420 Austin Bluffs Pkwy'
+  #user = request.user
+  #user_address = user.address
+  locations = Location.objects.all()
+
+  if locations.exists():
+    # Applying a filter (through href in navbar) on locations to only get store/restaurant objects
+    loc_type = request.GET.get('type')
+    if loc_type:
+      locations = locations.filter(location_type=loc_type)
+
+    sorted_locations = []
+    for location in locations:
+      distance = get_distance(user_address, location.address)
+      # Checking get_distance request went through/didnt return None
+      if distance is not None:
+        rounded_distance = round(distance, 2)
+        sorted_locations.append({
+          'name': location.name,
+          'description':location.description,
+          'location_type':location.location_type,
+          'address':location.address,
+          'distance': distance,
+          'rounded_distance': rounded_distance,
+        })
+
+    # Sorting in ascending order of distance (https://blogboard.io/blog/knowledge/python-sorted-lambda/)
+    # If the distance key is not found in sorted_locations, it will be sorted by the default value of float('inf')
+    sorted_locations.sort(key=lambda location: location.get('distance', float('inf')))
+
+    context = {
+      'user_address': user_address,
+      'sorted_locations': sorted_locations,
+    }
+    return render(request, 'templates/nearby.html', context) 
+  else:
+    context['no_locations'] = True
+    return render(request, 'templates/nearby.html', context)
+    
+
+  
 
 def login_user(request):
   if request.method == "POST":
@@ -83,4 +161,7 @@ def add_item(request):
     if 'submitted' in request.GET:
       submitted = True
   return render(request, 'templates/add_item.html', {'form':form, 'submitted':submitted})
+
+
+
 

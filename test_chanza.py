@@ -10,11 +10,12 @@ def test_add_location_form():
   form = LocationForm()
   assert form.fields['name'].required
   assert form.fields['description'].required
-  assert form.fields['type'].required
+  assert form.fields['location_type'].required
   assert form.fields['address'].required
 
 def test_add_location():
-  locationForm = LocationForm(data={'name': 'test', 'description': 'test', 'type': 'test', 'address': 'test'})
+  print(next(iter(Location.LOCATION_CHOICES.keys())))
+  locationForm = LocationForm(data={'name': 'test', 'description': 'test', 'location_type': next(iter(Location.LOCATION_CHOICES.keys())), 'address': 'test'})
   assert locationForm.is_valid()
 
 @pytest.mark.django_db
