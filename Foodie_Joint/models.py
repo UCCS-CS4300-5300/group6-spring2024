@@ -43,7 +43,7 @@ class User(models.Model):
   def __str__(self):
     return f"{self.username}"
 
-
+"""
 class Address(models.Model):
   user = models.ForeignKey(TrueUser, on_delete=models.CASCADE,
   address = models.CharField(max_length=50))
@@ -51,6 +51,8 @@ class Address(models.Model):
   def __init__(self, *args, temp=65, **kwargs):
      self.temp = temp
      return super().__init__(*args, **kwargs)
+
+
     
 @receiver(post_save, sender=TrueUser)
 def create_user_address(sender, instance, created, **kwargs):
@@ -64,7 +66,7 @@ def save_user_profile(sender, instance, **kwargs):
 
   
   
-
+"""
 
 class Review(models.Model):
   user = models.CharField(max_length=50)
