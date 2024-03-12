@@ -17,7 +17,8 @@
 
   .bottom-btn {
     margin-left: 11%;
-    margin-top: 3%;
+    margin-top: 1.5%;
+    margin-bottom: 3%;
   }
 
   @media (max-width: 768px) {
@@ -47,7 +48,7 @@
   <div class="row">
     <div class="col"></div>
     <div class="col-6 bg-light">
-      <div class="ratio ratio-1x1" style="max-width: 980px; margin: auto;">
+      <div class="ratio ratio-1x1" style="max-width: 366px; margin: auto;">
         <div class="d-flex justify-content-center align-items-center bg-light" style="height: 100%;">
           <h6>Image Placeholder</h6>
         </div>
@@ -78,10 +79,10 @@
           </div>
         </div>
       </div>
-      <a href="your_target_url_here" class="stretched-link"></a>
+      <a href="your_item_reviews_url_here" class="stretched-link"></a>
     </div>
   </div>
   {% endfor %}
 </div>
-<a class="btn custom-btn custom-btn-smaller bottom-btn" href="{% url 'nearby' %}"> < Back</a>
+<button class="btn custom-btn custom-btn-smaller bottom-btn" onclick="window.history.back();">Back</button>
 {% endblock %}
