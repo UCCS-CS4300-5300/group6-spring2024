@@ -1,0 +1,87 @@
+<!-- NOTE! The hyperlink <a> tag that's needed to add the route to the Item Details page is currently found on line 81 of this template. -->
+
+{% extends 'templates/base_template.html' %}
+
+{% block content %}
+<style>
+  .card-row {
+    max-width: 78%;
+    margin: 0 auto;
+  }
+
+  .img-fluid {
+    height: 100px;
+    object-fit: cover;
+    width: auto;
+  }
+
+  .bottom-btn {
+    margin-left: 11%;
+    margin-top: 3%;
+  }
+
+  @media (max-width: 768px) {
+    .img-fluid {
+      width: 100%; /* Full width on smaller screens */
+      height: auto; /* Adjusts height automatically */
+    }
+
+    .col-md-2, .col-md-8 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 364px) {
+    .custom-btn-smaller {
+      font-size: 0.75rem; /* Smaller font size */
+      padding: .25rem .5rem; /* Smaller padding */
+    }
+  }
+</style>
+
+<div class="container text-center">
+  <h1 style="margin-top:65px;">{{ location.name }}</h1>
+
+  <!-- Main image -->
+  <div class="row">
+    <div class="col"></div>
+    <div class="col-6 bg-light">
+      <div class="ratio ratio-1x1" style="max-width: 980px; margin: auto;">
+        <div class="d-flex justify-content-center align-items-center bg-light" style="height: 100%;">
+          <h6>Image Placeholder</h6>
+        </div>
+      </div>
+    </div>
+    <div class="col"></div>
+  </div>
+
+  <!-- Add Item button -->
+  <div class="row">
+    <div class="col"></div>
+    <div class="col-7" style="height: 48px;"></div>
+    <div class="col position-relative">
+      <a class="btn custom-btn custom-btn-smaller position-absolute bottom-0 start-0 mb-3" href="{% url 'add_item' %}">Add Item</a>
+    </div>
+  </div>
+
+  {% for item in items %}
+  <div class="row justify-content-center mb-0">
+    <div class="card card-row m-0 position-relative">
+      <div class="row">
+        <div class="col-2 d-flex align-items-center justify-content-center">
+          <img src="https://harmlessharvest.com/cdn/shop/files/harmless-harvest-12oz-organic-pink-coconut-water.png" class="img-fluid rounded-start" alt="{{ item.name }}">
+        </div>
+        <div class="col d-flex align-items-center ms-1 justify-content-center"> 
+          <div class="card-body text-start">
+            <h2 class="card-title mb-0">{{ item.name }}</h2>
+          </div>
+        </div>
+      </div>
+      <a href="your_target_url_here" class="stretched-link"></a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<a class="btn custom-btn custom-btn-smaller bottom-btn" href="{% url 'nearby' %}"> < Back</a>
+{% endblock %}
