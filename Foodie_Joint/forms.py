@@ -4,6 +4,7 @@ from .models import Location, Item, User, Review, ItemReview, Tag, CustomUser, I
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
+# NOTE: ADD VALIDATION TO ADDRESS PARAMETER ENSUIRNG ITS REAL (TC)
 
 class RegisterUserForm(UserCreationForm):
   email = forms.EmailField(widget=forms.EmailInput(

@@ -12,8 +12,6 @@ class Location(models.Model):
   
   name = models.CharField(max_length=50)
   description = models.CharField(max_length=500)
-  #Possibly subject to change, if we keep type then we only need 2 classes, 
-  #but otherwise we'll need 4 classes. (Store or Restaurant)
   location_type = models.CharField(max_length=10, choices=LOCATION_CHOICES)
   address = models.CharField(max_length=50)
 

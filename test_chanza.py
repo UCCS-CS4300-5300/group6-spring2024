@@ -6,6 +6,8 @@ import Foodie_Joint.views
 from Foodie_Joint.models import Location, Item
 from Foodie_Joint.forms import LocationForm, ItemForm
 
+# Run these tests with 'pytest'
+
 def test_add_location_form():
   form = LocationForm()
   assert form.fields['name'].required
