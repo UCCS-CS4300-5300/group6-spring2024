@@ -55,7 +55,8 @@ class Address(models.Model):
 @receiver(post_save, sender=TrueUser)
 def create_user_address(sender, instance, created, **kwargs):
   if created:
-    Address.objects.create(user=instance)
+      my_address = Address()
+      my_address.user = instance
 
 @receiver(post_save, sender=TrueUser)
 def save_user_profile(sender, instance, **kwargs):
