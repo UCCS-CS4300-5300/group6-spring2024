@@ -14,15 +14,19 @@ import requests  # Used to request info from API
 def index(request):
   # Since only one item can be recommended for now, we can just get the first item marked as recommended from the database.
   recommended_item = Item.objects.filter(is_recommended=True).first()
-  return render(request, 'templates/index.html', {'recommended_item': recommended_item})
+  return render(request, 'templates/index.html',
+                {'recommended_item': recommended_item})
+
 
 def base(request):
   return render(request, 'templates/base_template.html')
+
 
 # References:
 # https://geopy.readthedocs.io/en/stable/#module-geopy.distance
 # https://nominatim.org/release-docs/latest/api/Search/
 BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json'
+
 
 # Potentially move out of views.py
 def get_distance(address1, address2):
@@ -52,7 +56,7 @@ def get_distance(address1, address2):
   except requests.exceptions.RequestException as err:
     print(f"An error occured: {err}")
     return None
-  
+
 
 #@login_required(login_url='/login_user')
 def nearby(request):
@@ -76,29 +80,29 @@ def nearby(request):
       if distance is not None:
         rounded_distance = round(distance, 2)
         sorted_locations.append({
-          'name': location.name,
-          'description':location.description,
-          'location_type':location.location_type,
-          'address':location.address,
-          'distance': distance,
-          'rounded_distance': rounded_distance,
+            'name': location.name,
+            'description': location.description,
+            'location_type': location.location_type,
+            'address': location.address,
+            'distance': distance,
+            'rounded_distance': rounded_distance,
+            'id': location.id  # needed for location_item_info template
         })
 
     # Sorting in ascending order of distance (https://blogboard.io/blog/knowledge/python-sorted-lambda/)
     # If the distance key is not found in sorted_locations, it will be sorted by the default value of float('inf')
-    sorted_locations.sort(key=lambda location: location.get('distance', float('inf')))
+    sorted_locations.sort(
+        key=lambda location: location.get('distance', float('inf')))
 
     context = {
-      'user_address': user_address,
-      'sorted_locations': sorted_locations,
+        'user_address': user_address,
+        'sorted_locations': sorted_locations,
     }
-    return render(request, 'templates/nearby.html', context) 
+    return render(request, 'templates/nearby.html', context)
   else:
     context['no_locations'] = True
     return render(request, 'templates/nearby.html', context)
-    
 
-  
 
 def login_user(request):
   if request.method == "POST":
@@ -111,13 +115,15 @@ def login_user(request):
     else:
       messages.error(request, "Invalid username or password")
       return redirect("login")
-  else: 
+  else:
     return render(request, 'templates/login.html', {})
+
 
 def logout_user(request):
   logout(request)
   messages.success(request, ("Successfully logged out"))
   return redirect("index")
+
 
 def register_user(request):
   if request.method == "POST":
@@ -132,7 +138,10 @@ def register_user(request):
       return redirect('index')
   else:
     form = RegisterUserForm()
-  return render(request, 'templates/register_user.html', {'form': form,})
+  return render(request, 'templates/register_user.html', {
+      'form': form,
+  })
+
 
 @login_required(login_url='/login_user')
 def add_location(request):
@@ -146,7 +155,11 @@ def add_location(request):
     form = LocationForm
     if 'submitted' in request.GET:
       submitted = True
-  return render(request, 'templates/add_location.html', {'form':form, 'submitted':submitted})
+  return render(request, 'templates/add_location.html', {
+      'form': form,
+      'submitted': submitted
+  })
+
 
 @login_required(login_url='/login_user')
 def add_item(request):
@@ -160,8 +173,18 @@ def add_item(request):
     form = ItemForm
     if 'submitted' in request.GET:
       submitted = True
-  return render(request, 'templates/add_item.html', {'form':form, 'submitted':submitted})
+  return render(request, 'templates/add_item.html', {
+      'form': form,
+      'submitted': submitted
+  })
 
 
-
-
+# Renders a specific location's details and its associated items.
+def show_location_items(request, location_id):
+  location = get_object_or_404(Location, pk=location_id)
+  items = location.item_set.all()
+  context = {
+      'location': location,
+      'items': items,
+  }
+  return render(request, 'templates/location_item_info.html', context)
