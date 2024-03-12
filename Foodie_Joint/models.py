@@ -48,8 +48,12 @@ class Address(models.Model):
   user = models.ForeignKey(TrueUser, on_delete=models.CASCADE,
   address = models.CharField(max_length=50))
 
+  def __init__(self, *args, temp=65, **kwargs):
+     self.temp = temp
+     return super().__init__(*args, **kwargs)
+    
 @receiver(post_save, sender=TrueUser)
-def create_user_profile(sender, instance, created, **kwargs):
+def create_user_address(sender, instance, created, **kwargs):
   if created:
     Address.objects.create(user=instance)
 
