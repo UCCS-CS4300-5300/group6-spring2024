@@ -113,10 +113,11 @@
       <div class="collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="navbar-nav me-auto w-50 justify-content-evenly">
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="/nearby">Stores</a>
+            <!-- Added 'type' query parameter so can reuse template/view (TC) -->
+            <a class="nav-link" aria-current="page" href="/nearby?type=Store">Stores</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/nearby">Restaurants</a>
+            <a class="nav-link" href="/nearby?type=Restaurant">Restaurants</a>
           </li>
         </ul>
         <ul class="navbar-nav">
