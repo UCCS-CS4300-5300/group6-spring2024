@@ -191,6 +191,3 @@ def show_location_items(request, location_id):
   }
   return render(request, 'templates/location_item_info.html', context)
 
-
-
-
