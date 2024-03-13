@@ -13,4 +13,5 @@ urlpatterns = [
     path("location/<int:location_id>/details",
          views.show_location_items,
          name='location_details'),
+    path("add_review", views.add_review, name='add_review')
 ]
