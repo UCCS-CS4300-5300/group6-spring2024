@@ -16,11 +16,41 @@
   }
 
   .bottom-btn {
-    margin-left: 11%;
+    margin-left: 10.44%;
     margin-top: 1.5%;
     margin-bottom: 3%;
   }
 
+  .location-details {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    padding: 10px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    background-color: #D95A2B;
+  }
+
+
+  .flex-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+  }
+
+  .location-description {
+    display: flex;
+    flex-wrap: nowrap;
+  }
+  
+  .directions-btn {
+    display: flex;
+    margin-right: 10px; /* Adjusts spacing to the container edge */
+    padding: 5px 10px; /* Smaller padding for a compact look */
+    font-size: 0.75rem; /* Smaller font size */
+  }
+  
   @media (max-width: 768px) {
     .img-fluid {
       width: 100%; /* Full width on smaller screens */
@@ -32,12 +62,12 @@
       max-width: 100%;
     }
   }
-
+  
   @media (max-width: 364px) {
-    .custom-btn-smaller {
-      font-size: 0.75rem; /* Smaller font size */
-      padding: .25rem .5rem; /* Smaller padding */
-    }
+    .directions-btn {
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      margin-right: 8px; 
   }
 </style>
 
@@ -57,6 +87,37 @@
     <div class="col"></div>
   </div>
 
+  <!-- Rectangular section for location details with adjusted structure -->
+  <div class="row">
+    <div class="col"></div>
+    <div class="col-6">
+      <div class="location-details" style="margin-left: -12px; margin-right: -12px;">
+        <div class="flex-row"> 
+          
+          <!-- Address and Directions Line -->
+          <div class="location-description">
+            {% if location.address %}
+              <strong margin-right: 5px">Address:</strong>{{location.address}}
+            {% else %}
+              <strong>Location Address Not Present, Please Contact An Administrator</strong>
+            {% endif %}
+          </div>
+          <a class="btn custom-btn directions-btn" href="https://www.google.com/maps/search/?api=1&query={{ location.address|urlencode }}" target="_blank">Directions</a>
+        </div>
+
+        <!-- Location Description Line -->
+        <div class="location-description">
+          {% if location.description %}
+            <strong>Description:</strong><p>{{location.description}}</p>
+          {% else %}
+            <strong style="color: #f8f9fa;">There is no description for this location yet.</strong>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col"></div>
+  </div>
+
   <!-- Add Item button -->
   <div class="row">
     <div class="col"></div>
@@ -66,7 +127,9 @@
     </div>
   </div>
 
-  {% for item in items %}
+  <!-- Item List -->
+  {% if items %}
+    {% for item in items %}
   <div class="row justify-content-center mb-0">
     <div class="card card-row m-0 position-relative">
       <div class="row">
@@ -79,10 +142,30 @@
           </div>
         </div>
       </div>
+      
+      <!-- Link to Item Details page -->
       <a href="your_item_reviews_url_here" class="stretched-link"></a>
+      
     </div>
   </div>
-  {% endfor %}
+    {% endfor %}
+  {% else %}
+  <div class="row justify-content-center mb-0">
+    <div class="card card-row m-0 position-relative">
+      <div class="row">
+        <div class="col-2 d-flex align-items-center justify-content-center">
+        </div>
+        <div class="col d-flex align-items-center ms-1 justify-content-center"> 
+          <div class="card-body text-start">
+            <h3 class="card-title mb-0">No items exist yet for this location.</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 </div>
-<button class="btn custom-btn custom-btn-smaller bottom-btn" onclick="window.history.back();">Back</button>
+<div class=container>
+  <button class="btn custom-btn custom-btn-smaller bottom-btn" onclick="window.history.back();">Back</button>
+</div>
 {% endblock %}
