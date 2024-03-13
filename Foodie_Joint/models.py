@@ -41,11 +41,19 @@ class User(models.Model):
 
 
 class Review(models.Model):
+  NUM_STARS = {
+    1: '1',
+    2: '2',
+    3: '3',
+    4: '4',
+    5: '5', 
+  }
+
   user = models.CharField(max_length=50)
   location = models.ForeignKey(Location, on_delete=models.CASCADE)
   #review = models.CharField(max_length=200)
   review = models.TextField()  # Changed this to not limit length (Tyler)
-  num_stars = models.IntegerField()
+  num_stars = models.IntegerField(choices=NUM_STARS)
   date_created = models.DateTimeField(auto_now_add=True)
   #define return string
   def __str__(self):

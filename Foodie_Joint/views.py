@@ -183,9 +183,11 @@ def add_item(request):
 def show_location_items(request, location_id):
   location = get_object_or_404(Location, pk=location_id)
   items = location.item_set.all()
+  reviews = Review.objects.filter(location=location)
   context = {
       'location': location,
       'items': items,
+      'reviews': reviews
   }
   return render(request, 'templates/location_item_info.html', context)
 
