@@ -184,6 +184,7 @@ def show_location_items(request, location_id):
   location = get_object_or_404(Location, pk=location_id)
   items = location.item_set.all()
   reviews = Review.objects.filter(location=location)
+<<<<<<< HEAD
   context = {
       'location': location,
       'items': items,
@@ -191,3 +192,73 @@ def show_location_items(request, location_id):
   }
   return render(request, 'templates/location_item_info.html', context)
 
+=======
+  if items.exists():
+    item_list = []
+    for item in items:
+      item_list.append({
+        'name': item.name,
+        'description': item.description,
+        'location': item.location,
+        'is_recommended': item.is_recommended,
+        'id': item.id
+      })
+    context = {
+      'location': location,
+      'items': item_list,
+      'reviews': reviews,
+    }
+  else:
+    context = {
+      'location': location,
+      'items': items,
+      'reviews': reviews,
+    }
+  return render(request, 'templates/location_item_info.html', context)
+
+
+@login_required(login_url='/login_user')
+def add_review(request):
+   submitted = False
+   if request.method == 'POST':
+     form = ReviewForm(request.POST)
+     if form.is_valid():
+       form.save()
+       return HttpResponseRedirect('/add_review?submitted=True')
+   else:
+     form = ReviewForm
+     if 'submitted' in request.GET:
+       submitted = True
+   return render(request, 'templates/add_review.html', {
+       'form': form,
+       'submitted': submitted
+   })
+
+
+@login_required(login_url='/login_user')
+def add_review_item(request):
+  submitted = False
+  if request.method == 'POST':
+    form = ItemReviewForm(request.POST)
+    if form.is_valid():
+      form.save()
+      return HttpResponseRedirect('/add_review_item?submitted=True')
+  else:
+    form = ItemReviewForm
+    if 'submitted' in request.GET:
+      submitted = True
+  return render(request, 'templates/add_review_item.html', {
+    'form': form,
+    'submitted': submitted
+  })
+
+def item_info(request, item_id):
+  item = get_object_or_404(Item, pk=item_id)
+  reviews = ItemReview.objects.filter(item=item)
+  context = {
+    'item': item,
+    'reviews': reviews
+  }
+  return render(request, 'templates/item_info.html', context)
+    
+>>>>>>> GoodermontBranch
