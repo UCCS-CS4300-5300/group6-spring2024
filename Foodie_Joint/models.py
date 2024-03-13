@@ -50,7 +50,7 @@ class Review(models.Model):
     5: '5', 
   }
   
-  user = models.CharField(max_length=10)
+  user = models.CharField(max_length=20)
   location = models.ForeignKey(Location, on_delete=models.CASCADE)
   #review = models.CharField(max_length=200)
   review = models.TextField()  # Changed this to not limit length (Tyler)
