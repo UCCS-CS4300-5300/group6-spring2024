@@ -1,0 +1,45 @@
+{% extends 'templates/base_template.html' %}
+<head>
+</head>
+<body>
+  {% block content %}
+  {% if form.errors %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      There was an error with your form...
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"</button>
+    </div>
+  {% endif %}	
+  <div class="shadow p-4 mb-5 bg-body rounded form-row" style="margin-top: 65px;">
+    <h1 style="text-align: center">Fill Out the Form to Add a Review!</h1>
+    {% if submitted%}
+    <div class="container">
+      <div class="custom-scrollbar">
+        <div class="card">
+          <div class="card-body" style="display:flex; margin: auto;">
+            <div style="text-align: center">
+              <h2>Review Added Successfully</h2>
+              <button class="btn custom-btn"><a href="/add_location">Add Another Review</a></button>
+              <button class="btn custom-btn"><a href="/nearby">Return to List of Locations</a></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {%else%}
+    <div class="container">
+
+        <div class="card">
+          <div class="card-body" style="display:flex; margin: auto;">
+            <form action="" method=POST>
+              {% csrf_token %}
+              {{ form.as_p }}
+              <input type="submit" value="Submit" class="btn btn-secondary">
+            </form>
+          </div>
+        </div>
+
+    </div>
+    {%endif%}
+  </div>
+  {% endblock content %}
+</body>

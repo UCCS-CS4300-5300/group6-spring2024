@@ -1,6 +1,7 @@
 from django.test import TestCase
-from django.urls import reverse
+from django.urls import reverse, resolve
 from Foodie_Joint.models import Location
+from Foodie_Joint.views import show_location_items
 
 # For reference: https://docs.djangoproject.com/en/5.0/topics/testing/tools/
 # Run these tests with 'python manage.py test'
@@ -67,3 +68,35 @@ class NearbyViewTest(TestCase):
   # Add test, testing user logged in and gets user address (when implemented)
     
 ############# END OF TYLER CARROLL TESTS #############
+
+############# START OF DEREK GARY TESTS #############
+
+class LocationItemResponseTest(TestCase):
+
+  # Sets up the test data used in the tests.
+  def setUp(self):
+    self.location = Location.objects.create(
+      name = "Test Location",
+      description = "A test Description",
+      location_type=Location.RESTAURANT,
+      address="207 N Wahsatch Ave",
+    )
+
+  # Verifies if location_details URL correctly redirects to location_item_info page.
+  def test_location_details_url(self):
+    path = reverse('location_details', args=[1])
+    resolved_path = resolve(path)
+    self.assertEqual(resolved_path.func, show_location_items)
+
+  # Checks if the correct data was received by the location_item_info page.
+  def test_location_item_info_response(self):
+    url = reverse('location_details', args=[self.location.id])
+    response = self.client.get(url)
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.context['location'].id, self.location.id)
+    self.assertContains(response, "Test Location")
+    self.assertContains(response, "A test Description")
+    self.assertContains(response, "207 N Wahsatch Ave")
+############# END OF DEREK GARY TESTS #############
+
+
