@@ -188,3 +188,20 @@ def show_location_items(request, location_id):
       'items': items,
   }
   return render(request, 'templates/location_item_info.html', context)
+
+@login_required(login_url='/login_user')
+def add_review(request):
+   submitted = False
+   if request.method == 'POST':
+     form = ReviewForm(request.POST)
+     if form.is_valid():
+       form.save()
+       return HttpResponseRedirect('/add_review?submitted=True')
+   else:
+     form = ReviewForm
+     if 'submitted' in request.GET:
+       submitted = True
+   return render(request, 'templates/add_review.html', {
+       'form': form,
+       'submitted': submitted
+   })
