@@ -27,9 +27,10 @@ DEBUG = True
 ALLOWED_HOSTS = [
     ".replit.dev", ".replit.app", "127.0.0.1:8000",
     '9bce0e11-b6ba-4a1d-9b73-5b768fefccca-00-3emf0wwbd1vei.janeway.repl.co',
-    '5a25ef20-82cf-42d6-b716-69fbbe1fa9c3-00-310a111myqeeh.kirk.repl.co'
+    '5a25ef20-82cf-42d6-b716-69fbbe1fa9c3-00-310a111myqeeh.kirk.repl.co',
+  '97787d57-f143-4546-958d-6aa4f5b76cfa-00-2zy3yjsid1ls0.kirk.repl.co',
 ]
-CSRF_TRUSTED_ORIGINS = ["https://*.replit.dev", "https://*.replit.app", "https://9bce0e11-b6ba-4a1d-9b73-5b768fefccca-00-3emf0wwbd1vei.janeway.repl.co", "https://5a25ef20-82cf-42d6-b716-69fbbe1fa9c3-00-310a111myqeeh.kirk.repl.co"]
+CSRF_TRUSTED_ORIGINS = ["https://*.replit.dev", "https://*.replit.app", "https://9bce0e11-b6ba-4a1d-9b73-5b768fefccca-00-3emf0wwbd1vei.janeway.repl.co", "https://5a25ef20-82cf-42d6-b716-69fbbe1fa9c3-00-310a111myqeeh.kirk.repl.co",'https://97787d57-f143-4546-958d-6aa4f5b76cfa-00-2zy3yjsid1ls0.kirk.repl.co']
 
 # Application definition
 
