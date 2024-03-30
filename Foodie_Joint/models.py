@@ -1,7 +1,42 @@
 from django.db import models
 from django.db.models.enums import Choices
 
-# Create your models here.
+class LocationTag(models.Model):
+  # When more are added, they are instanciated whenever a new location obj is created
+  TAG_CHOICES = [
+    ("Food", "Food"),
+    ("Drink", "Drink"),
+    ("Gas Station", "Gas Station"),
+    ("Supermarket", "Supermarket"),
+    ("Specialty Store", "Specialty Store"),
+    ("Vegetarian", "Vegetarian"),
+    ("Vegan", "Vegan"),
+    ("Gluten Free", "Gluten Free"),
+    ("Pizza", "Pizza"),
+    ("Burger", "Burger"),
+    ("Bar", "Bar"),
+    ("Sandwiches", "Sandwiches"),
+    ("Salads", "Salads"),
+    ("Breakfast", "Breakfast"),
+    ("Brunch", "Brunch"),
+    ("Lunch", "Lunch"),
+    ("Dinner", "Dinner"),
+    ("Dessert", "Dessert"),
+    ("Coffee", "Coffee"),
+    ("Outside Dining", "Outside Dining"),
+    ("Italian", "Italian"),
+    ("Mexican", "Mexican"),
+    ("Chinese", "Chinese"),
+    ("Seafood", "Seafood"),
+    ("Pet Friendly", "Pet Friendly"),
+    ("Fast Food", "Fast Food"),
+    ("Fine Dining", "Fine Dining"),
+  ]
+  name = models.CharField(max_length=50, choices=TAG_CHOICES)
+
+  def __str__(self):
+    return f"{self.name}"
+
 class Location(models.Model):
   RESTAURANT = "Restaurant"
   STORE = "Store"
@@ -14,10 +49,10 @@ class Location(models.Model):
   description = models.CharField(max_length=500)
   location_type = models.CharField(max_length=10, choices=LOCATION_CHOICES)
   address = models.CharField(max_length=50)
+  tags = models.ManyToManyField(LocationTag)
 
   def __str__(self):
     return f"{self.name}: {self.description} ({self.location_type}, {self.address})"
-
 
 #Based on user stories, the item class will have to be updated
 class Item(models.Model):
@@ -39,7 +74,6 @@ class User(models.Model):
   
   def __str__(self):
     return f"{self.username}"
-
 
 class Review(models.Model):
   NUM_STARS = {
