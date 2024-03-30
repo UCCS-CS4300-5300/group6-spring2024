@@ -26,13 +26,19 @@ def base(request):
 # https://geopy.readthedocs.io/en/stable/#module-geopy.distance
 # https://nominatim.org/release-docs/latest/api/Search/
 BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json'
+# Added user-agent to request header to avoid 403 error
+# https://operations.osmfoundation.org/policies/nominatim/
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Foodie_Joint/1.0 (tcarroll@uccs.edu)"
+
 
 
 # Potentially move out of views.py
 def get_distance(address1, address2):
   try:
-    response1 = requests.get(f"{BASE_URL}&street={address1}")
-    response2 = requests.get(f"{BASE_URL}&street={address2}")
+    headers = {'User-Agent': USER_AGENT}
+    
+    response1 = requests.get(f"{BASE_URL}&street={address1}", headers=headers)
+    response2 = requests.get(f"{BASE_URL}&street={address2}", headers=headers)
 
     # Error handling: https://requests.readthedocs.io/en/latest/user/quickstart/#errors-and-exceptions
     response1.raise_for_status()
