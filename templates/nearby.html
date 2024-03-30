@@ -40,6 +40,13 @@
             <h3>{{location.name}}</h3>
             <p>{{location.description}}</p>
             <p>{{location.address}} ({{location.rounded_distance}} mi)</p>
+            <!-- Possibly make tags colored bubbles?? -->
+            <p>Tags:
+              {% for tag in location.tags %}
+              <!-- Add comma between tags if not last object -->
+                {{ tag.name }}{% if not forloop.last %},{% endif %}
+              {% endfor %}
+            </p>
           </div>
           <div style="margin-left: auto;">
             <ul class="navbar-nav" style="gap:.5rem;">
