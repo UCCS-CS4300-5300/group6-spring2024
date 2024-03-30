@@ -97,7 +97,7 @@
           <!-- Address and Directions Line -->
           <div class="location-description">
             {% if location.address %}
-              <strong margin-right: 5px">Address: </strong>{{location.address}}
+              <strong style="margin-right: 5px">Address:</strong> {{ location.address }}
             {% else %}
               <strong>Location Address Not Present, Please Contact An Administrator</strong>
             {% endif %}
@@ -108,7 +108,7 @@
         <!-- Location Description Line -->
         <div class="location-description">
           {% if location.description %}
-            <strong>Description: </strong><p>{{location.description}}</p>
+            <strong style="margin-right: 5px">Description:</strong><p> {{location.description}}</p>
           {% else %}
             <strong style="color: #f8f9fa;">There is no description for this location yet.</strong>
           {% endif %}
