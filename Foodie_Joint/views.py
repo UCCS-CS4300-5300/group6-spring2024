@@ -94,7 +94,8 @@ def nearby(request):
             'address': location.address,
             'distance': distance,
             'rounded_distance': rounded_distance,
-            'id': location.id  # needed for location_item_info template
+            'id': location.id,  # needed for location_item_info template
+            'tags': location.tags.all(),
         })
 
     # Sorting in ascending order of distance (https://blogboard.io/blog/knowledge/python-sorted-lambda/)
