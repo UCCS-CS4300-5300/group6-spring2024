@@ -5,10 +5,12 @@ from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .models import Location, Item, User, Review, ItemReview, Tag
 from .forms import LocationForm, ItemForm, ReviewForm, ItemReviewForm, TagForm, ItemTagForm, RegisterUserForm
+from .utils import instantiate_tags
 from django.contrib.auth.forms import UserCreationForm
 from geopy.distance import distance
 from geopy.units import miles
 import requests  # Used to request info from API
+
 
 
 def index(request):
@@ -151,6 +153,8 @@ def register_user(request):
 
 @login_required(login_url='/login_user')
 def add_location(request):
+  # Calling function to create tag objects if they dont exist
+  instantiate_tags()
   submitted = False
   if request.method == 'POST':
     form = LocationForm(request.POST)
