@@ -57,6 +57,7 @@ class Location(models.Model):
   location_type = models.CharField(max_length=10, choices=LOCATION_CHOICES)
   address = models.CharField(max_length=50)
   tags = models.ManyToManyField(LocationTag)
+  image = models.ImageField(upload_to='images/', blank = True, null=True, default='images/foodie-joint-logo.png')
 
   def __str__(self):
     return f"{self.name}: {self.description} ({self.location_type}, {self.address})"
@@ -67,6 +68,7 @@ class Item(models.Model):
   description = models.CharField(max_length=500)
   location = models.ForeignKey(Location, on_delete=models.CASCADE, default=None)
   is_recommended = models.BooleanField(default=False, verbose_name="Recommended by Admin")
+  image = models.ImageField(upload_to='images/', blank = True, null=True, default='images/foodie-joint-logo.png')
   # define return string
   def __str__(self):
     return f"{self.name}: {self.description}"

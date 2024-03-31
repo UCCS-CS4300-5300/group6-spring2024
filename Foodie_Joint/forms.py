@@ -35,7 +35,7 @@ class LocationForm(ModelForm):
 
   class Meta:
     model = Location
-    fields = ['name', 'description', 'location_type', 'address', 'tags']
+    fields = ['name', 'description', 'location_type', 'address', 'tags', 'image']
     widgets = {
       'tags': forms.CheckboxSelectMultiple
     }
@@ -45,7 +45,7 @@ class ItemForm(forms.ModelForm):
 
   class Meta:
     model = Item
-    fields = ['name', 'description', 'location', 'is_recommended']
+    fields = ['name', 'description', 'location', 'is_recommended', 'image']
 
 
 #class UserForm(forms.ModelForm):
