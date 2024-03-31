@@ -1,8 +1,13 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.db.models.enums import Choices
+
 
 class LocationTag(models.Model):
   # When more are added, they are instanciated whenever a new location obj is created
+  # Sort these?
   TAG_CHOICES = [
     ("Food", "Food"),
     ("Drink", "Drink"),
@@ -13,6 +18,7 @@ class LocationTag(models.Model):
     ("Vegan", "Vegan"),
     ("Gluten Free", "Gluten Free"),
     ("Pizza", "Pizza"),
+    ("Chicken", "Chicken"),
     ("Burger", "Burger"),
     ("Bar", "Bar"),
     ("Sandwiches", "Sandwiches"),
@@ -31,6 +37,7 @@ class LocationTag(models.Model):
     ("Pet Friendly", "Pet Friendly"),
     ("Fast Food", "Fast Food"),
     ("Fine Dining", "Fine Dining"),
+    ("Locally Owned", "Locally Owned"),
   ]
   name = models.CharField(max_length=50, choices=TAG_CHOICES)
 
@@ -50,6 +57,7 @@ class Location(models.Model):
   location_type = models.CharField(max_length=10, choices=LOCATION_CHOICES)
   address = models.CharField(max_length=50)
   tags = models.ManyToManyField(LocationTag)
+  image = models.ImageField(upload_to='images/', blank = True, null=True, default='images/foodie-joint-logo.png')
 
   def __str__(self):
     return f"{self.name}: {self.description} ({self.location_type}, {self.address})"
@@ -60,6 +68,7 @@ class Item(models.Model):
   description = models.CharField(max_length=500)
   location = models.ForeignKey(Location, on_delete=models.CASCADE, default=None)
   is_recommended = models.BooleanField(default=False, verbose_name="Recommended by Admin")
+  image = models.ImageField(upload_to='images/', blank = True, null=True, default='images/foodie-joint-logo.png')
   # define return string
   def __str__(self):
     return f"{self.name}: {self.description}"
@@ -74,6 +83,33 @@ class User(models.Model):
   
   def __str__(self):
     return f"{self.username}"
+
+
+"""
+class Address(models.Model):
+  user = models.ForeignKey(TrueUser, on_delete=models.CASCADE,
+  address = models.CharField(max_length=50))
+
+  def __init__(self, *args, temp=65, **kwargs):
+     self.temp = temp
+     return super().__init__(*args, **kwargs)
+
+
+    
+@receiver(post_save, sender=TrueUser)
+def create_user_address(sender, instance, created, **kwargs):
+  if created:
+      my_address = Address()
+      my_address.user = instance
+
+@receiver(post_save, sender=TrueUser)
+def save_user_profile(sender, instance, **kwargs):
+  instance.address.save()
+
+  
+  
+"""
+
 
 class Review(models.Model):
   NUM_STARS = {

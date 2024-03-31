@@ -9,7 +9,7 @@
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"</button>
     </div>
   {% endif %}	
-  <div class="shadow p-4 mb-5 bg-body rounded form-row" style="margin-top: 65px; margin-inline: 500px;">
+  <div class="shadow p-4 mb-5 bg-body rounded form-row" style="margin-top: 65px; margin-inline: 15%;">
     <h1 style="text-align: center">Fill Out the Form to Add an Item!</h1>
     {% if submitted%}
     <div class="container">
@@ -26,8 +26,8 @@
     {%else%}
     <div class="container">
       <div class="card">
-        <div class="card-body" style="display:flex; margin: auto;">
-          <form action="" method=POST>
+        <div class="card-body" style="display:flex; margin: 0 10%;">
+          <form action="" method=POST enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Submit" class="btn btn-secondary">

@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from .models import Location, Item, User, Review, ItemReview, Tag
+from .models import Location, LocationTag, Item, User, Review, ItemReview, Tag
 from .forms import LocationForm, ItemForm, ReviewForm, ItemReviewForm, TagForm, ItemTagForm, RegisterUserForm
 from .utils import instantiate_tags
 from django.contrib.auth.forms import UserCreationForm
@@ -31,7 +31,6 @@ BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json'
 # Added user-agent to request header to avoid 403 error
 # https://operations.osmfoundation.org/policies/nominatim/
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Foodie_Joint/1.0 (tcarroll@uccs.edu)"
-
 
 
 # Potentially move out of views.py
@@ -74,6 +73,7 @@ def nearby(request):
   #user = request.user
   #user_address = user.address
   locations = Location.objects.all()
+  all_tags = LocationTag.objects.all()
 
   if locations.exists():
     # Applying a filter (through href in navbar) on locations to only get store/restaurant objects
@@ -81,6 +81,18 @@ def nearby(request):
     if loc_type:
       locations = locations.filter(location_type=loc_type)
 
+    # Filtering results based on chosen tags 
+    # https://www.oreilly.com/library/view/python-in-a/0596001886/re928.html
+    # https://docs.djangoproject.com/en/5.0/ref/models/querysets/#in
+    selected_tags = request.GET.getlist('tag')
+    if selected_tags:
+        locations = locations.filter(tags__name__in=selected_tags)
+
+    # Filtering results based on searched name
+    search_name = request.GET.get('search_name')
+    if search_name:
+      locations = locations.filter(name__icontains=search_name)
+    
     sorted_locations = []
     for location in locations:
       distance = get_distance(user_address, location.address)
@@ -94,7 +106,8 @@ def nearby(request):
             'address': location.address,
             'distance': distance,
             'rounded_distance': rounded_distance,
-            'id': location.id  # needed for location_item_info template
+            'id': location.id,  # needed for location_item_info template
+            'tags': location.tags.all(),
         })
 
     # Sorting in ascending order of distance (https://blogboard.io/blog/knowledge/python-sorted-lambda/)
@@ -105,6 +118,8 @@ def nearby(request):
     context = {
         'user_address': user_address,
         'sorted_locations': sorted_locations,
+        'all_tags': all_tags,
+        'selected_tags': selected_tags, # Added this to have checkboxes stay marked in template
     }
     return render(request, 'templates/nearby.html', context)
   else:
@@ -118,8 +133,12 @@ def login_user(request):
     password = request.POST.get("password")
     user = authenticate(request, username=username, password=password)
     if user is not None:
-      login(request, user)
-      return redirect("index")
+      if user.is_active:
+        login(request, user)
+        return redirect("index")
+      else:
+        messages.error(request, "Account is not active.")
+        return redirect("login_user")
     else:
       messages.error(request, "Invalid username or password")
       return redirect("login")
@@ -157,7 +176,7 @@ def add_location(request):
   instantiate_tags()
   submitted = False
   if request.method == 'POST':
-    form = LocationForm(request.POST)
+    form = LocationForm(request.POST, request.FILES)
     if form.is_valid():
       form.save()
       return HttpResponseRedirect('/add_location?submitted=True')
@@ -175,7 +194,7 @@ def add_location(request):
 def add_item(request):
   submitted = False
   if request.method == 'POST':
-    form = ItemForm(request.POST)
+    form = ItemForm(request.POST, request.FILES)
     if form.is_valid():
       form.save()
       return HttpResponseRedirect('/add_item?submitted=True')
@@ -203,7 +222,8 @@ def show_location_items(request, location_id):
         'description': item.description,
         'location': item.location,
         'is_recommended': item.is_recommended,
-        'id': item.id
+        'id': item.id,
+        'image': item.image.url
       })
     context = {
       'location': location,
@@ -262,5 +282,17 @@ def item_info(request, item_id):
     'reviews': reviews
   }
   return render(request, 'templates/item_info.html', context)
-    
 
+@login_required(login_url='/login_user')
+def remove_user(request):
+  user = request.user
+  user.is_actived = False
+  user.save()
+  logout(request)
+  response = HttpResponse("You have been removed from the site. Please close this window.")
+  return response
+  
+@login_required(login_url='/login_user')
+def user_profile(request):
+  user = request.user
+  return render(request, 'templates/profile.html', {'user': user})
