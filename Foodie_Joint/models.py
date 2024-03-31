@@ -32,6 +32,7 @@ class LocationTag(models.Model):
     ("Pet Friendly", "Pet Friendly"),
     ("Fast Food", "Fast Food"),
     ("Fine Dining", "Fine Dining"),
+    ("Locally Owned", "Locally Owned"),
   ]
   name = models.CharField(max_length=50, choices=TAG_CHOICES)
 
