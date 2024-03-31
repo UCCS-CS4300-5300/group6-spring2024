@@ -114,6 +114,7 @@ def nearby(request):
         'user_address': user_address,
         'sorted_locations': sorted_locations,
         'all_tags': all_tags,
+        'selected_tags': selected_tags, # Added this to have checkboxes stay marked in template
     }
     return render(request, 'templates/nearby.html', context)
   else:

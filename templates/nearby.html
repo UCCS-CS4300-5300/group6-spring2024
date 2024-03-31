@@ -65,7 +65,7 @@
       </div>
       {%endfor%}
       {% endif %}
-    </div>
+      </div>
     
   <!-- Container for filtering locations via tags -->
     <div class="col-md-3">
@@ -74,10 +74,12 @@
         <form action="{% url 'nearby' %}" method="GET">
           <div class="form-group">
             <label for="tag"><strong>Filter by Tag:</strong></label>
-            <!-- https://www.w3schools.com/tags/att_select_multiple.asp -->
+            <!-- https://www.w3schools.com/tags/att_input_type_checkbox.asp -->
               {% for tag in all_tags %}
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="tag" value="{{ tag.name }}" id="{{ tag.name }}">
+                  <!-- Checks the boxes if the filter was applied in the request -->
+                  <input class="form-check-input" type="checkbox" name="tag" value="{{ tag.name }}" id="{{ tag.name }}"
+                    {% if tag.name in selected_tags %} checked {% endif %}>
                   <label class="form-check-label" for="{{ tag.name }}">{{ tag.name }}</label>
                 </div>
               {% endfor %}
@@ -90,10 +92,10 @@
             <button type="submit" class="btn custom-btn" style="margin-top: 5px;">Remove Filter</button>
           </form>
         </form>
-      </div>
+          </div>
+        </div>
     </div>
-  </div>
-  </div>
+    </div>
   </div>
   {% endblock content %}
 </body>
