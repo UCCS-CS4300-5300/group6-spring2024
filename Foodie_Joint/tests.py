@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
 from django.contrib.auth import get_user_model
-from Foodie_Joint.models import Location, User
+from Foodie_Joint.models import Location, User, LocationTag
 from Foodie_Joint.views import show_location_items
 
 # For reference: https://docs.djangoproject.com/en/5.0/topics/testing/tools/
@@ -23,6 +23,12 @@ class NearbyViewTest(TestCase):
       address = "4609 Austin Bluffs Pkwy"
     )
 
+    self.tag_mexican = LocationTag.objects.create(name="Mexican")
+    self.tag_local = LocationTag.objects.create(name="Locally Owned")
+    self.tag_supermarket = LocationTag.objects.create(name="Supermarket")
+
+    self.restaurant.tags.add(self.tag_mexican, self.tag_local)
+    self.store.tags.add(self.tag_supermarket)
 
   # Ensuring that the nearby.html template is used/returned by the nearby view
   def test_nearby_view_renders_proper_template(self):
@@ -66,6 +72,28 @@ class NearbyViewTest(TestCase):
     response = self.client.get(reverse('nearby'))
     self.assertEqual(response.status_code, 200)
     self.assertContains(response, "No locations found! Please add some locations to get started.")
+
+  # Testing that when on the Restaurant page, only the restaurant obj is shown with all filters applied
+  def test_nearby_view_with_all_filters(self):
+    response = self.client.get('/nearby?tag=Mexican&tag=Supermarket&tag=Locally+Owned&type=Restaurant')
+    self.assertEqual(response.status_code, 200)
+    self.assertContains(response, self.restaurant.name)
+    self.assertContains(response, self.restaurant.description)
+    self.assertContains(response, self.restaurant.address)
+    self.assertNotContains(response, self.store.name)
+    self.assertNotContains(response, self.store.description)
+    self.assertNotContains(response, self.store.address)
+
+  # Testing that when on the Store page, nothing is showed with the 'Mexican' filter
+  def test_nearby_view_with_mexican_filter(self):
+    response = self.client.get('/nearby?tag=Mexican&type=Store')
+    self.assertEqual(response.status_code, 200)
+    self.assertNotContains(response, self.restaurant.name)
+    self.assertNotContains(response, self.restaurant.description)
+    self.assertNotContains(response, self.restaurant.address)
+    self.assertNotContains(response, self.store.name)
+    self.assertNotContains(response, self.store.description)
+    self.assertNotContains(response, self.store.address)
 
   # Add test, testing user logged in and gets user address (when implemented)
 
