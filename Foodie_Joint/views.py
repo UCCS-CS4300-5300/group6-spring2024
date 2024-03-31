@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from .models import Location, Item, User, Review, ItemReview, Tag
+from .models import Location, LocationTag, Item, User, Review, ItemReview, Tag
 from .forms import LocationForm, ItemForm, ReviewForm, ItemReviewForm, TagForm, ItemTagForm, RegisterUserForm
 from .utils import instantiate_tags
 from django.contrib.auth.forms import UserCreationForm
@@ -31,7 +31,6 @@ BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json'
 # Added user-agent to request header to avoid 403 error
 # https://operations.osmfoundation.org/policies/nominatim/
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Foodie_Joint/1.0 (tcarroll@uccs.edu)"
-
 
 
 # Potentially move out of views.py
@@ -74,6 +73,7 @@ def nearby(request):
   #user = request.user
   #user_address = user.address
   locations = Location.objects.all()
+  all_tags = LocationTag.objects.all()
 
   if locations.exists():
     # Applying a filter (through href in navbar) on locations to only get store/restaurant objects
@@ -81,6 +81,13 @@ def nearby(request):
     if loc_type:
       locations = locations.filter(location_type=loc_type)
 
+    # Filtering results based on chosen tags 
+    # https://www.oreilly.com/library/view/python-in-a/0596001886/re928.html
+    # https://docs.djangoproject.com/en/5.0/ref/models/querysets/#in
+    selected_tags = request.GET.getlist('tag')
+    if selected_tags:
+        locations = locations.filter(tags__name__in=selected_tags)
+    
     sorted_locations = []
     for location in locations:
       distance = get_distance(user_address, location.address)
@@ -106,6 +113,7 @@ def nearby(request):
     context = {
         'user_address': user_address,
         'sorted_locations': sorted_locations,
+        'all_tags': all_tags,
     }
     return render(request, 'templates/nearby.html', context)
   else:
