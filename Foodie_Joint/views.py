@@ -184,15 +184,6 @@ def show_location_items(request, location_id):
   location = get_object_or_404(Location, pk=location_id)
   items = location.item_set.all()
   reviews = Review.objects.filter(location=location)
-<<<<<<< HEAD
-  context = {
-      'location': location,
-      'items': items,
-      'reviews': reviews
-  }
-  return render(request, 'templates/location_item_info.html', context)
-
-=======
   if items.exists():
     item_list = []
     for item in items:
@@ -261,4 +252,4 @@ def item_info(request, item_id):
   }
   return render(request, 'templates/item_info.html', context)
     
->>>>>>> GoodermontBranch
+
