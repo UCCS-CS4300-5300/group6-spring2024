@@ -171,7 +171,7 @@ def add_location(request):
   instantiate_tags()
   submitted = False
   if request.method == 'POST':
-    form = LocationForm(request.POST)
+    form = LocationForm(request.POST, request.FILES)
     if form.is_valid():
       form.save()
       return HttpResponseRedirect('/add_location?submitted=True')
@@ -189,7 +189,7 @@ def add_location(request):
 def add_item(request):
   submitted = False
   if request.method == 'POST':
-    form = ItemForm(request.POST)
+    form = ItemForm(request.POST, request.FILES)
     if form.is_valid():
       form.save()
       return HttpResponseRedirect('/add_item?submitted=True')
