@@ -47,7 +47,7 @@ class Location(models.Model):
     RESTAURANT: "Restaurant",
     STORE: "Store",
   }
-  
+
   name = models.CharField(max_length=50)
   description = models.CharField(max_length=500)
   location_type = models.CharField(max_length=10, choices=LOCATION_CHOICES)
@@ -74,7 +74,7 @@ class User(models.Model):
   email = models.CharField(max_length=50)
   address = models.CharField(max_length=50)
   password = models.CharField(max_length=50)
-  
+
   def __str__(self):
     return f"{self.username}"
 
@@ -120,7 +120,7 @@ class ItemReview(models.Model):
 class Tag(models.Model):
   title = models.CharField(max_length=50)
   location = models.ForeignKey(Location, on_delete=models.CASCADE)
-  
+
   def __str__(self):
     return f"{self.title}"
 

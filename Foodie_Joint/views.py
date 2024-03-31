@@ -128,8 +128,12 @@ def login_user(request):
     password = request.POST.get("password")
     user = authenticate(request, username=username, password=password)
     if user is not None:
-      login(request, user)
-      return redirect("index")
+      if user.is_active:
+        login(request, user)
+        return redirect("index")
+      else:
+        messages.error(request, "Account is not active.")
+        return redirect("login_user")
     else:
       messages.error(request, "Invalid username or password")
       return redirect("login")
@@ -272,5 +276,17 @@ def item_info(request, item_id):
     'reviews': reviews
   }
   return render(request, 'templates/item_info.html', context)
-    
 
+@login_required(login_url='/login_user')
+def remove_user(request):
+  user = request.user
+  user.is_actived = False
+  user.save()
+  logout(request)
+  response = HttpResponse("You have been removed from the site. Please close this window.")
+  return response
+  
+@login_required(login_url='/login_user')
+def user_profile(request):
+  user = request.user
+  return render(request, 'templates/profile.html', {'user': user})
