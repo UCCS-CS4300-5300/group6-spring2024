@@ -87,6 +87,11 @@ def nearby(request):
     selected_tags = request.GET.getlist('tag')
     if selected_tags:
         locations = locations.filter(tags__name__in=selected_tags)
+
+    # Filtering results based on searched name
+    search_name = request.GET.get('search_name')
+    if search_name:
+      locations = locations.filter(name__icontains=search_name)
     
     sorted_locations = []
     for location in locations:
