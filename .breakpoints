@@ -1,16 +1,12 @@
 {
-<<<<<<< HEAD
   "files": {
-    "django_project/settings.py": [
+    "Foodie_Joint/models.py": [
       {
-        "id": "67faf7dc-0635-4c6b-a605-c7f6413a9c7d",
-        "line": 16,
-        "version": 1,
-        "index": 406
+        "id": "90da6c7a-3d38-45fc-bafe-20db8b14de3d",
+        "line": 5,
+        "version": 3877,
+        "index": 165
       }
     ]
   }
-=======
-  "files": {}
->>>>>>> f0faea1515a2141737845ab5752c8e36effb23d4
 }

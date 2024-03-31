@@ -1,5 +1,9 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.db.models.enums import Choices
+
 
 class LocationTag(models.Model):
   # When more are added, they are instanciated whenever a new location obj is created
@@ -77,6 +81,33 @@ class User(models.Model):
   
   def __str__(self):
     return f"{self.username}"
+
+
+"""
+class Address(models.Model):
+  user = models.ForeignKey(TrueUser, on_delete=models.CASCADE,
+  address = models.CharField(max_length=50))
+
+  def __init__(self, *args, temp=65, **kwargs):
+     self.temp = temp
+     return super().__init__(*args, **kwargs)
+
+
+    
+@receiver(post_save, sender=TrueUser)
+def create_user_address(sender, instance, created, **kwargs):
+  if created:
+      my_address = Address()
+      my_address.user = instance
+
+@receiver(post_save, sender=TrueUser)
+def save_user_profile(sender, instance, **kwargs):
+  instance.address.save()
+
+  
+  
+"""
+
 
 class Review(models.Model):
   NUM_STARS = {
