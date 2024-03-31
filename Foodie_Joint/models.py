@@ -3,6 +3,7 @@ from django.db.models.enums import Choices
 
 class LocationTag(models.Model):
   # When more are added, they are instanciated whenever a new location obj is created
+  # Sort these?
   TAG_CHOICES = [
     ("Food", "Food"),
     ("Drink", "Drink"),
