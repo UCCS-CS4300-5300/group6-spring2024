@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Foodie_Joint',
     'bootstrap5',
-    'django-crontab'
+    #'django-crontab'
 ]
 
 MIDDLEWARE = [
@@ -130,6 +130,6 @@ MEDIA_URL = '/images/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CRONJOBS = [
-  ('* * * * 12', 'FoodieJoint.cron.delete_inactive_users')
-]
+#CRONJOBS = [
+ # ('0 0 * * *', 'FoodieJoint.cron.send_daily_email')
+#]
