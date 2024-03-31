@@ -97,7 +97,7 @@
           <!-- Address and Directions Line -->
           <div class="location-description">
             {% if location.address %}
-              <strong style="margin-right: 5px">Address:</strong> {{ location.address }}
+              <strong style="margin-right: 5px">Address:</strong>{{ location.address }}
             {% else %}
               <strong>Location Address Not Present, Please Contact An Administrator</strong>
             {% endif %}
@@ -108,9 +108,21 @@
         <!-- Location Description Line -->
         <div class="location-description">
           {% if location.description %}
-            <strong style="margin-right: 5px">Description:</strong><p> {{location.description}}</p>
+            <strong style="margin-right: 5px">Description:</strong>{{location.description}}
           {% else %}
             <strong style="color: #f8f9fa;">There is no description for this location yet.</strong>
+          {% endif %}
+        </div>
+
+        <!-- Location Tags Line -->
+        <div class="location-description">
+          <strong style="margin-right: 5px">Tags:</strong>
+          {% if location.tags.exists %}
+            {% for tag in location.tags.all %}
+              {{ tag.name }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+          {% else %}
+            <strong style="color: #f8f9fa;">None</strong>
           {% endif %}
         </div>
       </div>
