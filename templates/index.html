@@ -120,7 +120,7 @@
             <!-- Restaurants Card -> Button -->
             <div class="card-body">
               <p class="card-text">Go Visit These Restaurants!</p>
-              <a href="#" class="btn custom-btn">Check it out!</a>
+              <a href="{% url 'nearby' %}?type=Restaurant" class="btn custom-btn">Check it out!</a>
             </div>
           </div>
         </div>
@@ -161,7 +161,7 @@
             <!-- Stores Card -> Button -->
             <div class="card-body">
               <p class="card-text">Slick Stores in your Area!</p>
-              <a href="#" class="btn custom-btn">Click Me!</a>
+              <a href="{% url 'nearby' %}?type=Store" class="btn custom-btn">Click Me!</a>
             </div>
           </div>
         </div>
@@ -180,6 +180,10 @@
               <div class="col">
                 <div class="card-body">
                   {% if recommended_item %}
+                  <a href="{% url 'item_info' recommended_item.id %}">
+                    <img src="{{ recommended_item.image.url }}" alt="{{ recommended_item.name }}" 
+                      style="max-width: 25%; max-height: 25%;">
+                  </a>
                   <h3 class="card-title">{{ recommended_item.name }}</h3>
                   <p class="card-text">{{ recommended_item.description }}</p>
                   {% else %}
