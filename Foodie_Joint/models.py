@@ -13,6 +13,7 @@ class LocationTag(models.Model):
     ("Vegan", "Vegan"),
     ("Gluten Free", "Gluten Free"),
     ("Pizza", "Pizza"),
+    ("Chicken", "Chicken"),
     ("Burger", "Burger"),
     ("Bar", "Bar"),
     ("Sandwiches", "Sandwiches"),
