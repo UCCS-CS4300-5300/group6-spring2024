@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
 from django.contrib.auth import get_user_model
-from Foodie_Joint.models import Location, User, LocationTag
+from Foodie_Joint.models import Item, Location, User, LocationTag
 from Foodie_Joint.views import show_location_items
 
 # For reference: https://docs.djangoproject.com/en/5.0/topics/testing/tools/
@@ -127,21 +127,54 @@ class LocationItemResponseTest(TestCase):
     self.assertContains(response, "Test Location")
     self.assertContains(response, "A test Description")
     self.assertContains(response, "207 N Wahsatch Ave")
-############# END OF DEREK GARY TESTS #############
+
+# Tests the removal of an item by a superuser and verifies the redirect to the 'nearby' page.
+class ItemRemovalTest(TestCase):
+
+    def setUp(self):
+        User = get_user_model()
+        self.admin_user = User.objects.create_superuser('admin', 'admin@test.com', 'adminpass')
+        self.location = Location.objects.create(name="Test Location", address="123 Test Street")
+        self.item = Item.objects.create(name="Test Item", location=self.location)
+
+    def test_remove_item(self):
+        self.client.login(username='admin', password='adminpass')
+        items_before = Item.objects.count()
+        response = self.client.post(reverse('remove_item', kwargs={'item_id': self.item.id}))
+        items_after = Item.objects.count()
+        self.assertEqual(items_before - 1, items_after)
+        self.assertRedirects(response, reverse('nearby'))
+
+# Tests the removal of a store by a superuser and ensures proper redirect to the 'nearby' page.
+class StoreRemovalTest(TestCase):
+
+    def setUp(self):
+        User = get_user_model()
+        self.admin_user = User.objects.create_superuser('admin', 'admin@adminStuff.com', 'uniquePW1')
+        self.location = Location.objects.create(name="Test Location", address="123 Test Street")
+
+    def test_remove_store(self):
+        self.client.login(username='admin', password='uniquePW1')
+        locations_before = Location.objects.count()
+        response = self.client.post(reverse('remove_store', kwargs={'location_id': self.location.id}))
+        locations_after = Location.objects.count()
+        self.assertEqual(locations_before - 1, locations_after)
+        self.assertRedirects(response, reverse('nearby'))
+############# END OF DEREK GARY TESTS ############
 
 # Correct this test because it causes other tests not to run!
-'''
 ############# START OF LUKE FLANCHER TESTS #############
 class UsersTests(TestCase):
+  def setUp(self):
+    User = get_user_model()
+    self.new_user1 = User.objects.create_user(username='new_user1', password='adfjkfjk;fds2342', email='new1@user.com')
+    self.new_user2 = User.objects.create_user(username='new_user2', password='adfjkfjk;fds2342', email='new2@user.com')
 
-    new_user1 = User.objects.create_user(username = 'new_user1', password = 'adfjkfjk;fds2342', email = 'new1@user.com')
+  def test_user_creation(self):
+    # Assert that the users were actually created with matching attr.
+    self.assertEqual(self.new_user1.username, 'new_user1')
+    self.assertEqual(self.new_user1.email, 'new1@user.com')
 
-    new_user2 = User.objects.create_user(username = 'new_user2', password = 'adfjkfjk;fds2342', email = 'new2@user.com')
-
-    new_user1.save()
-    new_user2.save()
-
-    assert(new_user1.username == 'new_user1')
-    assert(new_user2.password == "adfjkfjk;fds2342")
+    self.assertEqual(self.new_user2.username, 'new_user2')
+    self.assertEqual(self.new_user2.email, 'new2@user.com')
 ############# END OF LUKE FLANCHER TESTS #############
-'''
