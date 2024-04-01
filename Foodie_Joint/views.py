@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from .filters import ItemReviewFilter, ReviewFilter
 from .models import Location, LocationTag, Item, User, Review, ItemReview, Tag
 from .forms import LocationForm, ItemForm, ReviewForm, ItemReviewForm, TagForm, ItemTagForm, RegisterUserForm
 from .utils import instantiate_tags
@@ -214,7 +215,8 @@ def show_location_items(request, location_id):
   location = get_object_or_404(Location, pk=location_id)
   items = location.item_set.all()
   reviews = Review.objects.filter(location=location)
-  
+  reviews_filter = ReviewFilter(request.GET, queryset=reviews)
+  reviews = reviews_filter.qs
   if items.exists():
     item_list = []
     for item in items:
@@ -230,12 +232,14 @@ def show_location_items(request, location_id):
       'location': location,
       'items': item_list,
       'reviews': reviews,
+      'reviews_filter': reviews_filter,
     }
   else:
     context = {
       'location': location,
       'items': items,
       'reviews': reviews,
+      'reviews_filter': reviews_filter,
     }
   return render(request, 'templates/location_item_info.html', context)
 
@@ -244,12 +248,12 @@ def show_location_items(request, location_id):
 def add_review(request):
    submitted = False
    if request.method == 'POST':
-     form = ReviewForm(request.POST)
+     form = ReviewForm(request.POST,initial={'user': request.user.username})
      if form.is_valid():
        form.save()
        return HttpResponseRedirect('/add_review?submitted=True')
    else:
-     form = ReviewForm
+     form = ReviewForm(initial={'user': request.user.username})
      if 'submitted' in request.GET:
        submitted = True
    return render(request, 'templates/add_review.html', {
@@ -262,12 +266,12 @@ def add_review(request):
 def add_review_item(request):
   submitted = False
   if request.method == 'POST':
-    form = ItemReviewForm(request.POST)
+    form = ItemReviewForm(request.POST, initial={'user': request.user.username})
     if form.is_valid():
       form.save()
       return HttpResponseRedirect('/add_review_item?submitted=True')
   else:
-    form = ItemReviewForm
+    form = ItemReviewForm(initial={'user': request.user.username})
     if 'submitted' in request.GET:
       submitted = True
   return render(request, 'templates/add_review_item.html', {
@@ -278,9 +282,12 @@ def add_review_item(request):
 def item_info(request, item_id):
   item = get_object_or_404(Item, pk=item_id)
   reviews = ItemReview.objects.filter(item=item)
+  item_filter = ItemReviewFilter(request.GET, queryset=reviews)
+  reviews = item_filter.qs
   context = {
     'item': item,
-    'reviews': reviews
+    'reviews': reviews,
+    'item_filter': item_filter,
   }
   return render(request, 'templates/item_info.html', context)
 

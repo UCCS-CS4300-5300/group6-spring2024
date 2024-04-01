@@ -182,22 +182,44 @@
 <p></p>
 <p></p>
 
-<h2 class="row justify-content-center text-center"> Reviews </h2> 
-{% for review in reviews %}
+<div class="row justify-content-center text-center"> 
+  <h2>Reviews </h2>
+  <form method="get">
+    {{ reviews_filter.form }}
+    <button type="submit" class="btn custom-btn custom-btn-smaller">Search</button>
+  </form>
+</div>
+{% if reviews %}
+  {% for review in reviews %}
+  <div class="row justify-content-center mb-0">
+    <div class="card card-row m-0 position-relative">
+      <div class="row">
+        <div class="d-flex align-items-center justify-content-center">
+          <div class="card-body text-start">
+            <h3 class="card-title mb-0"">{{review.user}}</h3>
+            <p class="card-body">{{ review.review }}</p>
+            <p class="card-body">Stars: {{ review.num_stars }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
 <div class="row justify-content-center mb-0">
   <div class="card card-row m-0 position-relative">
     <div class="row">
-      <div class="d-flex align-items-center justify-content-center">
+      <div class="col-2 d-flex align-items-center justify-content-center">
+      </div>
+      <div class="col d-flex align-items-center ms-1 justify-content-center"> 
         <div class="card-body text-start">
-          <h3 class="card-title mb-0"">{{review.user}}</h3>
-          <p class="card-body">{{ review.review }}</p>
-          <p class="card-body">Stars: {{ review.num_stars }}</p>
+          <h3 class="card-title mb-0">No Reviews exist yet for this location.</h3>
         </div>
       </div>
     </div>
   </div>
 </div>
-{% endfor %}
+{% endif %}
 <p></p>
 <p></p>
 <!--Add review button -->
