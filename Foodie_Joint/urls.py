@@ -20,6 +20,8 @@ urlpatterns = [
     path("item_info/<int:item_id>", views.item_info, name='item_info'),
     path("remove_user", views.remove_user, name='remove_user'),
     path("user_profile", views.user_profile, name='user_profile'),
+    path("remove_store/<int:location_id>", views.remove_store, name='remove_store'),
+    path('remove_item/<int:item_id>', views.remove_item, name='remove_item'),
 ]
 
 if settings.DEBUG:
