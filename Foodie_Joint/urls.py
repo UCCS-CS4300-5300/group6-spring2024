@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -16,4 +18,9 @@ urlpatterns = [
     path("add_review", views.add_review, name='add_review'),
     path("add_review_item", views.add_review_item, name='add_review_item'),
     path("item_info/<int:item_id>", views.item_info, name='item_info'),
+    path("remove_user", views.remove_user, name='remove_user'),
+    path("user_profile", views.user_profile, name='user_profile'),
 ]
+
+if settings.DEBUG:
+  urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

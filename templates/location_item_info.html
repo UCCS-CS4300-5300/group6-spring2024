@@ -80,7 +80,7 @@
     <div class="col-6 bg-light">
       <div class="ratio ratio-1x1" style="max-width: 366px; margin: auto;">
         <div class="d-flex justify-content-center align-items-center bg-light" style="height: 100%;">
-          <h6>Image Placeholder</h6>
+          <img src="{{location.image.url}}" class="img-responsive" style="width: 100%; max-height: 100%; object-fit: cover;" alt="Location Image"/>
         </div>
       </div>
     </div>
@@ -97,7 +97,7 @@
           <!-- Address and Directions Line -->
           <div class="location-description">
             {% if location.address %}
-              <strong margin-right: 5px">Address:</strong>{{location.address}}
+              <strong style="margin-right: 5px">Address:</strong>{{ location.address }}
             {% else %}
               <strong>Location Address Not Present, Please Contact An Administrator</strong>
             {% endif %}
@@ -108,9 +108,21 @@
         <!-- Location Description Line -->
         <div class="location-description">
           {% if location.description %}
-            <strong>Description:</strong><p>{{location.description}}</p>
+            <strong style="margin-right: 5px">Description:</strong>{{location.description}}
           {% else %}
             <strong style="color: #f8f9fa;">There is no description for this location yet.</strong>
+          {% endif %}
+        </div>
+
+        <!-- Location Tags Line -->
+        <div class="location-description">
+          <strong style="margin-right: 5px">Tags:</strong>
+          {% if location.tags.exists %}
+            {% for tag in location.tags.all %}
+              {{ tag.name }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+          {% else %}
+            <strong style="color: #f8f9fa;">None</strong>
           {% endif %}
         </div>
       </div>
@@ -134,7 +146,7 @@
     <div class="card card-row m-0 position-relative">
       <div class="row">
         <div class="col-2 d-flex align-items-center justify-content-center">
-          <img src="https://harmlessharvest.com/cdn/shop/files/harmless-harvest-12oz-organic-pink-coconut-water.png" class="img-fluid rounded-start" alt="{{ item.name }}">
+          <img src="{{item.image}}" class="img-fluid"  alt="{{item.name}}"/>
         </div>
         <div class="col d-flex align-items-center ms-1 justify-content-center"> 
           <div class="card-body text-start">
@@ -163,9 +175,6 @@
   </div>
   {% endif %}
 </div>
-<<<<<<< HEAD
-  <button class="btn custom-btn custom-btn-smaller bottom-btn" onclick="window.history.back();">Back</button>
-=======
 <div class=container>
   <button class="btn custom-btn custom-btn-smaller bottom-btn" onclick="window.history.back();">Back</button>
 </div>
@@ -173,22 +182,44 @@
 <p></p>
 <p></p>
 
-<h2 class="row justify-content-center text-center"> Reviews </h2> 
-{% for review in reviews %}
+<div class="row justify-content-center text-center"> 
+  <h2>Reviews </h2>
+  <form method="get">
+    {{ reviews_filter.form }}
+    <button type="submit" class="btn custom-btn custom-btn-smaller">Search</button>
+  </form>
+</div>
+{% if reviews %}
+  {% for review in reviews %}
+  <div class="row justify-content-center mb-0">
+    <div class="card card-row m-0 position-relative">
+      <div class="row">
+        <div class="d-flex align-items-center justify-content-center">
+          <div class="card-body text-start">
+            <h3 class="card-title mb-0"">{{review.user}}</h3>
+            <p class="card-body">{{ review.review }}</p>
+            <p class="card-body">Stars: {{ review.num_stars }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
 <div class="row justify-content-center mb-0">
   <div class="card card-row m-0 position-relative">
     <div class="row">
-      <div class="d-flex align-items-center justify-content-center">
+      <div class="col-2 d-flex align-items-center justify-content-center">
+      </div>
+      <div class="col d-flex align-items-center ms-1 justify-content-center"> 
         <div class="card-body text-start">
-          <h3 class="card-title mb-0"">{{review.user}}</h3>
-          <p class="card-body">{{ review.review }}</p>
-          <p class="card-body">Stars: {{ review.num_stars }}</p>
+          <h3 class="card-title mb-0">No Reviews exist yet for this location.</h3>
         </div>
       </div>
     </div>
   </div>
 </div>
-{% endfor %}
+{% endif %}
 <p></p>
 <p></p>
 <!--Add review button -->
@@ -202,5 +233,4 @@
 
 
 <button class="btn custom-btn custom-btn-smaller bottom-btn" onclick="window.history.back();">Back</button>
->>>>>>> GoodermontBranch
 {% endblock %}

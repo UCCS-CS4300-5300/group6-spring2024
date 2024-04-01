@@ -35,15 +35,43 @@ class LocationForm(ModelForm):
 
   class Meta:
     model = Location
-    fields = ['name', 'description', 'location_type', 'address']
+    fields = ['name', 'description', 'location_type', 'address', 'tags', 'image']
+    labels = {
+      'name': 'Name',
+      'description': 'Description',
+      'location_type': 'Location Type',
+      'address': 'Address',
+      'tags': 'Tags',
+      'image': 'Image'
+    }
+    widgets = {
+      'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Name of Location'}),
+      'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Description of Location'}),
+      'location_type': forms.Select(attrs={'class': 'form-control'}),
+      'address': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '1111 A Place Lane'}),
+      'image': forms.FileInput(attrs={'class': 'form-control'}),
+      'tags': forms.CheckboxSelectMultiple
+    }
 
 
 class ItemForm(forms.ModelForm):
 
   class Meta:
     model = Item
-    fields = ['name', 'description', 'location', 'is_recommended']
-
+    fields = ['name', 'description', 'location', 'is_recommended', 'image']
+    labels = {
+      'name': 'Name',
+      'description': 'Description',
+      'location': 'Location',
+      'is_recommended': 'Recommended?',
+      'image': 'Image'
+    }
+    widgets = {
+      'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Name of Item'}),
+      'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Description of Item'}),
+      'location': forms.Select(attrs={'class': 'form-control'}),
+      'image': forms.FileInput(attrs={'class': 'form-control'})
+    }
 
 #class UserForm(forms.ModelForm):
 
