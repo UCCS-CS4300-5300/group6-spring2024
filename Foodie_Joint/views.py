@@ -109,6 +109,7 @@ def nearby(request):
             'rounded_distance': rounded_distance,
             'id': location.id,  # needed for location_item_info template
             'tags': location.tags.all(),
+            'image': location.image
         })
 
     # Sorting in ascending order of distance (https://blogboard.io/blog/knowledge/python-sorted-lambda/)
@@ -225,7 +226,6 @@ def show_location_items(request, location_id):
         'location': item.location,
         'is_recommended': item.is_recommended,
         'id': item.id,
-        'image': item.image.url
       })
     context = {
       'location': location,
