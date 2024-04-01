@@ -1,194 +1,186 @@
-{% extends 'templates/base_template.html' %}
+  {% extends 'templates/base_template.html' %}
 
-{% block content %}
-<style>
-  .card-row {
-    max-width: 78%;
-    margin: 0 auto;
-  }
-
-  .location-description p {
-    margin-top: 0; /* Adjusted */
-    font-size: 1rem; /* Increased visibility */
-  }
-
-  .img-fluid {
-    height: 100px;
-    object-fit: cover;
-    width: auto;
-  }
-
-  .bottom-btn {
-    margin-left: 10.44%;
-    margin-top: 1.5%;
-    margin-bottom: 3%;
-  }
-
-  .custom-btn-width {
-      width: 110px; /* Fixed width: Adjust this value based on your layout's needs */
-      max-width: 100%; /* Ensures that the button doesn't overflow its container */
-  }
-  
-  .location-details {
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
-    background-color: #D95A2B;
-    padding: 1rem;
-    margin-top: -1px; /* Remove gap between image and this container */
-    margin-left: auto; /* Center align */
-    margin-right: auto; /* Center align */
-  }
-
-  .header {
-    font-weight: bold;
-    margin-bottom: 0.5rem; /* Spacing between header and content */
-  }
-
-  @media (max-width: 768px) {
-    .directions-btn {
-      display: block;
-      margin-top: 8px;
+  {% block content %}
+  <style>
+    .card-row {
+      max-width: 78%;
+      margin: 0 auto;
     }
-  }
 
-  @media (max-width: 364px) {
-    .directions-btn {
-      padding: 4px 8px;
-      font-size: 0.7rem;
-      margin-right: 8px;
+    .location-description p {
+      margin-top: 0; /* Adjusted */
+      font-size: 1rem; /* Increased visibility */
     }
-  }
-</style>
 
-<div class="container">
-  <h1 class="text-center" style="margin-top:65px;">{{ location.name }}</h1>
+    .img-fluid {
+      height: 100px;
+      object-fit: cover;
+      width: auto;
+    }
 
-  <div class="row justify-content-center">
-    <div class="col-md-8  ">
-      <div class="ratio ratio-16x9">
-          <img class="rounded-top" src="https://www.qsrmagazine.com/wp-content/uploads/2022/08/SlimChickens_RFsept2022.jpg"/>
+    .bottom-btn {
+      margin-left: 10.44%;
+      margin-top: 1.5%;
+      margin-bottom: 3%;
+    }
+
+    .custom-btn-width {
+        width: 110px; /* Fixed width: Adjust this value based on your layout's needs */
+        max-width: 100%; /* Ensures that the button doesn't overflow its container */
+    }
+
+    .location-details {
+      border-bottom-left-radius: 15px;
+      border-bottom-right-radius: 15px;
+      background-color: #D95A2B;
+      padding: 1rem;
+      margin-top: -1px; /* Remove gap between image and this container */
+      margin-left: auto; /* Center align */
+      margin-right: auto; /* Center align */
+    }
+
+    .header {
+      font-weight: bold;
+      margin-bottom: 0.5rem; /* Spacing between header and content */
+    }
+
+    @media (max-width: 768px) {
+      .directions-btn {
+        display: block;
+        margin-top: 8px;
+      }
+    }
+
+    @media (max-width: 364px) {
+      .directions-btn {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+        margin-right: 8px;
+      }
+    }
+  </style>
+
+  <div class="container">
+    <h1 class="text-center" style="margin-top:65px;">{{ location.name }}</h1>
+
+    <!-- Main image -->
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="ratio ratio-16x9">
+          <img class="rounded-top" src="{{ location.image.url }}" class="img-responsive" style="width: 100%; max-height: 100%; object-fit: cover;" alt="Location Image"/>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="location-details">
-        <div class="row  ">
-          <div class="col-md-8  ">
+
+    <!-- Rectangular section for location details with adjusted structure -->
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="location-details">
+          <div class="location-description">
             <p>Address: {{ location.address }}</p>
-          </div>
-          <div class="col d-flex justify-content-end">
-            <a class="btn custom-btn directions-btn" href="https://www.google.com/maps/search/?api=1&query={{ location.address|urlencode }}" target="_blank">Directions</a>
-          </div>
-      </div>
-        <div class="row  ">
-          <div class="col  ">
             <p>Description: {{ location.description }}</p>
           </div>
+          <div class="d-flex justify-content-between">
+            <div>
+              <strong>Tags:</strong>
+              {% if location.tags.exists %}
+                {% for tag in location.tags.all %}
+                  {{ tag.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+              {% else %}
+                None
+              {% endif %}
+            </div>
+            <a class="btn custom-btn directions-btn" href="https://www.google.com/maps/search/?api=1&query={{ location.address|urlencode }}" target="_blank">Directions</a>
+          </div>
         </div>
+      </div>
     </div>
-  </div>
-  </div>
-  <!-- Add Item button -->
-  <div class="container text-center mt-5">
-  <div class="row justify-content-center">
-    <h3 class="justify-content-center">Items Sold Here</h3>
-    <div class="col"></div>
-    <div class="col-7" style="height: 24px;"></div>
-    <div class="col position-relative">
-      <a class="btn custom-btn custom-btn-smaller custom-btn-width position-absolute bottom-0 start-0 mb-3" href="{% url 'add_item' %}">Add Item</a>
+
+    <!-- Add Item button -->
+    <div class="container text-center mt-5">
+      <div class="row justify-content-center">
+        <h3>Items Sold Here</h3>
+        <div class="col-12">
+          <a class="btn custom-btn custom-btn-width" href="{% url 'add_item' %}">Add Item</a>
+        </div>
+      </div>
     </div>
-  </div>
-  </div>
+
     <!-- Item List -->
     {% if items %}
       {% for item in items %}
-    <div class="row justify-content-center mb-0">
-      <div class="card card-row m-0 position-relative">
-        <div class="row">
-          <div class="col-2 d-flex align-items-center justify-content-center">
-            <img src="https://harmlessharvest.com/cdn/shop/files/harmless-harvest-12oz-organic-pink-coconut-water.png" class="img-fluid rounded-start" alt="{{ item.name }}">
-          </div>
-          <div class="col d-flex align-items-center ms-1 justify-content-center"> 
-            <div class="card-body text-start">
-              <h2 class="card-title mb-0">{{ item.name }}</h2>
+        <div class="row justify-content-center mb-0">
+          <div class="card card-row m-0 position-relative">
+            <div class="row">
+              <div class="col-2 d-flex align-items-center justify-content-center">
+                <img src="{{ item.image }}" class="img-fluid rounded-start" alt="{{ item.name }}">
+              </div>
+              <div class="col d-flex align-items-center ms-1 justify-content-center"> 
+                <div class="card-body text-start">
+                  <h2 class="card-title mb-0">{{ item.name }}</h2>
+                </div>
+              </div>
+              <!-- Link to Item Details page -->
+              <a href="{% url 'item_info' item.id %}" class="stretched-link"></a>
             </div>
           </div>
         </div>
-
-        <!-- Link to Item Details page -->
-        <a href="{% url 'item_info' item.id %}" class="stretched-link"></a>
-      </div>
-    </div>
       {% endfor %}
     {% else %}
-    <div class="row justify-content-center mb-0">
-      <div class="card card-row m-0 position-relative">
-        <div class="row">
-          <div class="col-2 d-flex align-items-center justify-content-center">
+      <div class="row justify-content-center mb-0">
+        <div class="card card-row m-0 position-relative">
+          <div class="row">
+            <div class="col d-flex align-items-center justify-content-center"> 
+              <div class="card-body text-start">
+                <h3>No items exist yet for this location.</h3>
+              </div>
+            </div>
           </div>
-          <div class="col d-flex align-items-center ms-1 justify-content-center"> 
-            <div class="card-body text-start">
-              <h3 class="card-title mb-0">No items exist yet for this location.</h3>
-            </div>
-            </div>
-            </div>
-            </div>
-            {% endif %}
-            </div>
-            <div class=container>
-            <button class="btn custom-btn custom-btn-smaller bottom-btn" onclick="window.history.back();">Back</button>
-            </div>
-            </div>
-            </div>
-</div>
+        </div>
+      </div>
+    {% endif %}
 
-<div class="container justify-content-center mt-3">
-    <!-- Add Item button -->
-    <div class="container text-center">
-    <div class="row justify-content-center">
-      <h3 class="justify-content-center">Reviews</h3>
-      <div class="col  "></div>
-      <div class="col-7" style="height: 24px;"></div>
-      <div class="col position-relative">
-        <a class="btn custom-btn custom-btn-smaller custom-btn-width position-absolute bottom-0 start-0 mb-3" href="{% url 'add_review' %}">Add Review</a>
+    <div class="container">
+      <button class="btn custom-btn custom-btn-smaller bottom-btn" onclick="window.history.back();">Back</button>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="container justify-content-center mt-3">
+      <div class="text-center">
+        <h3>Reviews</h3>
+        {% if reviews %}
+          {% for review in reviews %}
+            <div class="row justify-content-center mb-0">
+              <div class="card card-row m-0 position-relative">
+                <div class="row">
+                  <div class="col d-flex align-items-center justify-content-center"> 
+                    <div class="card-body text-start">
+                      <h3>{{ review.user }}</h3>
+                      <p>{{ review.review }}</p>
+                      <p>Stars: {{ review.num_stars }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="row justify-content-center mb-0 border-0">
+            <div class="card card-row m-0 p-0 position-relative">
+              <div class="row">
+                <div class="col d-flex align-items-start justify-content-center"> 
+                  <div class="card-body text-start">
+                    <p>No reviews exist for this location.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      <div class="container">
+        <button class="btn custom-btn custom-btn-smaller bottom-btn" onclick="window.history.back();">Back</button>
       </div>
     </div>
-    </div>
-
-<!-- Item List -->
-{% if reviews %}
-{% for review in reviews %}
-<div class="row justify-content-center mb-0">
-<div class="card card-row m-0 position-relative">
-<div class="row">
-<div class="col d-flex align-items-center ms-1 justify-content-center"> 
-  <div class="card-body text-start">
-    <h3 class="card-title mb-0"">{{review.user}}</h3>
-    <p class="card-body">{{ review.review }}</p>
-    <p class="card-body">Stars: {{ review.num_stars }}</p>
-  </div>
-</div>
-</div>
-
-</div>
-</div>
-{% endfor %}
-{% else %}
-<div class="row justify-content-center mb-0 border-0">
-<div class="card card-row m-0 p-0 position-relative">
-<div class="row">
-<div class="col d-flex align-items-start ms-0 justify-content-center"> 
-  <div class="card-body text-start">
-    <p class="card-title mb-0">No reviews exist for this location.</p>
-  </div>
-</div>
-</div>
-</div>
-</div>
-{% endif %}
-</div>
-<div class=container>
-<button class="btn custom-btn custom-btn-smaller bottom-btn" onclick="window.history.back();">Back</button>
-</div>
   {% endblock %}
