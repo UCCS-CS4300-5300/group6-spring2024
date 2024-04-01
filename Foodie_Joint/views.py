@@ -224,6 +224,7 @@ def show_location_items(request, location_id):
         'location': item.location,
         'is_recommended': item.is_recommended,
         'id': item.id,
+        'image': item.image.url
       })
     context = {
       'location': location,
