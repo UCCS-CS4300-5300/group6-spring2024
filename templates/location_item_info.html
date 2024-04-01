@@ -1,236 +1,233 @@
-<!-- NOTE! The hyperlink <a> tag that's needed to add the route to the Item Details page is currently found on line 81 of this template. -->
+  {% extends 'templates/base_template.html' %}
 
-{% extends 'templates/base_template.html' %}
+  {% block content %}
+  <style>
+    .card-row {
+      max-width: 78%;
+      margin: 0 auto;
+    }
 
-{% block content %}
-<style>
-  .card-row {
-    max-width: 78%;
-    margin: 0 auto;
-  }
+    .location-description p {
+      margin-top: 0; /* Adjusted */
+      font-size: 1rem; /* Increased visibility */
+    }
 
-  .img-fluid {
-    height: 100px;
-    object-fit: cover;
-    width: auto;
-  }
-
-  .bottom-btn {
-    margin-left: 10.44%;
-    margin-top: 1.5%;
-    margin-bottom: 3%;
-  }
-
-  .location-details {
-    display: flex;
-    flex-direction: column;
-    margin: auto;
-    padding: 10px;
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
-    background-color: #D95A2B;
-  }
-
-
-  .flex-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: nowrap;
-  }
-
-  .location-description {
-    display: flex;
-    flex-wrap: nowrap;
-  }
-  
-  .directions-btn {
-    display: flex;
-    margin-right: 10px; /* Adjusts spacing to the container edge */
-    padding: 5px 10px; /* Smaller padding for a compact look */
-    font-size: 0.75rem; /* Smaller font size */
-  }
-  
-  @media (max-width: 768px) {
     .img-fluid {
-      width: 100%; /* Full width on smaller screens */
-      height: auto; /* Adjusts height automatically */
+      height: 100px;
+      object-fit: cover;
+      width: auto;
     }
 
-    .col-md-2, .col-md-8 {
-      flex: 0 0 100%;
-      max-width: 100%;
+    .bottom-btn {
+      margin-left: 10.44%;
+      margin-top: 1.5%;
+      margin-bottom: 3%;
     }
-  }
-  
-  @media (max-width: 364px) {
-    .directions-btn {
-      padding: 4px 8px;
-      font-size: 0.7rem;
-      margin-right: 8px; 
-  }
-</style>
 
-<div class="container text-center">
-  <h1 style="margin-top:65px;">{{ location.name }}</h1>
+    .custom-btn-width {
+      width: 110px; /* Fixed width: Adjust this value based on your layout's needs */
+      max-width: 100%; /* Ensures that the button doesn't overflow its container */
+    }
 
-  <!-- Main image -->
-  <div class="row">
-    <div class="col"></div>
-    <div class="col-6 bg-light">
-      <div class="ratio ratio-1x1" style="max-width: 366px; margin: auto;">
-        <div class="d-flex justify-content-center align-items-center bg-light" style="height: 100%;">
-          <img src="{{location.image.url}}" class="img-responsive" style="width: 100%; max-height: 100%; object-fit: cover;" alt="Location Image"/>
+    .location-details {
+      border-bottom-left-radius: 15px;
+      border-bottom-right-radius: 15px;
+      background-color: #D95A2B;
+      padding: 1rem;
+      margin-top: -1px; /* Remove gap between image and this container */
+      margin-left: auto; /* Center align */
+      margin-right: auto; /* Center align */
+    }
+
+    .header {
+      font-weight: bold;
+      margin-bottom: 0.5rem; /* Spacing between header and content */
+    }
+
+    @media (max-width: 768px) {
+      .directions-btn {
+        display: block;
+        margin-top: 8px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .img-fluid {
+        display: none; /* Hide the images when the screen width is 720px or less */
+      }
+    }
+
+    @media (max-width: 364px) {
+      .directions-btn {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+        margin-right: 8px;
+      }
+    }
+  </style>
+
+  <div class="container">
+    <h1 class="text-center" style="margin-top:65px;">{{ location.name }}</h1>
+    <!-- Main image -->
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="ratio ratio-16x9">
+          <img class="rounded-top" src="{{ location.image.url }}" class="img-responsive" style="width: 100%; max-height: 100%; object-fit: cover;" alt="Location Image"/>
         </div>
       </div>
     </div>
-    <div class="col"></div>
-  </div>
 
-  <!-- Rectangular section for location details with adjusted structure -->
-  <div class="row">
-    <div class="col"></div>
-    <div class="col-6">
-      <div class="location-details" style="margin-left: -12px; margin-right: -12px;">
-        <div class="flex-row"> 
-          
-          <!-- Address and Directions Line -->
+    <!-- Rectangular section for location details with adjusted structure -->
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="location-details">
           <div class="location-description">
-            {% if location.address %}
-              <strong style="margin-right: 5px">Address:</strong>{{ location.address }}
-            {% else %}
-              <strong>Location Address Not Present, Please Contact An Administrator</strong>
-            {% endif %}
+            <p>Address: {{ location.address }}</p>
+            <p>Description: {{ location.description }}</p>
           </div>
-          <a class="btn custom-btn directions-btn" href="https://www.google.com/maps/search/?api=1&query={{ location.address|urlencode }}" target="_blank">Directions</a>
-        </div>
+          <div class="d-flex justify-content-between">
+            <div>
+              <strong>Tags:</strong>
+              {% if location.tags.exists %}
+                {% for tag in location.tags.all %}
+                  {{ tag.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+              {% else %}
+                None
+              {% endif %}
+            </div>
+            <a class="btn custom-btn directions-btn" href="https://www.google.com/maps/search/?api=1&query={{ location.address|urlencode }}" target="_blank">Directions</a>
+          </div>
+          {% if user.is_authenticated and user.is_superuser %}
+          <!-- Button trigger modal -->
+          <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removeStoreModal">
+            Remove Store
+          </button>
 
-        <!-- Location Description Line -->
-        <div class="location-description">
-          {% if location.description %}
-            <strong style="margin-right: 5px">Description:</strong>{{location.description}}
-          {% else %}
-            <strong style="color: #f8f9fa;">There is no description for this location yet.</strong>
+          <!-- Modal -->
+          <div class="modal fade" id="removeStoreModal" tabindex="-1" aria-labelledby="removeStoreModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="removeStoreModalLabel">Confirm Store Removal</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Are you sure that you would like to remove {{ location.name }}?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <form action="{% url 'remove_store' location.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Confirm</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
           {% endif %}
         </div>
-
-        <!-- Location Tags Line -->
-        <div class="location-description">
-          <strong style="margin-right: 5px">Tags:</strong>
-          {% if location.tags.exists %}
-            {% for tag in location.tags.all %}
-              {{ tag.name }}{% if not forloop.last %},{% endif %}
-            {% endfor %}
-          {% else %}
-            <strong style="color: #f8f9fa;">None</strong>
-          {% endif %}
-        </div>
       </div>
     </div>
-    <div class="col"></div>
-  </div>
 
-  <!-- Add Item button -->
-  <div class="row">
-    <div class="col"></div>
-    <div class="col-7" style="height: 48px;"></div>
-    <div class="col position-relative">
-      <a class="btn custom-btn custom-btn-smaller position-absolute bottom-0 start-0 mb-3" href="{% url 'add_item' %}">Add Item</a>
-    </div>
-  </div>
-
-  <!-- Item List -->
-  {% if items %}
-    {% for item in items %}
-  <div class="row justify-content-center mb-0">
-    <div class="card card-row m-0 position-relative">
-      <div class="row">
-        <div class="col-2 d-flex align-items-center justify-content-center">
-          <img src="{{item.image}}" class="img-fluid"  alt="{{item.name}}"/>
-        </div>
-        <div class="col d-flex align-items-center ms-1 justify-content-center"> 
-          <div class="card-body text-start">
-            <h2 class="card-title mb-0">{{ item.name }}</h2>
-          </div>
-        </div>
-      </div>
-      <a href="{% url 'item_info' item.id %}" class="stretched-link"></a>
-
-    </div>
-  </div>
-    {% endfor %}
-  {% else %}
-  <div class="row justify-content-center mb-0">
-    <div class="card card-row m-0 position-relative">
-      <div class="row">
-        <div class="col-2 d-flex align-items-center justify-content-center">
-        </div>
-        <div class="col d-flex align-items-center ms-1 justify-content-center"> 
-          <div class="card-body text-start">
-            <h3 class="card-title mb-0">No items exist yet for this location.</h3>
+    <!-- Add Item button -->
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-12">
+          <div style="max-width: 78%; margin: 0 auto; margin-bottom: 9.713px;">
+            <div class="d-flex justify-content-end"> <!-- Flex container for right alignment -->
+              <a class="btn custom-btn custom-btn-width mb-2" href="{% url 'add_item' %}">Add Item</a>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  {% endif %}
-</div>
-<div class=container>
-  <button class="btn custom-btn custom-btn-smaller bottom-btn" onclick="window.history.back();">Back</button>
-</div>
 
-<p></p>
-<p></p>
-
-<div class="row justify-content-center text-center"> 
-  <h2>Reviews </h2>
-  <form method="get">
-    {{ reviews_filter.form }}
-    <button type="submit" class="btn custom-btn custom-btn-smaller">Search</button>
-  </form>
-</div>
-{% if reviews %}
-  {% for review in reviews %}
-  <div class="row justify-content-center mb-0">
-    <div class="card card-row m-0 position-relative">
-      <div class="row">
-        <div class="d-flex align-items-center justify-content-center">
-          <div class="card-body text-start">
-            <h3 class="card-title mb-0"">{{review.user}}</h3>
-            <p class="card-body">{{ review.review }}</p>
-            <p class="card-body">Stars: {{ review.num_stars }}</p>
+    <!-- Item List -->
+    {% if items %}
+      {% for item in items %}
+      <div class="row justify-content-center mb-0">
+        <div class="card card-row m-0 position-relative">
+          <div class="row">
+            <div class="col-2 d-flex align-items-center justify-content-center">
+              <img src="{{ item.image }}" class="img-fluid rounded-start" alt="{{ item.name }}">
+            </div>
+            <div class="col d-flex align-items-center ms-1 justify-content-center"> 
+              <div class="card-body text-start">
+                <h2 class="card-title mb-0">{{ item.name }}</h2>
+              </div>
+            </div>
+            <!-- Link to Item Details page -->
+            <a href="{% url 'item_info' item.id %}" class="stretched-link"></a>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-  {% endfor %}
-{% else %}
-<div class="row justify-content-center mb-0">
-  <div class="card card-row m-0 position-relative">
-    <div class="row">
-      <div class="col-2 d-flex align-items-center justify-content-center">
-      </div>
-      <div class="col d-flex align-items-center ms-1 justify-content-center"> 
-        <div class="card-body text-start">
-          <h3 class="card-title mb-0">No Reviews exist yet for this location.</h3>
+      {% endfor %}
+    {% else %}
+      <div class="row justify-content-center mb-0">
+        <div class="card card-row m-0 position-relative">
+          <div class="row">
+            <div class="col d-flex align-items-center justify-content-center"> 
+              <div class="card-body text-start">
+                <h3>No items exist yet for this location.</h3>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+    {% endif %}
+
+    <div class="container">
+      
+      <button class="btn custom-btn custom-btn-smaller bottom-btn" onclick="window.history.back();">Back</button>
     </div>
-  </div>
-</div>
-{% endif %}
-<p></p>
-<p></p>
-<!--Add review button -->
-<div class="row">
-  <div class="col"></div>
-    <div class="col-7" style="height: 48px;"></div>
-      <div class="col position-relative">
-    <a class="btn custom-btn custom-btn-smaller position-absolute bottom-0 start-0 mb-3" href="{% url 'add_review' %}">Add Review</a>
+
+    <!-- Reviews Section with Filter -->
+    <div class="container justify-content-center mt-3">
+      <div class="text-center">
+        <h3>Reviews</h3>
+        <div class="row justify-content-center">
+          <div class="col-12">
+            <div style="max-width: 78%; margin: 0 auto; margin-bottom: 9.713px;">
+              <div class="d-flex justify-content-between align-items-center">
+                <form method="get" class="form-inline d-flex align-items-center">
+                  <div style="margin-right: 10px;">{{ reviews_filter.form }}</div>
+                  <button type="submit" class="btn custom-btn custom-btn-width">Search</button>
+                </form>
+                <a class="btn custom-btn custom-btn-smaller" href="{% url 'add_review' %}">Add Review</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% if reviews %}
+          {% for review in reviews %}
+            <div class="row justify-content-center mb-0">
+              <div class="card card-row m-0 position-relative">
+                <div class="row">
+                  <div class="col d-flex align-items-center justify-content-center">
+                    <div class="card-body text-start">
+                      <h3>{{ review.user }}</h3>
+                      <p>{{ review.review }}</p>
+                      <p>Stars: {{ review.num_stars }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="row justify-content-center mb-0">
+            <div class="card card-row m-0 position-relative">
+              <div class="row">
+                <div class="col d-flex align-items-center justify-content-center">
+                  <div class="card-body text-start">
+                    <h3>No reviews exist yet for this location.</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
       </div>
-  </div>
-
-
-<button class="btn custom-btn custom-btn-smaller bottom-btn" onclick="window.history.back();">Back</button>
-{% endblock %}
+    </div>
+    {% endblock %}
