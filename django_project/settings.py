@@ -29,9 +29,9 @@ ALLOWED_HOSTS = [
     ".replit.dev", ".replit.app", "127.0.0.1:8000",
     '9bce0e11-b6ba-4a1d-9b73-5b768fefccca-00-3emf0wwbd1vei.janeway.repl.co',
     '5a25ef20-82cf-42d6-b716-69fbbe1fa9c3-00-310a111myqeeh.kirk.repl.co',
-  "658b463e-14cd-4853-bd0e-cb12529f90c2-00-3ne0f11err3re.janeway.replit.dev", 
+  "658b463e-14cd-4853-bd0e-cb12529f90c2-00-3ne0f11err3re.janeway.repl.co", 
 ]
-CSRF_TRUSTED_ORIGINS = ["https://*.replit.dev", "https://*.replit.app", "https://9bce0e11-b6ba-4a1d-9b73-5b768fefccca-00-3emf0wwbd1vei.janeway.repl.co", "https://5a25ef20-82cf-42d6-b716-69fbbe1fa9c3-00-310a111myqeeh.kirk.repl.co", "https://658b463e-14cd-4853-bd0e-cb12529f90c2-00-3ne0f11err3re.janeway.replit.dev", ]
+CSRF_TRUSTED_ORIGINS = ["https://*.replit.dev", "https://*.replit.app", "https://9bce0e11-b6ba-4a1d-9b73-5b768fefccca-00-3emf0wwbd1vei.janeway.repl.co", "https://5a25ef20-82cf-42d6-b716-69fbbe1fa9c3-00-310a111myqeeh.kirk.repl.co", "https://658b463e-14cd-4853-bd0e-cb12529f90c2-00-3ne0f11err3re.janeway.repl.co", ]
 
 # Application definition
 
