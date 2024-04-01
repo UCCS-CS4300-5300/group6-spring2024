@@ -1,17 +1,21 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from .filters import ItemReviewFilter, ReviewFilter
-from .models import Location, LocationTag, Item, User, Review, ItemReview, Tag
-from .forms import LocationForm, ItemForm, ReviewForm, ItemReviewForm, TagForm, ItemTagForm, RegisterUserForm
-from .utils import instantiate_tags
-from django.contrib.auth.forms import UserCreationForm
-from geopy.distance import distance
-from geopy.units import miles
 import requests  # Used to request info from API
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect, render
+from geopy.distance import distance
 
+from .filters import ItemReviewFilter, ReviewFilter
+from .forms import (
+  ItemForm,
+  ItemReviewForm,
+  LocationForm,
+  RegisterUserForm,
+  ReviewForm,
+)
+from .models import Item, ItemReview, Location, LocationTag, Review
+from .utils import instantiate_tags
 
 
 def index(request):
@@ -304,3 +308,18 @@ def remove_user(request):
 def user_profile(request):
   user = request.user
   return render(request, 'templates/profile.html', {'user': user})
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def remove_store(request, location_id):
+  location = get_object_or_404(Location, id=location_id)
+  location.delete()
+  return redirect('nearby')
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def remove_item(request, item_id):
+  item = get_object_or_404(Item, pk=item_id)
+  store_id = item.location.id
+  item.delete()
+  return redirect('nearby')
