@@ -25,8 +25,8 @@
     }
 
     .custom-btn-width {
-        width: 110px; /* Fixed width: Adjust this value based on your layout's needs */
-        max-width: 100%; /* Ensures that the button doesn't overflow its container */
+      width: 110px; /* Fixed width: Adjust this value based on your layout's needs */
+      max-width: 100%; /* Ensures that the button doesn't overflow its container */
     }
 
     .location-details {
@@ -48,6 +48,12 @@
       .directions-btn {
         display: block;
         margin-top: 8px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .img-fluid {
+        display: none; /* Hide the images when the screen width is 720px or less */
       }
     }
 
@@ -101,7 +107,7 @@
     <div class="container mt-5">
       <div class="row justify-content-center">
         <div class="col-12">
-          <div style="max-width: 78%; margin: 0 auto;">
+          <div style="max-width: 78%; margin: 0 auto; margin-bottom: 9.713px;">
             <div class="d-flex justify-content-end"> <!-- Flex container for right alignment -->
               <a class="btn custom-btn custom-btn-width mb-2" href="{% url 'add_item' %}">Add Item</a>
             </div>
@@ -113,22 +119,22 @@
     <!-- Item List -->
     {% if items %}
       {% for item in items %}
-        <div class="row justify-content-center mb-0">
-          <div class="card card-row m-0 position-relative">
-            <div class="row">
-              <div class="col-2 d-flex align-items-center justify-content-center">
-                <img src="{{ item.image }}" class="img-fluid rounded-start" alt="{{ item.name }}">
-              </div>
-              <div class="col d-flex align-items-center ms-1 justify-content-center"> 
-                <div class="card-body text-start">
-                  <h2 class="card-title mb-0">{{ item.name }}</h2>
-                </div>
-              </div>
-              <!-- Link to Item Details page -->
-              <a href="{% url 'item_info' item.id %}" class="stretched-link"></a>
+      <div class="row justify-content-center mb-0">
+        <div class="card card-row m-0 position-relative">
+          <div class="row">
+            <div class="col-2 d-flex align-items-center justify-content-center">
+              <img src="{{ item.image }}" class="img-fluid rounded-start" alt="{{ item.name }}">
             </div>
+            <div class="col d-flex align-items-center ms-1 justify-content-center"> 
+              <div class="card-body text-start">
+                <h2 class="card-title mb-0">{{ item.name }}</h2>
+              </div>
+            </div>
+            <!-- Link to Item Details page -->
+            <a href="{% url 'item_info' item.id %}" class="stretched-link"></a>
           </div>
         </div>
+      </div>
       {% endfor %}
     {% else %}
       <div class="row justify-content-center mb-0">
@@ -154,36 +160,37 @@
         <h3>Reviews</h3>
         {% if reviews %}
           {% for review in reviews %}
-            <div class="row justify-content-center mb-0">
-              <div class="card card-row m-0 position-relative">
-                <div class="row">
-                  <div class="col d-flex align-items-center justify-content-center"> 
-                    <div class="card-body text-start">
-                      <h3>{{ review.user }}</h3>
-                      <p>{{ review.review }}</p>
-                      <p>Stars: {{ review.num_stars }}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          {% endfor %}
-        {% else %}
-          <div class="row justify-content-center mb-0 border-0">
-            <div class="card card-row m-0 p-0 position-relative">
+          <div class="row justify-content-center mb-0">
+            <div class="card card-row m-0 position-relative">
               <div class="row">
-                <div class="col d-flex align-items-start justify-content-center"> 
+                <div class="col d-flex align-items-center justify-content-center"> 
                   <div class="card-body text-start">
-                    <p>No reviews exist for this location.</p>
+                    <h3>{{ review.user }}</h3>
+                    <p>{{ review.review }}</p>
+                    <p>Stars: {{ review.num_stars }}</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+          {% endfor %}
+        {% else %}
+        <div class="row justify-content-center mb-0">
+          <div class="card card-row m-0 position-relative">
+            <div class="row">
+              <div class="col d-flex align-items-center justify-content-center"> 
+                <div class="card-body text-start">
+                  <h3>No reviews exist for this location.</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         {% endif %}
       </div>
-      <div class="container">
-        <button class="btn custom-btn custom-btn-smaller bottom-btn" onclick="window.history.back();">Back</button>
+      <!-- Add review button -->
+      <div class="row justify-content-center mt-3">
+        <a class="btn custom-btn custom-btn-smaller" href="{% url 'add_review' %}">Add Review</a>
       </div>
     </div>
   {% endblock %}
