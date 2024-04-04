@@ -20,9 +20,14 @@ from .utils import instantiate_tags
 
 def index(request):
   # Since only one item can be recommended for now, we can just get the first item marked as recommended from the database.
+  carousel_restaurants = Location.objects.filter(location_type='Restaurant')[:3]
+  carousel_stores = Location.objects.filter(location_type='Store')[:3]
   recommended_item = Item.objects.filter(is_recommended=True).first()
   return render(request, 'templates/index.html',
-                {'recommended_item': recommended_item})
+                {'recommended_item': recommended_item,
+                'carousel_restaurants': carousel_restaurants,
+                 'carousel_stores': carousel_stores}
+               )
 
 
 def base(request):

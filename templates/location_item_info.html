@@ -32,7 +32,6 @@
     .location-details {
       border-bottom-left-radius: 15px;
       border-bottom-right-radius: 15px;
-      background-color: #D95A2B;
       padding: 1rem;
       margin-top: -1px; /* Remove gap between image and this container */
       margin-left: auto; /* Center align */
@@ -80,10 +79,11 @@
     <!-- Rectangular section for location details with adjusted structure -->
     <div class="row justify-content-center">
       <div class="col-md-8">
-        <div class="location-details">
+        <div class="location-details bg-light">
+          <a class="btn custom-btn directions-btn mb-3" href="https://www.google.com/maps/search/?api=1&query={{ location.address|urlencode }}" target="_blank">Directions</a>
           <div class="location-description">
-            <p>Address: {{ location.address }}</p>
-            <p>Description: {{ location.description }}</p>
+            <h4>Address: {{ location.address }}</h4>
+            <h4>Description: {{ location.description }}</h4>
           </div>
           <div class="d-flex justify-content-between">
             <div>
@@ -96,11 +96,10 @@
                 None
               {% endif %}
             </div>
-            <a class="btn custom-btn directions-btn" href="https://www.google.com/maps/search/?api=1&query={{ location.address|urlencode }}" target="_blank">Directions</a>
           </div>
           {% if user.is_authenticated and user.is_superuser %}
           <!-- Button trigger modal -->
-          <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removeStoreModal">
+          <button type="button" class="btn btn-danger mt-3" data-bs-toggle="modal" data-bs-target="#removeStoreModal">
             Remove Store
           </button>
 
