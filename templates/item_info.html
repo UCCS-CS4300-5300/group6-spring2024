@@ -48,37 +48,46 @@
 </style>
 
 <div class="container text-center">
-  <h1 style="margin-top:65px;">{{ item.name }}</h1>
+  
 
   <div class="image-container">
     <img src="{{ item.image.url }}" class="img-fluid" alt="Item Image">
   </div>
 
-  {% if user.is_superuser %}
-    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removeItemModal">Remove Item</button>
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="location-details bg-light">
+        <h1 style="margin-top:65px;">{{ item.name }}</h1>
+        <h4>{{ item.description }}</h4>
+        {% if user.is_superuser %}
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removeItemModal">Remove Item</button>
 
-    <!-- Modal -->
-    <div class="modal fade" id="removeItemModal" tabindex="-1" aria-labelledby="removeItemModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="removeItemModalLabel">Confirm Item Removal</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            Are you sure you want to remove this item?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <form action="{% url 'remove_item' item.id %}" method="post">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-danger">Remove Item</button>
-            </form>
+        <!-- Modal -->
+        <div class="modal fade" id="removeItemModal" tabindex="-1" aria-labelledby="removeItemModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="removeItemModalLabel">Confirm Item Removal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to remove this item?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{% url 'remove_item' item.id %}" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger">Remove Item</button>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
+        {% endif %}
       </div>
     </div>
-  {% endif %}
+  </div>
+
 
   <div class="container justify-content-center mt-3">
     <div class="text-center">
