@@ -15,14 +15,10 @@
   
       {% csrf_token %}
 
-      
-
-
-
-
-
 <br/><br/>
 <!-- Button trigger modal -->
+<a href="{% url 'favorite_list' %}?type=Restaurant" class="btn custom-btn">View Favorites</a>
+<br><br>
 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
   Delete User
 </button>

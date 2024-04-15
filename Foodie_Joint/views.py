@@ -200,6 +200,20 @@ def add_location(request):
       'submitted': submitted
   })
 
+@login_required(login_url='/login_user')
+def favorite_item(request, location_id):
+  location = get_object_or_404(Location, id=location_id)
+  if location.favorites.filter(id=request.user.id).exists():
+    location.favorites.remove(request.user)
+  else:
+    fav=False
+    location.favorites.add(request.user)
+  return HttpResponseRedirect(request.META['HTTP_REFERER'])
+  
+@login_required(login_url='/login_user')
+def favorite_list(request):
+  new = Location.objects.filter(favorites=request.user)
+  return render(request, 'templates/favorites.html', {'new': new})
 
 @login_required(login_url='/login_user')
 def add_item(request):
@@ -219,6 +233,7 @@ def add_item(request):
   })
 
 
+
 # Renders a specific location's details and its associated items.
 def show_location_items(request, location_id):
   location = get_object_or_404(Location, pk=location_id)
@@ -226,6 +241,9 @@ def show_location_items(request, location_id):
   reviews = Review.objects.filter(location=location)
   reviews_filter = ReviewFilter(request.GET, queryset=reviews)
   reviews = reviews_filter.qs
+  fav = bool
+  if location.favorites.filter(id=request.user.id).exists():
+    fav=True
   if items.exists():
     item_list = []
     for item in items:
@@ -249,6 +267,7 @@ def show_location_items(request, location_id):
       'items': items,
       'reviews': reviews,
       'reviews_filter': reviews_filter,
+      'fav': fav,
     }
   return render(request, 'templates/location_item_info.html', context)
 
