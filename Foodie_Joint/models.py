@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models.enums import Choices
@@ -58,6 +58,7 @@ class Location(models.Model):
   address = models.CharField(max_length=50)
   tags = models.ManyToManyField(LocationTag)
   image = models.ImageField(upload_to='images/', blank = True, null=True, default='images/foodie-joint-logo.png')
+  favorites = models.ManyToManyField(User, related_name="favorites", default=None, blank=True)
 
   def __str__(self):
     return f"{self.name}: {self.description} ({self.location_type}, {self.address})"
