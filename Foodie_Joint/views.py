@@ -11,10 +11,10 @@ from .forms import (
   ItemForm,
   ItemReviewForm,
   LocationForm,
-  RegisterUserForm,
+  RegistrationForm,
   ReviewForm,
 )
-from .models import Item, ItemReview, Location, LocationTag, Review
+from .models import Item, ItemReview, Location, LocationTag, Review, Account, User
 from .utils import instantiate_tags
 
 
@@ -78,10 +78,7 @@ def get_distance(address1, address2):
 #@login_required(login_url='/login_user')
 def nearby(request):
   context = {}
-  # Static address as placeholder till User model working
-  user_address = '1420 Austin Bluffs Pkwy'
-  #user = request.user
-  #user_address = user.address
+  user_address = request.user.account.address
   locations = Location.objects.all()
   all_tags = LocationTag.objects.all()
 
@@ -131,6 +128,7 @@ def nearby(request):
         'sorted_locations': sorted_locations,
         'all_tags': all_tags,
         'selected_tags': selected_tags, # Added this to have checkboxes stay marked in template
+        'search_name': search_name,
     }
     return render(request, 'templates/nearby.html', context)
   else:
@@ -165,17 +163,28 @@ def logout_user(request):
 
 def register_user(request):
   if request.method == "POST":
-    form = RegisterUserForm(request.POST)
+    form = RegistrationForm(request.POST)
     if form.is_valid():
-      form.save()
-      username = form.cleaned_data['username']
-      password = form.cleaned_data['password1']
-      user = authenticate(request, username=username, password=password)
+      user = User.objects.create_user(
+        username = form.cleaned_data['username'],
+        password = form.cleaned_data['password'],
+        first_name = form.cleaned_data['first_name'],
+        last_name = form.cleaned_data['last_name'],
+        email = form.cleaned_data['email'],
+      )
+      account = Account.objects.create(
+        user = user,
+        address = form.cleaned_data['address'],
+      )
+      #form.save()
+      #username = form.cleaned_data['username']
+      #password = form.cleaned_data['password1']
+      user = authenticate(request, username=user.username, password=form.cleaned_data['password'])
       login(request, user)
       messages.success(request, ("Registration successful"))
       return redirect('index')
   else:
-    form = RegisterUserForm()
+    form = RegistrationForm()
   return render(request, 'templates/register_user.html', {
       'form': form,
   })
@@ -200,6 +209,20 @@ def add_location(request):
       'submitted': submitted
   })
 
+@login_required(login_url='/login_user')
+def favorite_item(request, location_id):
+  location = get_object_or_404(Location, id=location_id)
+  if location.favorites.filter(id=request.user.id).exists():
+    location.favorites.remove(request.user)
+  else:
+    fav=False
+    location.favorites.add(request.user)
+  return HttpResponseRedirect(request.META['HTTP_REFERER'])
+  
+@login_required(login_url='/login_user')
+def favorite_list(request):
+  new = Location.objects.filter(favorites=request.user)
+  return render(request, 'templates/favorites.html', {'new': new})
 
 @login_required(login_url='/login_user')
 def add_item(request):
@@ -219,6 +242,7 @@ def add_item(request):
   })
 
 
+
 # Renders a specific location's details and its associated items.
 def show_location_items(request, location_id):
   location = get_object_or_404(Location, pk=location_id)
@@ -226,6 +250,9 @@ def show_location_items(request, location_id):
   reviews = Review.objects.filter(location=location)
   reviews_filter = ReviewFilter(request.GET, queryset=reviews)
   reviews = reviews_filter.qs
+  fav = bool
+  if location.favorites.filter(id=request.user.id).exists():
+    fav=True
   if items.exists():
     item_list = []
     for item in items:
@@ -249,6 +276,7 @@ def show_location_items(request, location_id):
       'items': items,
       'reviews': reviews,
       'reviews_filter': reviews_filter,
+      'fav': fav,
     }
   return render(request, 'templates/location_item_info.html', context)
 

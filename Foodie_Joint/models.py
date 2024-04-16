@@ -1,8 +1,9 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models.enums import Choices
+
 
 
 class LocationTag(models.Model):
@@ -44,6 +45,16 @@ class LocationTag(models.Model):
   def __str__(self):
     return f"{self.name}"
 
+
+# Model to extend the base user model - potentially add more fields such as "about me"
+class Account(models.Model):
+  user = models.OneToOneField(User, on_delete=models.CASCADE)
+  address = models.CharField(max_length=255)
+
+  def __str__(self):
+    return f"{self.user}"
+
+
 class Location(models.Model):
   RESTAURANT = "Restaurant"
   STORE = "Store"
@@ -58,6 +69,7 @@ class Location(models.Model):
   address = models.CharField(max_length=50)
   tags = models.ManyToManyField(LocationTag)
   image = models.ImageField(upload_to='images/', blank = True, null=True, default='images/foodie-joint-logo.png')
+  favorites = models.ManyToManyField(User, related_name="favorites", default=None, blank=True)
 
   def __str__(self):
     return f"{self.name}: {self.description} ({self.location_type}, {self.address})"
@@ -73,16 +85,6 @@ class Item(models.Model):
   def __str__(self):
     return f"{self.name}: {self.description}"
 
-class User(models.Model):
-  username = models.CharField(max_length=50)
-  firstName = models.CharField(max_length=50)
-  lastName = models.CharField(max_length=50)
-  email = models.CharField(max_length=50)
-  address = models.CharField(max_length=50)
-  password = models.CharField(max_length=50)
-  
-  def __str__(self):
-    return f"{self.username}"
 
 
 """

@@ -1,0 +1,30 @@
+{% extends 'templates/base_template.html' %}
+
+{% block content %}
+
+<div>
+  <div class="shadow p-4 mb-5 bg-body rounded form-row" style="margin-top: 65px; margin-inline: 15%;">
+    <h1 style="text-align: center">Your Favorite Locations!</h1>
+    {% for location in new %}
+    <div class="container">
+      <div class="card mb-3">
+        <div class="card-body" >
+          <div>
+            <h3>{{ location.name }}</h3>
+            <p>{{ location.location_type }}</p>
+            <p>{{ location.description }}</p>
+            <p>Address: {{ location.address }}</p>
+            <a href="{%url 'location_details' location.id %}" class="btn custom-btn directions-btn mb-3">View Location</a>
+          <br>
+            <a href="{%url 'favorite_item' location.id %}" class="btn btn-danger">Remove from Favorites</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+<br/><br/>	
+{% endblock %}

@@ -9,7 +9,7 @@
 <body>
   {% block content %}
   <div style="margin-top: 65px;"></div>
-  <h1 style="text-align: center">Locations Near {{user_address}}!</h1>
+  <h1 style="text-align: center">Locations Near {{user_address}}</h1>
 
   <!-- Parent container -->
   <div class="container">
@@ -74,31 +74,35 @@
         <form action="{% url 'nearby' %}" method="GET" style="display:flex;">
           <div class="form-group">
             <label for="search"><strong>Search:</strong></label>
-            <input type="text" class="form-control" name="search_name" placeholder="Enter location name...">
+            <input type="text" class="form-control" name="search_name" placeholder="Enter location name..."
+                    value="{{ search_name|default_if_none:'' }}">
           </div>
+          <input type="hidden" name="type" value="{{ request.GET.type }}">
           <button type="submit" class="btn custom-btn" style="margin-left: 5px; align-self: flex-end;">Search</button>
         </form>
           <hr>
         <form action="{% url 'nearby' %}" method="GET">
-          <div class="form-group">
-            <label for="tag"><strong>Filter by Tag:</strong></label>
-            <!-- https://www.w3schools.com/tags/att_input_type_checkbox.asp -->
-              {% for tag in all_tags %}
+            <div class="form-group">
+                <label for="tag"><strong>Filter by Tag:</strong></label>
+                <!-- https://www.w3schools.com/tags/att_input_type_checkbox.asp -->
+                {% for tag in all_tags %}
                 <div class="form-check">
-                  <!-- Checks the boxes if the filter was applied in the request -->
-                  <input class="form-check-input" type="checkbox" name="tag" value="{{ tag.name }}" id="{{ tag.name }}"
-                    {% if tag.name in selected_tags %} checked {% endif %}>
-                  <label class="form-check-label" for="{{ tag.name }}">{{ tag.name }}</label>
+                    <!-- Checks the boxes if the filter was applied in the request -->
+                    <input class="form-check-input" type="checkbox" name="tag" value="{{ tag.name }}" id="{{ tag.name }}"
+                        {% if tag.name in selected_tags %} checked {% endif %}>
+                    <label class="form-check-label" for="{{ tag.name }}">{{ tag.name }}</label>
                 </div>
-              {% endfor %}
-          </div>
-          <button type="submit" class="btn custom-btn" style="margin-right: 5px; margin-top: 5px;">Filter</button>
-          <!-- Allowing for filters to be removed -->
-          <form action="{% url 'nearby' %}" method="GET">
-            <!-- Retaining type parameter so easily returned to Store/Restaurant page -->
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn custom-btn" style="margin-right: 5px; margin-top: 5px;">Filter</button>
+            <!-- Retaining the location type -->
+            <input type="hidden" name="type" value="{{ request.GET.type }}">
+        </form>
+
+        <form action="{% url 'nearby' %}" method="GET">
+            <!-- Allowing for filters to be removed -->
             <input type="hidden" name="type" value="{{ request.GET.type }}">
             <button type="submit" class="btn custom-btn" style="margin-top: 5px;">Remove Filter</button>
-          </form>
         </form>
           </div>
         </div>
