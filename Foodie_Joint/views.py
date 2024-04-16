@@ -11,10 +11,10 @@ from .forms import (
   ItemForm,
   ItemReviewForm,
   LocationForm,
-  RegisterUserForm,
+  RegistrationForm,
   ReviewForm,
 )
-from .models import Item, ItemReview, Location, LocationTag, Review
+from .models import Item, ItemReview, Location, LocationTag, Review, Account, User
 from .utils import instantiate_tags
 
 
@@ -78,10 +78,7 @@ def get_distance(address1, address2):
 #@login_required(login_url='/login_user')
 def nearby(request):
   context = {}
-  # Static address as placeholder till User model working
-  user_address = '1420 Austin Bluffs Pkwy'
-  #user = request.user
-  #user_address = user.address
+  user_address = request.user.account.address
   locations = Location.objects.all()
   all_tags = LocationTag.objects.all()
 
@@ -165,17 +162,28 @@ def logout_user(request):
 
 def register_user(request):
   if request.method == "POST":
-    form = RegisterUserForm(request.POST)
+    form = RegistrationForm(request.POST)
     if form.is_valid():
-      form.save()
-      username = form.cleaned_data['username']
-      password = form.cleaned_data['password1']
-      user = authenticate(request, username=username, password=password)
+      user = User.objects.create_user(
+        username = form.cleaned_data['username'],
+        password = form.cleaned_data['password'],
+        first_name = form.cleaned_data['first_name'],
+        last_name = form.cleaned_data['last_name'],
+        email = form.cleaned_data['email'],
+      )
+      account = Account.objects.create(
+        user = user,
+        address = form.cleaned_data['address'],
+      )
+      #form.save()
+      #username = form.cleaned_data['username']
+      #password = form.cleaned_data['password1']
+      user = authenticate(request, username=user.username, password=form.cleaned_data['password'])
       login(request, user)
       messages.success(request, ("Registration successful"))
       return redirect('index')
   else:
-    form = RegisterUserForm()
+    form = RegistrationForm()
   return render(request, 'templates/register_user.html', {
       'form': form,
   })
