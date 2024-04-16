@@ -82,8 +82,8 @@
         <div class="location-details bg-light">
           <a class="btn custom-btn directions-btn mb-3" href="https://www.google.com/maps/search/?api=1&query={{ location.address|urlencode }}" target="_blank">Directions</a>
           <div class="location-description">
-            <h4>Address: {{ location.address }}</h4>
-            <h4>Description: {{ location.description }}</h4>
+            <h4>Address:  <span class="fs-5 fw-normal">{{ location.address }}</span></h4>
+            <h4>Description: <span class="fs-5 fw-normal">{{ location.description }}</span></h4>
           </div>
           <div class="d-flex justify-content-between">
             <div>
