@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.db.models.enums import Choices
 
 
+
 class LocationTag(models.Model):
   # When more are added, they are instanciated whenever a new location obj is created
   # Sort these?
@@ -44,6 +45,16 @@ class LocationTag(models.Model):
   def __str__(self):
     return f"{self.name}"
 
+
+# Model to extend the base user model - potentially add more fields such as "about me"
+class Account(models.Model):
+  user = models.OneToOneField(User, on_delete=models.CASCADE)
+  address = models.CharField(max_length=255)
+
+  def __str__(self):
+    return f"{self.user}"
+
+
 class Location(models.Model):
   RESTAURANT = "Restaurant"
   STORE = "Store"
@@ -74,16 +85,6 @@ class Item(models.Model):
   def __str__(self):
     return f"{self.name}: {self.description}"
 
-class User(models.Model):
-  username = models.CharField(max_length=50)
-  firstName = models.CharField(max_length=50)
-  lastName = models.CharField(max_length=50)
-  email = models.CharField(max_length=50)
-  address = models.CharField(max_length=50)
-  password = models.CharField(max_length=50)
-  
-  def __str__(self):
-    return f"{self.username}"
 
 
 """
