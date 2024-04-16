@@ -63,6 +63,10 @@
         margin-right: 8px;
       }
     }
+
+      .checked {
+        color: orange;
+      }
   </style>
 
   <div class="container">
@@ -200,7 +204,7 @@
                   <div style="margin-right: 10px;">{{ reviews_filter.form }}</div>
                   <button type="submit" class="btn custom-btn custom-btn-width">Search</button>
                 </form>
-                <a class="btn custom-btn custom-btn-smaller" href="{% url 'add_review' %}">Add Review</a>
+                <a class="btn custom-btn custom-btn-smaller" href="{% url 'add_review' location.id %}">Add Review</a>
               </div>
             </div>
           </div>
@@ -214,7 +218,38 @@
                     <div class="card-body text-start">
                       <h3>{{ review.user }}</h3>
                       <p>{{ review.review }}</p>
-                      <p>Stars: {{ review.num_stars }}</p>
+                      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+                      {% if review.num_stars == 5 %}
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                      {% elif review.num_stars == 4%}
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star"></span>
+                      {% elif review.num_stars == 3%}
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                      {% elif review.num_stars == 2%}
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                      {% elif review.num_stars == 1%}
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                      {% endif %}
                     </div>
                   </div>
                 </div>
