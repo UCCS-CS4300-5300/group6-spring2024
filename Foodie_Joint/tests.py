@@ -1,7 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
 from django.contrib.auth import get_user_model
-from Foodie_Joint.models import Item, Location, User, LocationTag
+from django.contrib.auth.models import User
+from Foodie_Joint.models import Item, Location, Account, LocationTag
 from Foodie_Joint.views import show_location_items
 
 # For reference: https://docs.djangoproject.com/en/5.0/topics/testing/tools/
@@ -10,6 +11,16 @@ from Foodie_Joint.views import show_location_items
 ############# START OF TYLER CARROLL TESTS #############
 class NearbyViewTest(TestCase):
   def setUp(self):
+    self.user = User.objects.create_user(
+      username='testUsername',
+      email='user@test.com',
+      password='testPass',
+      first_name='firstName',
+      last_name='lastName',
+    )
+    self.account = Account.objects.create(user=self.user, address="123 Test Street")
+    self.client.login(username="testUsername", password="testPass")
+    
     self.restaurant = Location.objects.create(
       name = "Albertacos",
       description = "Taco joint",
@@ -44,6 +55,7 @@ class NearbyViewTest(TestCase):
     self.assertContains(response, self.restaurant.description)
     self.assertContains(response, self.restaurant.address)
     self.assertNotContains(response, self.store.name)
+    self.assertContains(response, self.user.account.address)  # Ensuring user address is shown on nearby page
 
   # Testing that a Store object is shown on the 'nearby' page when 'Store' selected in navbar
   def test_nearby_view_with_store_nearby_page(self):
@@ -134,6 +146,7 @@ class ItemRemovalTest(TestCase):
     def setUp(self):
         User = get_user_model()
         self.admin_user = User.objects.create_superuser('admin', 'admin@test.com', 'adminpass')
+        self.account = Account.objects.create(user=self.admin_user, address="123 Test Street")
         self.location = Location.objects.create(name="Test Location", address="123 Test Street")
         self.item = Item.objects.create(name="Test Item", location=self.location)
 
@@ -151,6 +164,7 @@ class StoreRemovalTest(TestCase):
     def setUp(self):
         User = get_user_model()
         self.admin_user = User.objects.create_superuser('admin', 'admin@adminStuff.com', 'uniquePW1')
+        self.account = Account.objects.create(user=self.admin_user, address="123 Test Street")
         self.location = Location.objects.create(name="Test Location", address="123 Test Street")
 
     def test_remove_store(self):
