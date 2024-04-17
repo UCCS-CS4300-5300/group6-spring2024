@@ -10,7 +10,7 @@
   #itemRecommendationCard {
     background-color: #D95A2B;
   }
-  
+
   .fade-in {
     animation: fadeIn ease 5s;
     -webkit-animation: fadeIn ease 5s;
@@ -28,42 +28,11 @@
     }
   }
 
-  @-moz-keyframes fadeIn {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-  @-webkit-keyframes fadeIn {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-  @-o-keyframes fadeIn {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-  @-ms-keyframes fadeIn {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-
-  .carousel > .carousel-inner > .carousel-item > img {
-    width: 404px;
-    height: 303px;
+  /* Styling for carousel images */
+  .carousel .carousel-inner .carousel-item img {
+    width: 100%;    /* Ensure the image fills the width of the carousel */
+    height: 303px;  /* Fixed height */
+    object-fit: cover; /* Cover ensures that the aspect ratio is maintained while filling the area */
   }
 
   .carousel-item {
@@ -76,7 +45,7 @@
     margin-bottom: 15px;
   }
 </style>
-{% endblock %} 
+{% endblock additional_styles%} 
 
 {% block content %}
 <div class="container text-center">
@@ -173,7 +142,7 @@
               <div
                 class="col-auto d-flex align-items-center justify-content-center px-3"
               id="itemRecommendationCard">
-                <h5 class="text-white m-0">Trending Item</h5>
+                <h5 class="text-white m-0">Recommended Item</h5>
               </div>
               <div class="col">
                 <div class="card-body">
@@ -188,6 +157,30 @@
                   <p>No recommended items at the moment.</p>
                 </div>
                 {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="card mb-3" style="max-width: 100%">
+            <div class="row g-0">
+              <div
+                class="col-auto d-flex align-items-center justify-content-center px-3"
+              id="itemRecommendationCard">
+                <h5 class="text-white m-0">Recommended Location</h5>
+                  </div>
+                  <div class="col">
+                    <div class="card-body">
+                      {% if recommended_location %}
+                      <a href="{% url 'location_details' recommended_location.id %}">
+                      </a>
+                      <h3 class="card-title">{{ recommended_location.name }}</h3>
+                      <p class="card-text">{{ recommended_location.description }}</p>
+                      {% else %}
+                      <p>No recommended location at the moment.</p>
+                      {% endif %}
               </div>
             </div>
           </div>

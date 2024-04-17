@@ -8,31 +8,31 @@ from Foodie_Joint.views import show_location_items
 # For reference: https://docs.djangoproject.com/en/5.0/topics/testing/tools/
 # Run these tests with 'python manage.py test'
 
+
 ############# START OF TYLER CARROLL TESTS #############
 class NearbyViewTest(TestCase):
+
   def setUp(self):
     self.user = User.objects.create_user(
-      username='testUsername',
-      email='user@test.com',
-      password='testPass',
-      first_name='firstName',
-      last_name='lastName',
+        username='testUsername',
+        email='user@test.com',
+        password='testPass',
+        first_name='firstName',
+        last_name='lastName',
     )
-    self.account = Account.objects.create(user=self.user, address="123 Test Street")
+    self.account = Account.objects.create(user=self.user,
+                                          address="123 Test Street")
     self.client.login(username="testUsername", password="testPass")
-    
+
     self.restaurant = Location.objects.create(
-      name = "Albertacos",
-      description = "Taco joint",
-      location_type = Location.RESTAURANT,
-      address = "4494 Austin Bluffs Pkwy"
-    )
-    self.store = Location.objects.create(
-      name = "Family Dollar",
-      description = "Dollar store",
-      location_type = Location.STORE,
-      address = "4609 Austin Bluffs Pkwy"
-    )
+        name="Albertacos",
+        description="Taco joint",
+        location_type=Location.RESTAURANT,
+        address="4494 Austin Bluffs Pkwy")
+    self.store = Location.objects.create(name="Family Dollar",
+                                         description="Dollar store",
+                                         location_type=Location.STORE,
+                                         address="4609 Austin Bluffs Pkwy")
 
     self.tag_mexican = LocationTag.objects.create(name="Mexican")
     self.tag_local = LocationTag.objects.create(name="Locally Owned")
@@ -55,7 +55,8 @@ class NearbyViewTest(TestCase):
     self.assertContains(response, self.restaurant.description)
     self.assertContains(response, self.restaurant.address)
     self.assertNotContains(response, self.store.name)
-    self.assertContains(response, self.user.account.address)  # Ensuring user address is shown on nearby page
+    self.assertContains(response, self.user.account.address
+                        )  # Ensuring user address is shown on nearby page
 
   # Testing that a Store object is shown on the 'nearby' page when 'Store' selected in navbar
   def test_nearby_view_with_store_nearby_page(self):
@@ -83,11 +84,15 @@ class NearbyViewTest(TestCase):
     Location.objects.all().delete()
     response = self.client.get(reverse('nearby'))
     self.assertEqual(response.status_code, 200)
-    self.assertContains(response, "No locations found! Please add some locations to get started.")
+    self.assertContains(
+        response,
+        "No locations found! Please add some locations to get started.")
 
   # Testing that when on the Restaurant page, only the restaurant obj is shown with all filters applied
   def test_nearby_view_with_all_filters(self):
-    response = self.client.get('/nearby?tag=Mexican&tag=Supermarket&tag=Locally+Owned&type=Restaurant')
+    response = self.client.get(
+        '/nearby?tag=Mexican&tag=Supermarket&tag=Locally+Owned&type=Restaurant'
+    )
     self.assertEqual(response.status_code, 200)
     self.assertContains(response, self.restaurant.name)
     self.assertContains(response, self.restaurant.description)
@@ -109,6 +114,7 @@ class NearbyViewTest(TestCase):
 
   # Add test, testing user logged in and gets user address (when implemented)
 
+
 ############# END OF TYLER CARROLL TESTS #############
 
 
@@ -118,10 +124,10 @@ class LocationItemResponseTest(TestCase):
   # Sets up the test data used in the tests.
   def setUp(self):
     self.location = Location.objects.create(
-      name = "Test Location",
-      description = "A test Description",
-      location_type=Location.RESTAURANT,
-      address="207 N Wahsatch Ave",
+        name="Test Location",
+        description="A test Description",
+        location_type=Location.RESTAURANT,
+        address="207 N Wahsatch Ave",
     )
 
   # Verifies if location_details URL correctly redirects to location_item_info page.
@@ -140,49 +146,99 @@ class LocationItemResponseTest(TestCase):
     self.assertContains(response, "A test Description")
     self.assertContains(response, "207 N Wahsatch Ave")
 
+
 # Tests the removal of an item by a superuser and verifies the redirect to the 'nearby' page.
 class ItemRemovalTest(TestCase):
 
-    def setUp(self):
-        User = get_user_model()
-        self.admin_user = User.objects.create_superuser('admin', 'admin@test.com', 'adminpass')
-        self.account = Account.objects.create(user=self.admin_user, address="123 Test Street")
-        self.location = Location.objects.create(name="Test Location", address="123 Test Street")
-        self.item = Item.objects.create(name="Test Item", location=self.location)
+  def setUp(self):
+    User = get_user_model()
+    self.admin_user = User.objects.create_superuser('admin', 'admin@test.com',
+                                                    'adminpass')
+    self.account = Account.objects.create(user=self.admin_user,
+                                          address="123 Test Street")
+    self.location = Location.objects.create(name="Test Location",
+                                            address="123 Test Street")
+    self.item = Item.objects.create(name="Test Item", location=self.location)
 
-    def test_remove_item(self):
-        self.client.login(username='admin', password='adminpass')
-        items_before = Item.objects.count()
-        response = self.client.post(reverse('remove_item', kwargs={'item_id': self.item.id}))
-        items_after = Item.objects.count()
-        self.assertEqual(items_before - 1, items_after)
-        self.assertRedirects(response, reverse('nearby'))
+  def test_remove_item(self):
+    self.client.login(username='admin', password='adminpass')
+    items_before = Item.objects.count()
+    response = self.client.post(
+        reverse('remove_item', kwargs={'item_id': self.item.id}))
+    items_after = Item.objects.count()
+    self.assertEqual(items_before - 1, items_after)
+    self.assertRedirects(response, reverse('nearby'))
+
 
 # Tests the removal of a store by a superuser and ensures proper redirect to the 'nearby' page.
 class StoreRemovalTest(TestCase):
 
-    def setUp(self):
-        User = get_user_model()
-        self.admin_user = User.objects.create_superuser('admin', 'admin@adminStuff.com', 'uniquePW1')
-        self.account = Account.objects.create(user=self.admin_user, address="123 Test Street")
-        self.location = Location.objects.create(name="Test Location", address="123 Test Street")
+  def setUp(self):
+    User = get_user_model()
+    self.admin_user = User.objects.create_superuser('admin',
+                                                    'admin@adminStuff.com',
+                                                    'uniquePW1')
+    self.account = Account.objects.create(user=self.admin_user,
+                                          address="123 Test Street")
+    self.location = Location.objects.create(name="Test Location",
+                                            address="123 Test Street")
 
-    def test_remove_store(self):
-        self.client.login(username='admin', password='uniquePW1')
-        locations_before = Location.objects.count()
-        response = self.client.post(reverse('remove_store', kwargs={'location_id': self.location.id}))
-        locations_after = Location.objects.count()
-        self.assertEqual(locations_before - 1, locations_after)
-        self.assertRedirects(response, reverse('nearby'))
+  def test_remove_store(self):
+    self.client.login(username='admin', password='uniquePW1')
+    locations_before = Location.objects.count()
+    response = self.client.post(
+        reverse('remove_store', kwargs={'location_id': self.location.id}))
+    locations_after = Location.objects.count()
+    self.assertEqual(locations_before - 1, locations_after)
+    self.assertRedirects(response, reverse('nearby'))
+
+
+class StoreRecommendationTest(TestCase):
+
+  def setUp(self):
+    self.user = get_user_model().objects.create_superuser(
+        'admin', 'admin@adminStuff.com', 'uniquePW1')
+    self.client.login(username='admin', password='uniquePW1')
+
+    self.location1 = Location.objects.create(name="Test Location 1",
+                                             address="207 N Wahsatch Ave",
+                                             description="A test Description",
+                                             location_type=Location.RESTAURANT,
+                                             is_recommended=False)
+
+    self.location2 = Location.objects.create(name="Test Location 2",
+                                             address="208 N Wahsatch Ave",
+                                             description="A test Description",
+                                             location_type=Location.RESTAURANT,
+                                             is_recommended=False)
+
+  def test_recommend_location(self):
+    self.assertFalse(Location.objects.filter(is_recommended=True).exists())
+    response = self.client.post(
+        reverse('recommend_location', args=[self.location1.id]))
+    self.assertTrue(Location.objects.get(id=self.location1.id).is_recommended)
+    self.assertFalse(Location.objects.get(id=self.location2.id).is_recommended)
+    self.assertRedirects(response, reverse('index'))
+
+    self.client.post(reverse('recommend_location', args=[self.location2.id]))
+    self.assertFalse(Location.objects.get(id=self.location1.id).is_recommended)
+    self.assertTrue(Location.objects.get(id=self.location2.id).is_recommended)
+
 ############# END OF DEREK GARY TESTS ############
+
 
 # Correct this test because it causes other tests not to run!
 ############# START OF LUKE FLANCHER TESTS #############
 class UsersTests(TestCase):
+
   def setUp(self):
     User = get_user_model()
-    self.new_user1 = User.objects.create_user(username='new_user1', password='adfjkfjk;fds2342', email='new1@user.com')
-    self.new_user2 = User.objects.create_user(username='new_user2', password='adfjkfjk;fds2342', email='new2@user.com')
+    self.new_user1 = User.objects.create_user(username='new_user1',
+                                              password='adfjkfjk;fds2342',
+                                              email='new1@user.com')
+    self.new_user2 = User.objects.create_user(username='new_user2',
+                                              password='adfjkfjk;fds2342',
+                                              email='new2@user.com')
 
   def test_user_creation(self):
     # Assert that the users were actually created with matching attr.
@@ -191,4 +247,6 @@ class UsersTests(TestCase):
 
     self.assertEqual(self.new_user2.username, 'new_user2')
     self.assertEqual(self.new_user2.email, 'new2@user.com')
+
+
 ############# END OF LUKE FLANCHER TESTS #############
