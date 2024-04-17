@@ -12,6 +12,14 @@
 
 {% endif %}	
 
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-danger" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
   <div class="shadow p-4 mb-5 bg-body rounded form-row">
   <h1>Register</h1>
 <br/>

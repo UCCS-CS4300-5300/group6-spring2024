@@ -165,8 +165,13 @@ def register_user(request):
   if request.method == "POST":
     form = RegistrationForm(request.POST)
     if form.is_valid():
+      username = form.cleaned_data['username']
+      if User.objects.filter(username=username).exists():
+        messages.error(request, "Username already exists. Please choose another username.")
+        return render(request, 'templates/register_user.html', {'form': form})
+        
       user = User.objects.create_user(
-        username = form.cleaned_data['username'],
+        username = username,
         password = form.cleaned_data['password'],
         first_name = form.cleaned_data['first_name'],
         last_name = form.cleaned_data['last_name'],
@@ -176,9 +181,6 @@ def register_user(request):
         user = user,
         address = form.cleaned_data['address'],
       )
-      #form.save()
-      #username = form.cleaned_data['username']
-      #password = form.cleaned_data['password1']
       user = authenticate(request, username=user.username, password=form.cleaned_data['password'])
       login(request, user)
       messages.success(request, ("Registration successful"))
