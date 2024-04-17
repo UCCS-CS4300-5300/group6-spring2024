@@ -269,6 +269,7 @@ def show_location_items(request, location_id):
       'items': item_list,
       'reviews': reviews,
       'reviews_filter': reviews_filter,
+      'id': location.id,
     }
   else:
     context = {
@@ -277,20 +278,21 @@ def show_location_items(request, location_id):
       'reviews': reviews,
       'reviews_filter': reviews_filter,
       'fav': fav,
+      'id': location.id,
     }
   return render(request, 'templates/location_item_info.html', context)
 
 
 @login_required(login_url='/login_user')
-def add_review(request):
+def add_review(request, location_id):
    submitted = False
    if request.method == 'POST':
-     form = ReviewForm(request.POST,initial={'user': request.user.username})
+     form = ReviewForm(request.POST,initial={'user': request.user.username, 'location':Location.objects.get(id=location_id)})
      if form.is_valid():
        form.save()
-       return HttpResponseRedirect('/add_review?submitted=True')
+       return HttpResponseRedirect('/add_review/%d?submitted=True'%location_id)
    else:
-     form = ReviewForm(initial={'user': request.user.username})
+     form = ReviewForm(initial={'user': request.user.username,'location':Location.objects.get(id=location_id)})
      if 'submitted' in request.GET:
        submitted = True
    return render(request, 'templates/add_review.html', {
@@ -300,15 +302,16 @@ def add_review(request):
 
 
 @login_required(login_url='/login_user')
-def add_review_item(request):
+def add_review_item(request, item_id):
   submitted = False
   if request.method == 'POST':
-    form = ItemReviewForm(request.POST, initial={'user': request.user.username})
+    form = ItemReviewForm(request.POST,                   initial={'user':request.user.username, 'item':Item.objects.get(id=item_id)})
     if form.is_valid():
       form.save()
-      return HttpResponseRedirect('/add_review_item?submitted=True')
+      return HttpResponseRedirect('/add_review_item/%d?submitted=True'%item_id)
   else:
-    form = ItemReviewForm(initial={'user': request.user.username})
+    form = ItemReviewForm(initial={'user':request.user.username,
+    'item':Item.objects.get(id=item_id)})
     if 'submitted' in request.GET:
       submitted = True
   return render(request, 'templates/add_review_item.html', {
@@ -325,6 +328,7 @@ def item_info(request, item_id):
     'item': item,
     'reviews': reviews,
     'item_filter': item_filter,
+    'id' : item.id,
   }
   return render(request, 'templates/item_info.html', context)
 
