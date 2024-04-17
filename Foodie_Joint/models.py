@@ -53,7 +53,7 @@ class Account(models.Model):
   def __str__(self):
     return f"{self.user}"
 
-
+#MAYBE?
 class Location(models.Model):
   RESTAURANT = "Restaurant"
   STORE = "Store"
