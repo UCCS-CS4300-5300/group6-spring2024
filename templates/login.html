@@ -1,43 +1,35 @@
 {% extends 'templates/base_template.html' %}
 {% block content %}
 
-  <h1>Login</h1>
-<br/>
-
+<div class="container py-4">
+  <div class="bg-white rounded p-4"> <!-- Add bg-white and rounded classes for the white box -->
+    <h1>Login</h1>
+    <br/>
 
     <form action="" method=POST>
       {% csrf_token %}
 
-    <form>
-  <div class="mb-3">
-    <!-- Attempt at adding a useful message to invalid users (Luke) -->
-    {% if messages %}
-      {% for message in messages %}
-
-       <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <div class="mb-3">
+        <!-- Attempt at adding a useful message to invalid users (Luke) -->
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
           {{ message }}
-         <button type = "button" class = "btn-close" data-bs-dismiss = "alert" aria-label = "Close">
+          <button type = "button" class = "btn-close" data-bs-dismiss = "alert" aria-label = "Close">
         </div>
-      {% endfor %}
-    {% endif %}
-    
-    <label for="exampleInputEmail1" class="form-label">Username</label>
-    <input type="text" class="form-control" name="username" aria-describedby="emailHelp">
+        {% endfor %}
+        {% endif %}
+        <label for="exampleInputEmail1" class="form-label">Username</label>
+        <input type="text" class="form-control" name="username" aria-describedby="emailHelp">
+      </div>
 
-  </div>
-  <div class="mb-3">
-    <label for="exampleInputPassword1" class="form-label">Password</label>
-    <input type="password" class="form-control" name="password">
-  </div>
-
-
-
-
-
+      <div class="mb-3">
+        <label for="exampleInputPassword1" class="form-label">Password</label>
+        <input type="password" class="form-control" name="password">
+      </div>
       <input type="submit" value="Submit" class="btn btn-secondary">
-
     </form>
-
-
-<br/><br/>	
+  </div>
+</div>
+<br/><br/> 
 {% endblock %}
