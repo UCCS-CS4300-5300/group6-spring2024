@@ -8,11 +8,11 @@ from geopy.distance import distance
 
 from .filters import ItemReviewFilter, ReviewFilter
 from .forms import (
-  ItemForm,
-  ItemReviewForm,
-  LocationForm,
-  RegistrationForm,
-  ReviewForm,
+    ItemForm,
+    ItemReviewForm,
+    LocationForm,
+    RegistrationForm,
+    ReviewForm,
 )
 from .models import Item, ItemReview, Location, LocationTag, Review, Account, User
 from .utils import instantiate_tags
@@ -20,14 +20,18 @@ from .utils import instantiate_tags
 
 def index(request):
   # Since only one item can be recommended for now, we can just get the first item marked as recommended from the database.
-  carousel_restaurants = Location.objects.filter(location_type='Restaurant')[:3]
+  carousel_restaurants = Location.objects.filter(
+      location_type='Restaurant')[:3]
   carousel_stores = Location.objects.filter(location_type='Store')[:3]
   recommended_item = Item.objects.filter(is_recommended=True).first()
-  return render(request, 'templates/index.html',
-                {'recommended_item': recommended_item,
-                'carousel_restaurants': carousel_restaurants,
-                 'carousel_stores': carousel_stores}
-               )
+  recommended_location = Location.objects.filter(is_recommended=True).first()
+  return render(
+      request, 'templates/index.html', {
+          'recommended_item': recommended_item,
+          'carousel_restaurants': carousel_restaurants,
+          'carousel_stores': carousel_stores,
+          'recommended_location': recommended_location
+      })
 
 
 def base(request):
@@ -47,7 +51,7 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 def get_distance(address1, address2):
   try:
     headers = {'User-Agent': USER_AGENT}
-    
+
     response1 = requests.get(f"{BASE_URL}&street={address1}", headers=headers)
     response2 = requests.get(f"{BASE_URL}&street={address2}", headers=headers)
 
@@ -93,18 +97,18 @@ def nearby(request):
     if loc_type:
       locations = locations.filter(location_type=loc_type)
 
-    # Filtering results based on chosen tags 
+    # Filtering results based on chosen tags
     # https://www.oreilly.com/library/view/python-in-a/0596001886/re928.html
     # https://docs.djangoproject.com/en/5.0/ref/models/querysets/#in
     selected_tags = request.GET.getlist('tag')
     if selected_tags:
-        locations = locations.filter(tags__name__in=selected_tags)
+      locations = locations.filter(tags__name__in=selected_tags)
 
     # Filtering results based on searched name
     search_name = request.GET.get('search_name')
     if search_name:
       locations = locations.filter(name__icontains=search_name)
-    
+
     sorted_locations = []
     for location in locations:
       distance = get_distance(user_address, location.address)
@@ -132,7 +136,8 @@ def nearby(request):
         'user_address': user_address,
         'sorted_locations': sorted_locations,
         'all_tags': all_tags,
-        'selected_tags': selected_tags, # Added this to have checkboxes stay marked in template
+        'selected_tags':
+        selected_tags,  # Added this to have checkboxes stay marked in template
         'search_name': search_name,
     }
     return render(request, 'templates/nearby.html', context)
@@ -172,21 +177,25 @@ def register_user(request):
     if form.is_valid():
       username = form.cleaned_data['username']
       if User.objects.filter(username=username).exists():
-        messages.error(request, "Username already exists. Please choose another username.")
+        messages.error(
+            request,
+            "Username already exists. Please choose another username.")
         return render(request, 'templates/register_user.html', {'form': form})
-        
+
       user = User.objects.create_user(
-        username = username,
-        password = form.cleaned_data['password'],
-        first_name = form.cleaned_data['first_name'],
-        last_name = form.cleaned_data['last_name'],
-        email = form.cleaned_data['email'],
+          username=username,
+          password=form.cleaned_data['password'],
+          first_name=form.cleaned_data['first_name'],
+          last_name=form.cleaned_data['last_name'],
+          email=form.cleaned_data['email'],
       )
       account = Account.objects.create(
-        user = user,
-        address = form.cleaned_data['address'],
+          user=user,
+          address=form.cleaned_data['address'],
       )
-      user = authenticate(request, username=user.username, password=form.cleaned_data['password'])
+      user = authenticate(request,
+                          username=user.username,
+                          password=form.cleaned_data['password'])
       login(request, user)
       messages.success(request, ("Registration successful"))
       return redirect('index')
@@ -216,20 +225,23 @@ def add_location(request):
       'submitted': submitted
   })
 
+
 @login_required(login_url='/login_user')
 def favorite_item(request, location_id):
   location = get_object_or_404(Location, id=location_id)
   if location.favorites.filter(id=request.user.id).exists():
     location.favorites.remove(request.user)
   else:
-    fav=False
+    fav = False
     location.favorites.add(request.user)
   return HttpResponseRedirect(request.META['HTTP_REFERER'])
-  
+
+
 @login_required(login_url='/login_user')
 def favorite_list(request):
   new = Location.objects.filter(favorites=request.user)
   return render(request, 'templates/favorites.html', {'new': new})
+
 
 @login_required(login_url='/login_user')
 def add_item(request):
@@ -249,7 +261,6 @@ def add_item(request):
   })
 
 
-
 # Renders a specific location's details and its associated items.
 def show_location_items(request, location_id):
   location = get_object_or_404(Location, pk=location_id)
@@ -259,72 +270,89 @@ def show_location_items(request, location_id):
   reviews = reviews_filter.qs
   fav = bool
   if location.favorites.filter(id=request.user.id).exists():
-    fav=True
+    fav = True
   if items.exists():
     item_list = []
     for item in items:
       item_list.append({
-        'name': item.name,
-        'description': item.description,
-        'location': item.location,
-        'is_recommended': item.is_recommended,
-        'id': item.id,
-        'image': item.image.url
+          'name': item.name,
+          'description': item.description,
+          'location': item.location,
+          'is_recommended': item.is_recommended,
+          'id': item.id,
+          'image': item.image.url
       })
     context = {
-      'location': location,
-      'items': item_list,
-      'reviews': reviews,
-      'reviews_filter': reviews_filter,
-      'id': location.id,
+        'location': location,
+        'items': item_list,
+        'reviews': reviews,
+        'reviews_filter': reviews_filter,
+        'id': location.id,
     }
   else:
     context = {
-      'location': location,
-      'items': items,
-      'reviews': reviews,
-      'reviews_filter': reviews_filter,
-      'fav': fav,
-      'id': location.id,
+        'location': location,
+        'items': items,
+        'reviews': reviews,
+        'reviews_filter': reviews_filter,
+        'fav': fav,
+        'id': location.id,
     }
   return render(request, 'templates/location_item_info.html', context)
 
 
 @login_required(login_url='/login_user')
 def add_review(request, location_id):
-   submitted = False
-   if request.method == 'POST':
-     form = ReviewForm(request.POST,initial={'user': request.user.username, 'location':Location.objects.get(id=location_id)})
-     if form.is_valid():
-       form.save()
-       return HttpResponseRedirect('/add_review/%d?submitted=True'%location_id)
-   else:
-     form = ReviewForm(initial={'user': request.user.username,'location':Location.objects.get(id=location_id)})
-     if 'submitted' in request.GET:
-       submitted = True
-   return render(request, 'templates/add_review.html', {
-       'form': form,
-       'submitted': submitted
-   })
+  submitted = False
+  if request.method == 'POST':
+    form = ReviewForm(request.POST,
+                      initial={
+                          'user': request.user.username,
+                          'location': Location.objects.get(id=location_id)
+                      })
+    if form.is_valid():
+      form.save()
+      return HttpResponseRedirect('/add_review/%d?submitted=True' %
+                                  location_id)
+  else:
+    form = ReviewForm(
+        initial={
+            'user': request.user.username,
+            'location': Location.objects.get(id=location_id)
+        })
+    if 'submitted' in request.GET:
+      submitted = True
+  return render(request, 'templates/add_review.html', {
+      'form': form,
+      'submitted': submitted
+  })
 
 
 @login_required(login_url='/login_user')
 def add_review_item(request, item_id):
   submitted = False
   if request.method == 'POST':
-    form = ItemReviewForm(request.POST,                   initial={'user':request.user.username, 'item':Item.objects.get(id=item_id)})
+    form = ItemReviewForm(request.POST,
+                          initial={
+                              'user': request.user.username,
+                              'item': Item.objects.get(id=item_id)
+                          })
     if form.is_valid():
       form.save()
-      return HttpResponseRedirect('/add_review_item/%d?submitted=True'%item_id)
+      return HttpResponseRedirect('/add_review_item/%d?submitted=True' %
+                                  item_id)
   else:
-    form = ItemReviewForm(initial={'user':request.user.username,
-    'item':Item.objects.get(id=item_id)})
+    form = ItemReviewForm(initial={
+        'user': request.user.username,
+        'item': Item.objects.get(id=item_id)
+    })
     if 'submitted' in request.GET:
       submitted = True
   return render(request, 'templates/add_review_item.html', {
-    'form': form,
-    'submitted': submitted
+      'form': form,
+      'submitted': submitted
   })
+
 
 def item_info(request, item_id):
   item = get_object_or_404(Item, pk=item_id)
@@ -332,12 +360,13 @@ def item_info(request, item_id):
   item_filter = ItemReviewFilter(request.GET, queryset=reviews)
   reviews = item_filter.qs
   context = {
-    'item': item,
-    'reviews': reviews,
-    'item_filter': item_filter,
-    'id' : item.id,
+      'item': item,
+      'reviews': reviews,
+      'item_filter': item_filter,
+      'id': item.id,
   }
   return render(request, 'templates/item_info.html', context)
+
 
 @login_required(login_url='/login_user')
 def remove_user(request):
@@ -345,13 +374,16 @@ def remove_user(request):
   user.is_actived = False
   user.save()
   logout(request)
-  response = HttpResponse("You have been removed from the site. Please close this window.")
+  response = HttpResponse(
+      "You have been removed from the site. Please close this window.")
   return response
-  
+
+
 @login_required(login_url='/login_user')
 def user_profile(request):
   user = request.user
   return render(request, 'templates/profile.html', {'user': user})
+
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
@@ -360,6 +392,7 @@ def remove_store(request, location_id):
   location.delete()
   return redirect('nearby')
 
+
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def remove_item(request, item_id):
@@ -367,3 +400,13 @@ def remove_item(request, item_id):
   store_id = item.location.id
   item.delete()
   return redirect('nearby')
+
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def recommend_location(request, location_id):
+  Location.objects.update(is_recommended=False)
+  location = get_object_or_404(Location, id=location_id)
+  location.is_recommended = True
+  location.save()
+  return redirect('index')

@@ -59,12 +59,12 @@
   </div>
 
   <div class="row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-md-8 ps-3 pe-3">
       <div class="location-details bg-light">
         <h1 style="margin-top:65px;">{{ item.name }}</h1>
-        <h4>{{ item.description }}</h4>
+        <h4><span class="fs-5 fw-normal">{{ item.description }}</span></h4>
         {% if user.is_superuser %}
-        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removeItemModal">Remove Item</button>
+        <button type="button" class="btn btn-danger mb-3" data-bs-toggle="modal" data-bs-target="#removeItemModal">Remove Item</button>
 
         <!-- Modal -->
         <div class="modal fade" id="removeItemModal" tabindex="-1" aria-labelledby="removeItemModalLabel" aria-hidden="true">
@@ -93,7 +93,7 @@
   </div>
 
 
-  <div class="container justify-content-center mt-3">
+  <div class="container justify-content-center mt-3  mb-3">
     <div class="text-center">
       <h3>Reviews</h3>
       <div class="row justify-content-center">
