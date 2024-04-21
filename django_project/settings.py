@@ -41,6 +41,7 @@ CSRF_TRUSTED_ORIGINS = ["https://*.replit.dev", "https://*.replit.app",
 'https://97787d57-f143-4546-958d-6aa4f5b76cfa-00-2zy3yjsid1ls0.kirk.repl.co', 
 "https://658b463e-14cd-4853-bd0e-cb12529f90c2-00-3ne0f11err3re.janeway.repl.co"]
 
+
 # Application definition
 
 INSTALLED_APPS = [

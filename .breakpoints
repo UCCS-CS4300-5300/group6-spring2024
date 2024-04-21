@@ -2,13 +2,9 @@
     "Foodie_Joint/models.py": [
       {
         "id": "90da6c7a-3d38-45fc-bafe-20db8b14de3d",
-        "line": 1,
-<<<<<<< HEAD
-        "version": 393,
-=======
+        "line": 5,
         "version": 1,
->>>>>>> main
-        "index": 0
+        "index": 165
       }
     ]
   }
