@@ -82,9 +82,14 @@ def get_distance(address1, address2):
 #@login_required(login_url='/login_user')
 def nearby(request):
   context = {}
-  user_address = request.user.account.address
   locations = Location.objects.all()
   all_tags = LocationTag.objects.all()
+
+  # Providing static address in case of user not logged in
+  if request.user.is_authenticated:
+    user_address = request.user.account.address
+  else:
+    user_address = "1420 Austin Bluffs Pkwy"  # UCCS
 
   if locations.exists():
     # Applying a filter (through href in navbar) on locations to only get store/restaurant objects
