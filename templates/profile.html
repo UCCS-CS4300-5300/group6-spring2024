@@ -11,15 +11,30 @@
 
 
 {% endif %}	
-<body>ACCOUNT SETTINGS</body>
-  
-      {% csrf_token %}
+<h1 style="text-align:center">User Settings</h1>
+      <ul class = "list-group" style = "text-align:center">
+        <li>{{user.username}}</li>
+        <li>{{user.account.address}}</li>
+        <li> 
+          <div class = "form-content">
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class = "form-group">
+                <label>Address</label>
+                {{ account_form.address }}
+              </div>
+              <button type="submit">save</button>
+            </form>
+          </div>
 
+        </li>
+      </ul>
 <br/><br/>
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
   Delete User
 </button>
+
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

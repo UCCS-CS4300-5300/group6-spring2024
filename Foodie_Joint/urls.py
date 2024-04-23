@@ -21,7 +21,7 @@ urlpatterns = [
          name='add_review_item'),
     path("item_info/<int:item_id>", views.item_info, name='item_info'),
     path("remove_user", views.remove_user, name='remove_user'),
-    path("user_profile", views.user_profile, name='user_profile'),
+    path("user_profile", views.profile, name='user_profile'),
     path("user_profile/favorite_list",
          views.favorite_list,
          name='favorite_list'),

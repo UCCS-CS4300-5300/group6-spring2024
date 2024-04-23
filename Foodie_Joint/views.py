@@ -380,12 +380,6 @@ def remove_user(request):
   return response
 
 
-@login_required(login_url='/login_user')
-def user_profile(request):
-  user = request.user
-  return render(request, 'templates/profile.html', {'user': user})
-
-
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def remove_store(request, location_id):
@@ -412,10 +406,10 @@ def recommend_location(request, location_id):
   location.save()
   return redirect('index')
 
-@login_required 
+@login_required(login_url='/login_user')
 def profile(request):
   if request.method == 'POST':
-    account_form = UpdateAccountForm(request.POST, instance = request.user.acccount)
+    account_form = UpdateAccountForm(request.POST, instance = request.user.account)
     
     if account_form.is_valid():
       account_form.save()
