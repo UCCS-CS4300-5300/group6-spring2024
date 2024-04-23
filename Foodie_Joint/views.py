@@ -13,6 +13,7 @@ from .forms import (
     LocationForm,
     RegistrationForm,
     ReviewForm,
+    UpdateAccountForm,
 )
 from .models import Item, ItemReview, Location, LocationTag, Review, Account, User
 from .utils import instantiate_tags
@@ -410,3 +411,18 @@ def recommend_location(request, location_id):
   location.is_recommended = True
   location.save()
   return redirect('index')
+
+@login_required 
+def profile(request):
+  if request.method == 'POST':
+    account_form = UpdateAccountForm(request.POST, instance = request.user.acccount)
+    
+    if account_form.is_valid():
+      account_form.save()
+      messages.success(request, "Account updated successfully")
+      return redirect('index')
+  else:
+    account_form = UpdateAccountForm(instance = request.user.account)
+  
+  return render(request, 'templates/profile.html', {'account_form': account_form})
+      
