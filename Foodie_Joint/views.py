@@ -13,6 +13,7 @@ from .forms import (
     LocationForm,
     RegistrationForm,
     ReviewForm,
+    UpdateAccountForm,
 )
 from .models import Item, ItemReview, Location, LocationTag, Review, Account, User
 from .utils import instantiate_tags
@@ -82,9 +83,14 @@ def get_distance(address1, address2):
 #@login_required(login_url='/login_user')
 def nearby(request):
   context = {}
-  user_address = request.user.account.address
   locations = Location.objects.all()
   all_tags = LocationTag.objects.all()
+
+  # Providing static address in case of user not logged in
+  if request.user.is_authenticated:
+    user_address = request.user.account.address
+  else:
+    user_address = "1420 Austin Bluffs Pkwy"  # UCCS
 
   if locations.exists():
     # Applying a filter (through href in navbar) on locations to only get store/restaurant objects
@@ -374,12 +380,6 @@ def remove_user(request):
   return response
 
 
-@login_required(login_url='/login_user')
-def user_profile(request):
-  user = request.user
-  return render(request, 'templates/profile.html', {'user': user})
-
-
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def remove_store(request, location_id):
@@ -405,3 +405,18 @@ def recommend_location(request, location_id):
   location.is_recommended = True
   location.save()
   return redirect('index')
+
+@login_required(login_url='/login_user')
+def profile(request):
+  if request.method == 'POST':
+    account_form = UpdateAccountForm(request.POST, instance = request.user.account)
+    
+    if account_form.is_valid():
+      account_form.save()
+      messages.success(request, "Account updated successfully")
+      return redirect('index')
+  else:
+    account_form = UpdateAccountForm(instance = request.user.account)
+  
+  return render(request, 'templates/profile.html', {'account_form': account_form})
+      
