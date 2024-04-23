@@ -14,16 +14,16 @@
 <h1 style="text-align:center">User Settings</h1>
       <ul class = "list-group" style = "text-align:center">
         <li>{{user.username}}</li>
-        <li>{{user.account.address}}</li>
         <li> 
           <div class = "form-content">
             <form method="post" enctype="multipart/form-data">
               {% csrf_token %}
-              <div class = "form-group">
+              
+              <div class = "form-group; text-center">
                 <label>Address</label>
                 {{ account_form.address }}
               </div>
-              <button type="submit">save</button>
+              <button type="submit" class = "btn btn-primary">save</button>
             </form>
           </div>
 
@@ -31,9 +31,11 @@
       </ul>
 <br/><br/>
 <!-- Button trigger modal -->
+<div class = "text-center">
 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
   Delete User
 </button>
+</div>
 
 
 <!-- Modal -->
