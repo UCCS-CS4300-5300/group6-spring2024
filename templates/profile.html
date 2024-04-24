@@ -11,27 +11,26 @@
 
 
 {% endif %}	
-<h1 style="text-align:center">User Settings</h1>
-      <ul class = "list-group" style = "text-align:center">
-        <li>{{user.username}}</li>
-        <li> 
-          <div class = "form-content">
+
+<h1 style="text-align:left">User Settings for {{user.username}}</h1>
+<div class = "form-control"
+  <div class = "text-center">
             <form method="post" enctype="multipart/form-data">
               {% csrf_token %}
-              
-              <div class = "form-group; text-center">
+              </br>
+              <div class = "form-group; w-25">
                 <label>Address</label>
                 {{ account_form.address }}
-              </div>
+            </br>
               <button type="submit" class = "btn btn-primary">save</button>
             </form>
-          </div>
+  </div>
 
-        </li>
-      </ul>
+
+        
 <br/><br/>
 <!-- Button trigger modal -->
-<div class = "text-center">
+<div class = "text-left">
 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
   Delete User
 </button>
