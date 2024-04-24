@@ -11,6 +11,18 @@
     background-color: #D95A2B;
   }
 
+  .recommendation-label {
+    width: 200px;
+    background-color: #D95A2B;
+    display: flex;
+    justify-content: center;
+    padding: 15px 15px 0;
+  }
+
+  .recommendation-container {
+    width: 100%;
+  }
+
   .fade-in {
     animation: fadeIn ease 5s;
     -webkit-animation: fadeIn ease 5s;
@@ -60,7 +72,7 @@
 
       <!-- Carousel within Card Section (Restaurants and Stores Showcase) -->
       <div class="row">
-        <div class="col-sm-6 mb-3 mb-sm-0">
+        <div class="col-sm-6 mb-3 mb-sm-0 px-1">
           <!-- Restaurants Card -->
           <div class="card">
             <h3 class="card-title text-center pt-3">Restaurants</h3>
@@ -97,7 +109,7 @@
         </div>
 
         <!-- Stores Card -->
-        <div class="col-sm-6">
+        <div class="col-sm-6 px-1">
           <div class="card">
             <h3 class="card-title text-center pt-3">Stores</h3>
 
@@ -135,58 +147,47 @@
       </div>
 
       <!-- Item Recommendation Card Section -->
-      <div class="row mt-4">
-        <div class="col-12">
-          <div class="card mb-3" style="max-width: 100%">
-            <div class="row g-0">
-              <div
-                class="col-auto d-flex align-items-center justify-content-center px-3"
-              id="itemRecommendationCard">
-                <h5 class="text-white m-0">Recommended Item</h5>
-              </div>
-              <div class="col">
-                <div class="card-body">
-                  {% if recommended_item %}
-                  <a href="{% url 'item_info' recommended_item.id %}">
-                    <img src="{{ recommended_item.image.url }}" alt="{{ recommended_item.name }}" 
-                      style="max-width: 25%; max-height: 25%;">
-                  </a>
-                  <h3 class="card-title">{{ recommended_item.name }}</h3>
-                  <p class="card-text">{{ recommended_item.description }}</p>
-                  {% else %}
-                  <p>No recommended items at the moment.</p>
-                </div>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row mt-4">
-        <div class="col-12">
-          <div class="card mb-3" style="max-width: 100%">
-            <div class="row g-0">
-              <div
-                class="col-auto d-flex align-items-center justify-content-center px-3"
-              id="itemRecommendationCard">
-                <h5 class="text-white m-0">Recommended Location</h5>
+      <div class="row mt-4 px-0">
+          <div class="col-12 gb-0 pb-0 mb-0 px-0">
+              <div class="card mb-4">
+                  <div class="card-header" style="background-color: #F27E63; border-0 p-0">
+                      <h5 style="color: white; font-size: 1.5em; margin: 0;">Recommended Item</h5>
                   </div>
-                  <div class="col">
-                    <div class="card-body">
-                      {% if recommended_location %}
-                      <a href="{% url 'location_details' recommended_location.id %}">
+                  <div class="card-body">
+                      {% if recommended_item %}
+                      <a href="{% url 'item_info' recommended_item.id %}">
+                          <img src="{{ recommended_item.image.url }}" alt="{{ recommended_item.name }}" 
+                               style="max-width: 20%; height: auto;">
                       </a>
+                      <h3 class="card-title">{{ recommended_item.name }}</h3>
+                      <p class="card-text">{{ recommended_item.description }}</p>
+                      {% else %}
+                      <p>No recommended items at the moment.</p>
+                      {% endif %}
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Store Recommendation Card Section -->
+      <div class="row px-0 mt-0">
+          <div class="col-12 px-0">
+              <div class="card mb-3">
+                  <div class="card-header" style="background-color: #F27E63; border-0 p-0">
+                      <h5 style="color: white; font-size: 1.5em; margin: 0;">Recommended Location</h5>
+                  </div>
+                  <div class="card-body">
+                      {% if recommended_location %}
+                        <img src="{{ recommended_location.image.url }}" alt="{{ recommended_item.name }}" 
+                             style="max-width: 20%; height: auto;">
+                    </a>
                       <h3 class="card-title">{{ recommended_location.name }}</h3>
                       <p class="card-text">{{ recommended_location.description }}</p>
                       {% else %}
                       <p>No recommended location at the moment.</p>
                       {% endif %}
+                  </div>
               </div>
-            </div>
           </div>
-        </div>
       </div>
-    </div>
-  </div>
-</div>
 {% endblock content %}
