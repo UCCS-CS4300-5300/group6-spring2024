@@ -77,6 +77,9 @@
   <!-- Added a block to contain custom styling on a per-template basis -->
   {% block additional_styles %}{% endblock %}
 </head>
+
+
+
   
 <body style="background-color: #F2D8C2;">
   <!-- Added navbar-light so the dropdown shows when viewport narrows (Tyler) -->
@@ -149,6 +152,14 @@
     </div>
   </nav>
 
+  {% if messages %}
+  {% for message in messages %}
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type = "button" class = "btn-close" data-bs-dismiss = "alert" aria-label = "Close">
+  </div>
+  {% endfor %}
+  {% endif %}
 
     {% block content %}
     {% endblock %}
