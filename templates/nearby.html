@@ -9,8 +9,8 @@
 <body>
   {% block content %}
   <div style="margin-top: 65px;"></div>
-  <h1 style = "text-align: center" >Locations Near {{user.account.address}}</h1>
-
+  <h1 style = "text-align: center" >Locations Near {{user_address}}</h1>  
+  
   <!-- Parent container -->
   <div class="container">
       <!--Container for 'Add Location Button'-->
@@ -25,6 +25,8 @@
             </ul>
           </div>
         </div>
+
+
 
       {% if no_locations %}
       <div class="card">
@@ -50,6 +52,7 @@
                 {{ tag.name }}{% if not forloop.last %},{% endif %}
               {% endfor %}
             </p>
+            <p>Created by {{location.created_by}}</p> <!-- Make a clickable link to public profile page -->
           </div>
           <div style="margin-left: auto;">
             <ul class="navbar-nav" style="gap:.5rem;">
