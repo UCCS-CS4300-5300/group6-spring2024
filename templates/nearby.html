@@ -9,7 +9,13 @@
 <body>
   {% block content %}
   <div style="margin-top: 65px;"></div>
-  <h1 style = "text-align: center" >Locations Near {{user_address}}</h1>  
+  {% if request.GET.type == 'Store' %}
+    <h1 style="text-align: center">Stores Nearby {{user_address}}</h1>
+  {% elif request.GET.type == 'Restaurant' %}
+    <h1 style="text-align: center">Restaurants Nearby {{user_address}}</h1>
+  {% else %}
+  <h1 style = "text-align: center" >Locations Near {{user_address}}</h1>
+  {% endif %}
   
   <!-- Parent container -->
   <div class="container">
