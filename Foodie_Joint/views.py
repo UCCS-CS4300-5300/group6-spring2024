@@ -4,7 +4,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
-from geopy.distance import distance
 
 from .filters import ItemReviewFilter, ReviewFilter
 from .forms import (
@@ -16,7 +15,7 @@ from .forms import (
     UpdateAccountForm,
 )
 from .models import Item, ItemReview, Location, LocationTag, Review, Account, User
-from .utils import instantiate_tags
+from .utils import instantiate_tags, get_distance
 
 
 def index(request):
@@ -39,48 +38,7 @@ def base(request):
   return render(request, 'templates/base_template.html')
 
 
-# References:
-# https://geopy.readthedocs.io/en/stable/#module-geopy.distance
-# https://nominatim.org/release-docs/latest/api/Search/
-BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json'
-# Added user-agent to request header to avoid 403 error
-# https://operations.osmfoundation.org/policies/nominatim/
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Foodie_Joint/1.0 (tcarroll@uccs.edu)"
-
-
-# Potentially move out of views.py
-def get_distance(address1, address2):
-  try:
-    headers = {'User-Agent': USER_AGENT}
-
-    response1 = requests.get(f"{BASE_URL}&street={address1}", headers=headers)
-    response2 = requests.get(f"{BASE_URL}&street={address2}", headers=headers)
-
-    # Error handling: https://requests.readthedocs.io/en/latest/user/quickstart/#errors-and-exceptions
-    response1.raise_for_status()
-    response2.raise_for_status()
-
-    data1 = response1.json()
-    data2 = response2.json()
-
-    lat1 = float(data1[0]['lat'])
-    lon1 = float(data1[0]['lon'])
-
-    lat2 = float(data2[0]['lat'])
-    lon2 = float(data2[0]['lon'])
-
-    location1 = (lat1, lon1)
-    location2 = (lat2, lon2)
-
-    return distance(location1, location2).miles
-
-  # In case request fails an error is printed to console
-  except requests.exceptions.RequestException as err:
-    print(f"An error occured: {err}")
-    return None
-
-
-#@login_required(login_url='/login_user')
+# View to get geographical info of Locations from API and sort by distamce from user
 def nearby(request):
   context = {}
   locations = Location.objects.all()
@@ -113,7 +71,7 @@ def nearby(request):
     sorted_locations = []
     for location in locations:
       distance = get_distance(user_address, location.address)
-      # Checking get_distance request went through/didnt return None
+      # Ensuring get_distance request went through/didnt return None
       if distance is not None:
         rounded_distance = round(distance, 2)
         sorted_locations.append({
@@ -144,6 +102,7 @@ def nearby(request):
     }
     return render(request, 'templates/nearby.html', context)
   else:
+    # Case where no locations exist, uses static address
     context['user_address'] = user_address
     context['no_locations'] = True
     return render(request, 'templates/nearby.html', context)
@@ -197,15 +156,6 @@ def register_user(request):
       account = form.save(commit=False)
       account.user = user
       account.save()
-      '''
-      account = Account.objects.create(
-          user=user,
-          address=form.cleaned_data['address'],
-          city=form.cleaned_data['city'],
-          state=form.cleaned_data['state'],
-          profile_picture=form.cleaned_data['profile_picture'],
-      )
-      '''
       
       user = authenticate(request,
                           username=user.username,
@@ -450,15 +400,25 @@ def profile(request, account_id):
 
 @login_required(login_url='/login_user')
 def update_profile(request):
+  context = {}
+  user = request.user
+  email = user.email
   if request.method == 'POST':
-    account_form = UpdateAccountForm(request.POST, instance = request.user.account)
-    
+    account_form = UpdateAccountForm(request.POST, request.FILES, instance=user.account)
     if account_form.is_valid():
+      new_email = account_form.cleaned_data['email']
+      user.email = new_email
+      user.save()
       account_form.save()
       messages.success(request, "Account updated successfully")
       return redirect('index')
   else:
-    account_form = UpdateAccountForm(instance = request.user.account)
-  
-  return render(request, 'templates/update_profile.html', {'account_form': account_form})
+    account_form = UpdateAccountForm(instance=user.account)
+    account_form.fields['email'].initial = email
+
+  context = {
+      'account_form': account_form,
+      'user': user,
+  }
+  return render(request, 'templates/update_profile.html', context)
       
