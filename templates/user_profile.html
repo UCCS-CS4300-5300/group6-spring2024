@@ -25,7 +25,11 @@
     </div>
     
   <h4>About Me:</h4>
-  <p>{{ account.bio }}</p>
+    {% if account.bio %}
+      <p>{{ account.bio }}</p>
+    {% else %}
+      <p>I have not set up my about me yet.</p>
+    {% endif %}
   <br>
     
   <h4>My Favorite Locations:</h4>
@@ -57,7 +61,7 @@
             </ul>
           {% endfor %}
         {% else %}
-        <p>No Location contributions yet.</p>
+        <p>No location contributions yet.</p>
         {% endif %}
         </div>
       <br>
@@ -74,7 +78,7 @@
             </ul>
           {% endfor %}
         {% else %}
-        <p>No Item contributions yet.</p>
+        <p>No item contributions yet.</p>
         {% endif %}
         </div>
       <br>
