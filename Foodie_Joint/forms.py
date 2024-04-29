@@ -29,7 +29,8 @@ class RegistrationForm(ModelForm):
               'address',
               'state',
               'city',
-              'profile_picture']
+              'profile_picture',
+              'bio']
     labels = {
       'username': 'Username',
       'password': 'Password',
@@ -39,13 +40,15 @@ class RegistrationForm(ModelForm):
       'address': 'Address',
       'state': 'State',
       'city': 'City',
-      'profile_picture': 'Profile Picture',
+      'profile_picture': 'Profile Picture (Optional)',
+      'bio': 'About Me (Optional)'
     }
     widgets = {
       'address': forms.TextInput(attrs={'class': 'form-control'}),
       'state': forms.TextInput(attrs={'class': 'form-control'}),
       'city': forms.TextInput(attrs={'class': 'form-control'}),
       'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
+      'bio': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'This can be changed later...'})
     }
 
 
@@ -104,21 +107,7 @@ class ItemReviewForm(forms.ModelForm):
   class Meta:
     model = ItemReview
     fields = ['user', 'item', 'review', 'num_stars']
-
-'''
-class TagForm(forms.ModelForm):
-
-  class Meta:
-    model = Tag
-    fields = ['title', 'location']
-
-
-class ItemTagForm(forms.ModelForm):
-
-  class Meta:
-    model = ItemTag
-    fields = ['title', 'item']
-'''
+    
 
 class UpdateAccountForm(forms.ModelForm):
   address = forms.CharField(max_length = 255, 
