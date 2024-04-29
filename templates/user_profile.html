@@ -1,0 +1,85 @@
+{% extends 'templates/base_template.html' %}
+{% block content %}
+
+<style>
+  .profile-picture-container {
+    width: 400px;
+    height: 400px;
+    overflow: hidden; /* If image overflows container, the rest is hidden */
+    margin: 0 auto; /* Centering */
+  }
+  .profile-picture {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0;
+  }
+</style>
+
+<div class="container py-4">
+  <div class="shadow p-4 mb-5 bg-body rounded">
+  <h1>{{ account.user.username }}'s Profile</h1>
+    <br>
+    <div class="profile-picture-container">
+      <img src="{{ account.profile_picture.url }}" class="profile-picture" alt="User profile picture">
+    </div>
+    
+  <h4>About Me:</h4>
+  <p>{{ account.bio }}</p>
+  <br>
+    
+  <h4>My Favorite Locations:</h4>
+      {% if favorites %}
+        {% for fav in favorites %}
+          <ul>
+            <li>
+              <!-- Had to overide attrb color since set in base_index -->
+              <a href="{% url 'location_details' fav.id %}" style="color: blue !important;">{{fav.name}} - {{fav.address}}</a>
+            </li>
+          </ul>
+        {% endfor %}
+      {% else %}
+      <p>No favorite locations yet.</p>
+      {% endif %}
+    <br>
+    
+  <!--<h4>My Contributions:</h4>-->
+    <div class="row">
+      <div class="col-md-6">
+        <h4>My Locations:</h4>
+        {% if created_locations %}
+          {% for location in created_locations %}
+            <ul>
+              <li>
+                <!-- Had to overide attrb color since set in base_index -->
+                <a href="{% url 'location_details' location.id %}" style="color: blue !important;">{{location.name}} - {{location.address}}</a>
+              </li>
+            </ul>
+          {% endfor %}
+        {% else %}
+        <p>No Location contributions yet.</p>
+        {% endif %}
+        </div>
+      <br>
+
+      <div class="col-md-6">
+        <h4>My Items:</h4>
+        {% if created_items %}
+          {% for item in created_items %}
+            <ul>
+              <li>
+                <!-- Had to overide attrb color since set in base_index -->
+                <a href="{% url 'item_info' item.id %}" style="color: blue !important;">{{item.name}} - {{item.location.name}}</a>
+              </li>
+            </ul>
+          {% endfor %}
+        {% else %}
+        <p>No Item contributions yet.</p>
+        {% endif %}
+        </div>
+      <br>
+    </div>
+  </div>
+</div>
+<br/><br/>	
+{% endblock %}
