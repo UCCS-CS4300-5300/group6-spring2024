@@ -31,7 +31,8 @@ ALLOWED_HOSTS = [
     '5a25ef20-82cf-42d6-b716-69fbbe1fa9c3-00-310a111myqeeh.kirk.repl.co',
   '97787d57-f143-4546-958d-6aa4f5b76cfa-00-2zy3yjsid1ls0.kirk.repl.co',
   '658b463e-14cd-4853-bd0e-cb12529f90c2-00-3ne0f11err3re.janeway.repl.co',
-  '6349a396-d958-48e7-85c4-8e2eaae44781-00-2fd7v2wdro19k.janeway.repl.co'
+  '6349a396-d958-48e7-85c4-8e2eaae44781-00-2fd7v2wdro19k.janeway.repl.co',
+  '0ae1f6b2-8a7a-4714-867a-3f3bae279792-00-3j9w6oeyyoxhm.picard.repl.co'
 ]
 
 CSRF_TRUSTED_ORIGINS = ["https://*.replit.dev", "https://*.replit.app", 
@@ -39,7 +40,8 @@ CSRF_TRUSTED_ORIGINS = ["https://*.replit.dev", "https://*.replit.app",
 "https://5a25ef20-82cf-42d6-b716-69fbbe1fa9c3-00-310a111myqeeh.kirk.repl.co",
 "https://658b463e-14cd-4853-bd0e-cb12529f90c2-00-3ne0f11err3re.janeway.replit.dev",                 
 'https://97787d57-f143-4546-958d-6aa4f5b76cfa-00-2zy3yjsid1ls0.kirk.repl.co', 
-"https://658b463e-14cd-4853-bd0e-cb12529f90c2-00-3ne0f11err3re.janeway.repl.co"]
+"https://658b463e-14cd-4853-bd0e-cb12529f90c2-00-3ne0f11err3re.janeway.repl.co", "https://0ae1f6b2-8a7a-4714-867a-3f3bae279792-00-3j9w6oeyyoxhm.picard.repl.co"
+                       ]
 
 
 # Application definition
