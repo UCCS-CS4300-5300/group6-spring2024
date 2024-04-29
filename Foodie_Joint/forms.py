@@ -127,3 +127,10 @@ class ItemTagForm(forms.ModelForm):
   class Meta:
     model = ItemTag
     fields = ['title', 'item']
+
+class UpdateAccountForm(forms.ModelForm):
+  address = forms.CharField(max_length = 255, 
+                            widget=forms.TextInput(attrs={'class': 'form-control'}))
+  class Meta:
+    model = Account 
+    fields = ['address']
