@@ -1,55 +1,90 @@
-  {% extends 'templates/base_template.html' %}
+{% extends 'templates/base_template.html' %}
+{% block content %}
 
-  {% block content %}
+<style>
+  .form-control {
+    max-width: 100%;
+  }
+</style>
 
-  {% if form.errors %}
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-              There was an error with your form...
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-  {% endif %}	
-
-
-  {% if messages %}
-      {% for message in messages %}
-          <div class="alert alert-danger" role="alert">
-              {{ message }}
-          </div>
-      {% endfor %}
-  {% endif %}
-
-  <style>.form-control{max-width: 300px;}</style>
-
+{% if form.errors %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  There was an error with your form...
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
 
 {% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-danger" role="alert">
-            {{ message }}
-        </div>
-    {% endfor %}
+{% for message in messages %}
+<div class="alert alert-danger" role="alert">
+  {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-danger" role="alert">
+  {{ message }}
+</div>
+{% endfor %}
 {% endif %}
 
 
-<style>.form-control{max-width: 300px;}</style>
 
-    <div class="shadow p-4 mb-5 bg-body rounded form-row">
+<div class="container py-4">
+  <div class="shadow p-4 mb-5 bg-body rounded form-row">
     <h1>Register</h1>
-  <br/>
-
-        <form action="" method=POST enctype="multipart/form-data">
-        {% csrf_token %}
-
-        {{ form.as_p }}
-
-
-
-
-
-  <br/><br/>
-        <input type="submit" value="Submit" class="btn btn-secondary">
-
-      </form>
-
+    <br/>
+    <form action="" method=POST enctype="multipart/form-data">
+      {% csrf_token %}
+      <!--{{ form.as_p }} -->
+      <div class="form-group mb-3">
+        <!-- Using the defined labels in the form Meta (TC) -->
+        <!-- https://docs.djangoproject.com/en/5.0/topics/forms/#rendering-fields-manually -->
+        {{ form.username.label_tag }}
+        {{ form.username }}
+      </div>
+      <div class="form-group mb-3">
+        {{ form.password.label_tag }}
+        {{ form.password }}
+      </div>
+      <div class="form-group mb-3">
+        {{ form.email.label_tag }}
+        {{ form.email }}
+      </div>
+      <div class="form-group mb-3">
+        <label for="id_first_name">First Name:</label> <!-- Was using generic User model label, not the label in Meta -->
+        {{ form.first_name }}
+      </div>
+      <div class="form-group mb-3">
+        <label for="id_last_name">Last Name:</label>
+        {{ form.last_name }}
+      </div>
+      <div class="form-group mb-3">
+        {{ form.address.label_tag }}
+        {{ form.address }}
+      </div>
+      <div class="form-group mb-3">
+        {{ form.city.label_tag }}
+        {{ form.city }}
+      </div>
+      <div class="form-group mb-3">
+        {{ form.state.label_tag }}
+        {{ form.state }}
+      </div>
+      <div class="form-group mb-3">
+        {{ form.profile_picture.label_tag }}
+        {{ form.profile_picture }}
+      </div>
+      <div class="form-group mb-3">
+        {{ form.bio.label_tag }}
+        {{ form.bio }}
+      </div>
+      <br/>
+      <input type="submit" value="Submit" class="btn btn-secondary">
+    </form>
   </div>
-  <br/><br/>	
-  {% endblock %}
+</div>
+
+{% endblock %}
