@@ -114,6 +114,8 @@
               {% else %}
                 None
               {% endif %}
+              <br>
+              <strong>Created by </strong>{{location.created_by}} <!-- Make clickable to public profile page -->
             </div>
           </div>
           {% if user.is_authenticated and user.is_superuser %}
