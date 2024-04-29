@@ -63,6 +63,7 @@
       <div class="location-details bg-light">
         <h1 style="margin-top:65px;">{{ item.name }}</h1>
         <h4><span class="fs-5 fw-normal">{{ item.description }}</span></h4>
+        <h4><span class="fs-5 fw-normal">Created by {{ item.created_by }}</span></h4><!-- Make clickable to public profile -->
         {% if user.is_superuser %}
         <button type="button" class="btn btn-danger mb-3" data-bs-toggle="modal" data-bs-target="#removeItemModal">Remove Item</button>
 
