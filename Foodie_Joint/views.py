@@ -125,7 +125,8 @@ def nearby(request):
             'rounded_distance': rounded_distance,
             'id': location.id,  # needed for location_item_info template
             'tags': location.tags.all(),
-            'image': location.image
+            'image': location.image,
+            'created_by': location.created_by,
         })
 
     # Sorting in ascending order of distance (https://blogboard.io/blog/knowledge/python-sorted-lambda/)
@@ -143,6 +144,7 @@ def nearby(request):
     }
     return render(request, 'templates/nearby.html', context)
   else:
+    context['user_address'] = user_address
     context['no_locations'] = True
     return render(request, 'templates/nearby.html', context)
 
@@ -174,7 +176,7 @@ def logout_user(request):
 
 def register_user(request):
   if request.method == "POST":
-    form = RegistrationForm(request.POST)
+    form = RegistrationForm(request.POST, request.FILES)
     if form.is_valid():
       username = form.cleaned_data['username']
       if User.objects.filter(username=username).exists():
@@ -183,6 +185,7 @@ def register_user(request):
             "Username already exists. Please choose another username.")
         return render(request, 'templates/register_user.html', {'form': form})
 
+      # Creating the user and account objects. Associating them to each other
       user = User.objects.create_user(
           username=username,
           password=form.cleaned_data['password'],
@@ -190,10 +193,20 @@ def register_user(request):
           last_name=form.cleaned_data['last_name'],
           email=form.cleaned_data['email'],
       )
+
+      account = form.save(commit=False)
+      account.user = user
+      account.save()
+      '''
       account = Account.objects.create(
           user=user,
           address=form.cleaned_data['address'],
+          city=form.cleaned_data['city'],
+          state=form.cleaned_data['state'],
+          profile_picture=form.cleaned_data['profile_picture'],
       )
+      '''
+      
       user = authenticate(request,
                           username=user.username,
                           password=form.cleaned_data['password'])
@@ -215,6 +228,8 @@ def add_location(request):
   if request.method == 'POST':
     form = LocationForm(request.POST, request.FILES)
     if form.is_valid():
+      location = form.save(commit=False)
+      location.created_by = request.user.account
       form.save()
       return HttpResponseRedirect('/add_location?submitted=True')
   else:
@@ -250,6 +265,8 @@ def add_item(request):
   if request.method == 'POST':
     form = ItemForm(request.POST, request.FILES)
     if form.is_valid():
+      item = form.save(commit=False)
+      item.created_by = request.user.account
       form.save()
       return HttpResponseRedirect('/add_item?submitted=True')
   else:
@@ -281,7 +298,8 @@ def show_location_items(request, location_id):
           'location': item.location,
           'is_recommended': item.is_recommended,
           'id': item.id,
-          'image': item.image.url
+          'image': item.image.url,
+          'created_by': item.created_by
       })
     context = {
         'location': location,
@@ -365,6 +383,7 @@ def item_info(request, item_id):
       'reviews': reviews,
       'item_filter': item_filter,
       'id': item.id,
+      'created_by': item.created_by
   }
   return render(request, 'templates/item_info.html', context)
 
