@@ -109,10 +109,18 @@ class ItemReviewForm(forms.ModelForm):
     fields = ['user', 'item', 'review', 'num_stars']
     
 
+# FINISH THIS!!!
 class UpdateAccountForm(forms.ModelForm):
-  address = forms.CharField(max_length = 255, 
-                            widget=forms.TextInput(attrs={'class': 'form-control'}))
+  #address = forms.CharField(max_length = 255, 
+  #                          widget=forms.TextInput(attrs={'class': 'form-control'}))
   class Meta:
     model = Account 
-    fields = ['address']
+    fields = ['address',
+             ]
+    labels = {
+      'address': 'Address'
+    }
+    widgets = {
+      'address': forms.TextInput(attrs={'class': 'form-control'}),
+    }
 
