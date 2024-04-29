@@ -425,8 +425,28 @@ def recommend_location(request, location_id):
   location.save()
   return redirect('index')
 
+
+# View to display a user's PUBLIC profile
+def profile(request, account_id):
+  context = {}
+  account = get_object_or_404(Account, id=account_id)
+  favorites = Location.objects.filter(favorites=account.user.id)
+  created_locations = Location.objects.filter(created_by=account)
+  created_items = Item.objects.filter(created_by=account)
+
+  context = {
+      'account': account,
+      'favorites': favorites,
+      'created_locations': created_locations,
+      'created_items': created_items,
+  }
+  return render(request, 'templates/user_profile.html', context)
+
+  
+
+
 @login_required(login_url='/login_user')
-def profile(request):
+def update_profile(request):
   if request.method == 'POST':
     account_form = UpdateAccountForm(request.POST, instance = request.user.account)
     
@@ -437,5 +457,5 @@ def profile(request):
   else:
     account_form = UpdateAccountForm(instance = request.user.account)
   
-  return render(request, 'templates/profile.html', {'account_form': account_form})
+  return render(request, 'templates/update_profile.html', {'account_form': account_form})
       
