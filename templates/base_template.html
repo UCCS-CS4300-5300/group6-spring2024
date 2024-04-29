@@ -136,7 +136,7 @@
               <a button class="btn btn-success" href = "{% url 'logout' %}">Logout</a></button>
             </li>
             <li class="nav-item">
-              <a button class="btn btn-success" href = "{% url 'user_profile' %}">{{request.user.username}} <span class = "bi-person-fill"></span></a></button>
+              <a button class="btn btn-success" href = "{% url 'update_profile' %}">{{request.user.username}} <span class = "bi-person-fill"></span></a></button>
         </li>
           {% else %}
           <li class="nav-item px-2">
