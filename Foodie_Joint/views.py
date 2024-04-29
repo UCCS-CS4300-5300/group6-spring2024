@@ -260,20 +260,23 @@ def favorite_list(request):
 
 
 @login_required(login_url='/login_user')
-def add_item(request):
+def add_item(request, location_id):
   submitted = False
+  location = get_object_or_404(Location, id=location_id)
   if request.method == 'POST':
     form = ItemForm(request.POST, request.FILES)
     if form.is_valid():
       item = form.save(commit=False)
       item.created_by = request.user.account
+      item.location = Location.objects.get(id=location_id)
       form.save()
-      return HttpResponseRedirect('/add_item?submitted=True')
+      return HttpResponseRedirect('/add_item/'+str(location_id)+'?submitted=True')
   else:
     form = ItemForm
     if 'submitted' in request.GET:
       submitted = True
   return render(request, 'templates/add_item.html', {
+      'location': location,
       'form': form,
       'submitted': submitted
   })
