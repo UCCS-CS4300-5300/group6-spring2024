@@ -115,7 +115,8 @@
                 None
               {% endif %}
               <br>
-              <strong>Created by </strong>{{location.created_by}} <!-- Make clickable to public profile page -->
+              <strong>Created by </strong><a href="{% url 'profile' location.created_by.user.account.id %}" style="color: blue !important;">
+                {{location.created_by}}</a> <!-- Clickable - brings to user's public profile -->
             </div>
           </div>
           {% if user.is_authenticated and user.is_superuser %}
