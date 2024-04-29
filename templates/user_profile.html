@@ -14,6 +14,11 @@
     display: block;
     margin: 0;
   }
+  .bottom-btn-container {
+    display: flex;
+    justify-content: left;
+    margin-top: 20px;
+  }
 </style>
 
 <div class="container py-4">
@@ -23,6 +28,7 @@
     <div class="profile-picture-container">
       <img src="{{ account.profile_picture.url }}" class="profile-picture" alt="User profile picture">
     </div>
+    <br>
     
   <h4>About Me:</h4>
     {% if account.bio %}
@@ -82,6 +88,9 @@
         {% endif %}
         </div>
       <br>
+    </div>
+    <div class="bottom-btn-container">
+    <button class="btn custom-btn" onclick="window.history.back();">Back</button>
     </div>
   </div>
 </div>
