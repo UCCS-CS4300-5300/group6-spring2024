@@ -79,18 +79,16 @@ class ItemForm(forms.ModelForm):
 
   class Meta:
     model = Item
-    fields = ['name', 'description', 'location', 'is_recommended', 'image']
+    fields = ['name', 'description', 'is_recommended', 'image']
     labels = {
       'name': 'Name',
       'description': 'Description',
-      'location': 'Location',
       'is_recommended': 'Recommended?',
       'image': 'Image'
     }
     widgets = {
       'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Name of Item'}),
       'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Description of Item'}),
-      'location': forms.Select(attrs={'class': 'form-control'}),
       'image': forms.FileInput(attrs={'class': 'form-control'})
     }
 

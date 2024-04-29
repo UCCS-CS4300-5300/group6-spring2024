@@ -10,20 +10,24 @@
     </div>
   {% endif %}	
   <div class="shadow p-4 mb-5 bg-body rounded form-row" style="margin-top: 65px; margin-inline: 15%;">
-    <h1 style="text-align: center">Fill Out the Form to Add an Item!</h1>
     {% if submitted%}
+    <h1 style="text-align: center">Item Added Successfully!</h1>
+    <h2 style="text-align: center">Location: {{location.name}}</h2>
     <div class="container">
       <div class="card">
         <div class="card-body" style="display:flex; margin: auto;">
           <div style="text-align: center">
-            <h2>Item Added Successfully</h2>
-            <a class="btn custom-btn" href="{% url 'add_item' %}">Add Another Item</button></a>
+            <h3>Would you like to?</h3>
+            <a class="btn custom-btn" href="{% url 'add_item' location.id %}">Add Another Item</a>
+            <a class="btn custom-btn" href="{% url 'location_details' location.id %}">View {{location.name}} </a>
             <a class="btn custom-btn" href="{% url 'nearby' %}">Return to List of Locations</a>
           </div>
         </div>
       </div>
     </div>
     {%else%}
+    <h1 style="text-align: center">Fill Out the Form to Add an Item!</h1>
+    <h2 style="text-align: center">Location: {{location.name}}</h2>
     <div class="container">
       <div class="card">
         <div class="card-body" style="display:flex; margin: 0 10%;">
