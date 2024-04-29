@@ -4,9 +4,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models.enums import Choices
 
-
+# Model to associate various locations with 'tags' to help categorize/filter them
+# Tags are instanciated whenever a new location object is created ('Add Location' button)
 class LocationTag(models.Model):
-  # When more are added, they are instanciated whenever a new location obj is created
   # Sort these?
   TAG_CHOICES = [
       ("Food", "Food"),
@@ -45,15 +45,22 @@ class LocationTag(models.Model):
     return f"{self.name}"
 
 
-# Model to extend the base user model - potentially add more fields such as "about me"
+# Model to extend the base user model
 class Account(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE)
   address = models.CharField(max_length=255)
+  bio = models.TextField(blank=True, null=True) # Optional bio field
+  state = models.CharField(max_length=50, blank=False, null=True) # Used to verify location API request
+  city = models.CharField(max_length=50, blank=False, null=True)
+  profile_picture = models.ImageField(upload_to='images/',
+                              blank=True,
+                              null=True,
+                              default='images/foodie-joint-logo.png')
 
   def __str__(self):
     return f"{self.user}"
 
-#MAYBE?
+# Model to represent a Location object
 class Location(models.Model):
   RESTAURANT = "Restaurant"
   STORE = "Store"
@@ -76,12 +83,15 @@ class Location(models.Model):
                                      default=None,
                                      blank=True)
   is_recommended = models.BooleanField(default=False)
+  # Now has relationship with user who created the Location (Tyler)
+  # Accessed in templates via location.created_by (e.g. location.created_by.profile_picture)
+  created_by = models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
 
   def __str__(self):
     return f"{self.name}: {self.description} ({self.location_type}, {self.address})"
 
 
-#Based on user stories, the item class will have to be updated
+# Model to represent a Location's item
 class Item(models.Model):
   name = models.CharField(max_length=50)
   description = models.CharField(max_length=500)
@@ -94,38 +104,15 @@ class Item(models.Model):
                             blank=True,
                             null=True,
                             default='images/foodie-joint-logo.png')
+  # Now has relationship with user who created the item (Tyler)
+  created_by = models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
 
   # define return string
   def __str__(self):
-    return f"{self.name}: {self.description}"
+    return f"{self.name} ({self.location}): {self.description}"
 
 
-"""
-class Address(models.Model):
-  user = models.ForeignKey(TrueUser, on_delete=models.CASCADE,
-  address = models.CharField(max_length=50))
-
-  def __init__(self, *args, temp=65, **kwargs):
-     self.temp = temp
-     return super().__init__(*args, **kwargs)
-
-
-    
-@receiver(post_save, sender=TrueUser)
-def create_user_address(sender, instance, created, **kwargs):
-  if created:
-      my_address = Address()
-      my_address.user = instance
-
-@receiver(post_save, sender=TrueUser)
-def save_user_profile(sender, instance, **kwargs):
-  instance.address.save()
-
-  
-  
-"""
-
-
+# Model to represent a review of Location
 class Review(models.Model):
   NUM_STARS = {
       1: '1',
@@ -134,8 +121,8 @@ class Review(models.Model):
       4: '4',
       5: '5',
   }
-
-  user = models.CharField(max_length=50)
+  # Now has relationship with user who created the review (Tyler)
+  user = models.ForeignKey(Account, on_delete=models.CASCADE) 
   location = models.ForeignKey(Location, on_delete=models.CASCADE)
   #review = models.CharField(max_length=200)
   review = models.TextField()  # Changed this to not limit length (Tyler)
@@ -144,10 +131,10 @@ class Review(models.Model):
 
   #define return string
   def __str__(self):
-    return f"{self.user} - {self.review} {self.num_stars} {self.date_created}"
-    # Probably shouldnt have the review in the string representation of obj (Tyler)
+    return f"{self.user}: Created on {self.date_created} ({self.num_stars} stars)"
 
 
+# Model to represent a review of Location's item
 class ItemReview(models.Model):
   NUM_STARS = {
       1: '1',
@@ -156,7 +143,8 @@ class ItemReview(models.Model):
       4: '4',
       5: '5',
   }
-  user = models.CharField(max_length=50)
+  # Now has relationship with user who created the review (Tyler)
+  user = models.ForeignKey(Account, on_delete=models.CASCADE) 
   item = models.ForeignKey(Item, on_delete=models.CASCADE)
   #review = models.CharField(max_length=200)
   review = models.TextField()  # Changed this to not limit length (Tyler)
@@ -165,10 +153,12 @@ class ItemReview(models.Model):
 
   #define return string
   def __str__(self):
-    return f"{self.user} - {self.review} {self.num_stars} {self.date_created}"
-    # Probably shouldnt have the review in the string representation of obj (Tyler)
+    return f"{self.user}: Created on {self.date_created} ({self.num_stars} stars)"
 
 
+
+# IF NO PURPOSE REMOVE THESE!!!!
+'''
 class Tag(models.Model):
   title = models.CharField(max_length=50)
   location = models.ForeignKey(Location, on_delete=models.CASCADE)
@@ -183,3 +173,4 @@ class ItemTag(models.Model):
 
   def __str__(self):
     return f"{self.title}"
+'''
