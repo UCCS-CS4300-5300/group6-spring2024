@@ -107,18 +107,29 @@ class ItemReviewForm(forms.ModelForm):
     fields = ['user', 'item', 'review', 'num_stars']
     
 
-# FINISH THIS!!!
 class UpdateAccountForm(forms.ModelForm):
-  #address = forms.CharField(max_length = 255, 
-  #                          widget=forms.TextInput(attrs={'class': 'form-control'}))
+  email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
+  
   class Meta:
     model = Account 
     fields = ['address',
-             ]
+              'state',
+              'city',
+              'email',
+              'profile_picture',
+              'bio']
     labels = {
-      'address': 'Address'
+      'address': 'Address',
+      'state': 'State',
+      'city': 'City',
+      'email': 'Email',
+      'profile_picture': 'Profile Picture',
+      'bio': 'About Me'
     }
     widgets = {
       'address': forms.TextInput(attrs={'class': 'form-control'}),
+      'state': forms.TextInput(attrs={'class': 'form-control'}),
+      'city': forms.TextInput(attrs={'class': 'form-control'}),
+      'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
+      'bio': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Write something about yourself...'})
     }
-
