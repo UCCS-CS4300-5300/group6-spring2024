@@ -1,6 +1,6 @@
 import requests  # Used to request info from API
 from geopy.distance import distance
-from .models import LocationTag
+from .models import TagCategory, TagItem
 
 
 # References:
@@ -44,7 +44,70 @@ def get_distance(address1, address2):
     return None
 
 # Created a function to create tag objects (trying tags as seperate model)
-def instantiate_tags():
-  for tag_name, _ in LocationTag.TAG_CHOICES:
-    if not LocationTag.objects.filter(name=tag_name).exists():
-      LocationTag.objects.create(name=tag_name)
+def init_tags():
+  food_cat, created = TagCategory.objects.get_or_create(name='Food')
+  cuisine_cat, created  = TagCategory.objects.get_or_create(name='Cuisine')
+  drink_cat, created  = TagCategory.objects.get_or_create(name='Drink')
+  dietary_cat, created  = TagCategory.objects.get_or_create(name='Dietary')
+  meal_cat, created  = TagCategory.objects.get_or_create(name='Meal')
+  dining_cat, created  = TagCategory.objects.get_or_create(name='Dining')
+  accomodations_cat, created  = TagCategory.objects.get_or_create(name='Accomodations')
+  store_cat, created  = TagCategory.objects.get_or_create(name='Store')
+  other_cat, created  = TagCategory.objects.get_or_create(name='Other')
+
+  tags = [
+    (food_cat, "Pizza"),
+    (food_cat, "Chicken"),
+    (food_cat, "Burgers"),
+    (food_cat, "Sandwiches"),
+    (food_cat, "Salads"),
+    (food_cat, "Fish"),
+    (food_cat, "Steak"),
+    (food_cat, "Pasta"),
+    (food_cat, "Soup"),
+
+    (cuisine_cat, "American"),
+    (cuisine_cat, "Mexican"),
+    (cuisine_cat, "Chinese"),
+    (cuisine_cat, "Japanese"),
+    (cuisine_cat, "French"),
+    (cuisine_cat, "Indian"),
+    (cuisine_cat, "Italian"),
+
+    (drink_cat, "Coffee"),
+    (drink_cat, "Beer"),
+    (drink_cat, "Wine"),
+
+    (dietary_cat, "Vegetarian"),
+    (dietary_cat, "Vegan"),
+    (dietary_cat, "Gluten Free"),
+    (dietary_cat, "Kosher"),
+    (dietary_cat, "Halal"),
+
+    (meal_cat, "Breakfast"),
+    (meal_cat, "Lunch"),
+    (meal_cat, "Dinner"),
+    (meal_cat, "Snacks"),
+    (meal_cat, "Dessert"),
+
+    (dining_cat, "Bar"),
+    (dining_cat, "Café"),
+    (dining_cat, "Fast Food"),
+    (dining_cat, "Fine Dining"),
+    (dining_cat, "Casual Dining"),
+    
+    (accomodations_cat, "Pet Friendly"),
+    (accomodations_cat, "Wheelchair Accessible"),
+
+    (store_cat, "Gas Station"),
+    (store_cat, "Grocery Store"),
+    (store_cat, "Specialty Store"),   
+
+    (other_cat, "Other"),
+  ]
+
+  for category, tag_name in tags:
+    TagItem.objects.get_or_create(category=category, name=tag_name)
+  
+  
+  
