@@ -11,7 +11,6 @@ from Foodie_Joint.views import show_location_items
 
 ############# START OF TYLER CARROLL TESTS #############
 class NearbyViewTest(TestCase):
-
   def setUp(self):
     self.user = User.objects.create_user(
         username='testUsername',
@@ -21,7 +20,7 @@ class NearbyViewTest(TestCase):
         last_name='lastName',
     )
     self.account = Account.objects.create(user=self.user,
-                                          address="123 Test Street",
+                                          address="3650 N Nevada Ave",
                                           state="Test State",
                                           city="Test City",
                                           bio="Test Bio")
@@ -67,6 +66,7 @@ class NearbyViewTest(TestCase):
     self.assertContains(response, self.restaurant.name)
     self.assertContains(response, self.restaurant.description)
     self.assertContains(response, self.restaurant.address)
+    self.assertContains(response, "4.01 mi") # Distance from user to restaurant
     self.assertNotContains(response, self.store.name)
     self.assertContains(response, self.user.account.address)  # Ensuring user address is shown on nearby page
 
@@ -135,8 +135,100 @@ class NearbyViewTest(TestCase):
     self.assertContains(response, "1420 Austin Bluffs Pkwy")
     self.assertNotContains(response, self.user.account.address)
 
+class ProfileViewTest(TestCase):
+  def setUp(self):
+    self.user1 = User.objects.create_user(
+        username='testUser1',
+        email='user1@test.com',
+        password='testPass',
+        first_name='firstName1',
+        last_name='lastName1',
+    )
+    self.account1 = Account.objects.create(user=self.user,
+                                          address="3650 N Nevada Ave",
+                                          state="Test State",
+                                          city="Test City",
+                                          bio="Test Bio")
+    self.user2 = User.objects.create_user(
+      username='testUser2',
+      email='user2@test.com',
+      password='testPass',
+      first_name='firstName2',
+      last_name='lastName2',
+    )
+    self.account2 = Account.objects.create(user=self.user,
+                                        address="3504 N Academy Blvd",
+                                        state="Test State",
+                                        city="Test City",
+                                        bio="Test Bio")
 
+    self.restaurant = Location.objects.create(
+      name="Albertacos",
+      description="Taco joint",
+      location_type=Location.RESTAURANT,
+      address="4494 Austin Bluffs Pkwy",
+      created_by=self.account1)
 
+    # Note, this store object is created by a DIFFERENT user
+    self.store = Location.objects.create(name="Family Dollar",
+       description="Dollar store",
+       location_type=Location.STORE,
+       address="4609 Austin Bluffs Pkwy",
+       created_by=self.account2)
+
+    # Favoriting the store as account1
+    self.account1.favorites.add(self.store)
+
+    # Testing that the update_profile view returns the proper template
+    def test_update_profile_view_renders_proper_template(self):
+      response = self.client.get(reverse('update_profile'))
+      self.assertTemplateUsed(response, 'templates/update_profile.html')
+    
+    # Testing trying to access account settings without logging in
+    def test_update_profile_view_redirects_to_login_user_NOT_logged(self):
+      response = self.client.get(reverse('update_profile'))
+      self.assertRedirects(response, '/login/?next=/update_profile/')
+
+    # Testing that the update_profile view renders with logged in user's info
+    def test_update_profile_view_when_user_logged_in(self):
+      self.client.login(username='testUser1', password='testPass')
+      response = self.client.get(reverse('update_profile'))
+      self.assertEqual(response.status_code, 200)
+      self.assertContains(response, "User settings for testUser1")
+      self.assertContains(response, self.account1.address)
+      self.assertContains(response, self.account1.state)
+      self.assertContains(response, self.account1.city)
+      self.assertContains(response, self.account1.bio)
+      self.assertNotContains(response, "User settings for testUser2")
+      self.client.logout()
+
+    # Testing that the update_profile view does not render a user's info when not logged in
+    def test_update_profile_view_when_user_NOT_logged_in(self):
+      response = self.client.get(reverse('update_profile'))
+      self.assertEqual(response.status_code, 200)
+      self.assertNotContains(response, "User settings for testUser1")
+      self.assertNotContains(response, self.account1.address)
+      self.assertNotContains(response, self.account1.state)
+      self.assertNotContains(response, self.account1.city)
+      self.assertNotContains(response, self.account1.bio)
+      self.assertNotContains(response, "User settings for testUser2")
+
+    # Testing a user's public profile
+    def test_user_profile_view_renders_proper_template(self):
+      response = self.client.get(reverse('user_profile', args=[self.account1.id]))
+      self.assertEqual(response.status_code, 200)
+      self.assertTemplateUsed(response, 'templates/user_profile.html')
+
+    # Testing a user's public profile renders with proper context (not logged in - doesnt have to be)
+    def test_user_profile_view_renders_proper_user(self):
+      response = self.client.get(reverse('user_profile', args=[self.account1.id]))
+      self.assertEqual(response.status_code, 200)
+      self.assertContains(response, "testUser1's Profile")
+      self.assertContains(response, self.account1.bio)
+      self.assertContains(response, self.restaurant.name) # Should show user's created objects
+      self.assertContains(response, self.store.name) # Should show a user's favorites
+      self.assertNotContains(response, self.account2.user.first_name)
+      
 ############# END OF TYLER CARROLL TESTS #############
 
 
@@ -269,6 +361,5 @@ class UsersTests(TestCase):
 
     self.assertEqual(self.new_user2.username, 'new_user2')
     self.assertEqual(self.new_user2.email, 'new2@user.com')
-
 
 ############# END OF LUKE FLANCHER TESTS #############
