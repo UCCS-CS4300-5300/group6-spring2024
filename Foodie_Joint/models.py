@@ -6,43 +6,18 @@ from django.db.models.enums import Choices
 
 # Model to associate various locations with 'tags' to help categorize/filter them
 # Tags are instanciated whenever a new location object is created ('Add Location' button)
-class LocationTag(models.Model):
-  # Sort these?
-  TAG_CHOICES = [
-      ("Food", "Food"),
-      ("Drink", "Drink"),
-      ("Gas Station", "Gas Station"),
-      ("Supermarket", "Supermarket"),
-      ("Specialty Store", "Specialty Store"),
-      ("Vegetarian", "Vegetarian"),
-      ("Vegan", "Vegan"),
-      ("Gluten Free", "Gluten Free"),
-      ("Pizza", "Pizza"),
-      ("Chicken", "Chicken"),
-      ("Burger", "Burger"),
-      ("Bar", "Bar"),
-      ("Sandwiches", "Sandwiches"),
-      ("Salads", "Salads"),
-      ("Breakfast", "Breakfast"),
-      ("Brunch", "Brunch"),
-      ("Lunch", "Lunch"),
-      ("Dinner", "Dinner"),
-      ("Dessert", "Dessert"),
-      ("Coffee", "Coffee"),
-      ("Outside Dining", "Outside Dining"),
-      ("Italian", "Italian"),
-      ("Mexican", "Mexican"),
-      ("Chinese", "Chinese"),
-      ("Seafood", "Seafood"),
-      ("Pet Friendly", "Pet Friendly"),
-      ("Fast Food", "Fast Food"),
-      ("Fine Dining", "Fine Dining"),
-      ("Locally Owned", "Locally Owned"),
-  ]
-  name = models.CharField(max_length=50, choices=TAG_CHOICES)
+class TagCategory(models.Model):
+  name = models.CharField(max_length=50, unique=True)
+  
+  def __str__(self):
+    return self.name
+
+class TagItem(models.Model):
+  category = models.ForeignKey(TagCategory, on_delete=models.CASCADE)
+  name = models.CharField(max_length=50, unique=True)
 
   def __str__(self):
-    return f"{self.name}"
+    return f"{self.name} ({self.category})"
 
 
 # Model to extend the base user model
@@ -73,7 +48,7 @@ class Location(models.Model):
   description = models.CharField(max_length=500)
   location_type = models.CharField(max_length=10, choices=LOCATION_CHOICES)
   address = models.CharField(max_length=50)
-  tags = models.ManyToManyField(LocationTag)
+  tags = models.ManyToManyField(TagItem)
   image = models.ImageField(upload_to='images/',
                             blank=True,
                             null=True,
@@ -154,23 +129,3 @@ class ItemReview(models.Model):
   #define return string
   def __str__(self):
     return f"{self.user}: Created on {self.date_created} ({self.num_stars} stars)"
-
-
-
-# IF NO PURPOSE REMOVE THESE!!!!
-'''
-class Tag(models.Model):
-  title = models.CharField(max_length=50)
-  location = models.ForeignKey(Location, on_delete=models.CASCADE)
-
-  def __str__(self):
-    return f"{self.title}"
-
-
-class ItemTag(models.Model):
-  title = models.CharField(max_length=50)
-  item = models.ForeignKey(Item, on_delete=models.CASCADE)
-
-  def __str__(self):
-    return f"{self.title}"
-'''
