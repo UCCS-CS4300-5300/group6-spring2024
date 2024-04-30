@@ -53,7 +53,7 @@
             <p>{{location.address}} ({{location.rounded_distance}} mi)</p>
             <!-- Possibly make tags colored bubbles?? -->
             <p>Tags:
-              {% for tag in location.tags %}
+              {% for tag in location.tags.all %}
               <!-- Add comma between tags if not last object -->
                 {{ tag.name }}{% if not forloop.last %},{% endif %}
               {% endfor %}
@@ -91,20 +91,35 @@
           <button type="submit" class="btn custom-btn" style="margin-left: 5px; align-self: flex-end;">Search</button>
         </form>
           <hr>
+
+        
         <form action="{% url 'nearby' %}" method="GET">
             <div class="form-group">
                 <label for="tag"><strong>Filter by Tag:</strong></label>
                 <!-- https://www.w3schools.com/tags/att_input_type_checkbox.asp -->
+              <div class="card">
+                <div class="card-body">
+                
+              {% for category in categories %}
+              <p><strong>{{ category.name }}</strong></p>
                 {% for tag in all_tags %}
+                  {% if tag.category == category %}
                 <div class="form-check">
                     <!-- Checks the boxes if the filter was applied in the request -->
                     <input class="form-check-input" type="checkbox" name="tag" value="{{ tag.name }}" id="{{ tag.name }}"
                         {% if tag.name in selected_tags %} checked {% endif %}>
                     <label class="form-check-label" for="{{ tag.name }}">{{ tag.name }}</label>
                 </div>
+                  {% endif %}
+                  {% if forloop.last and not forloop.parentloop.last %}
+                  <hr>
+                  {% endif %}
                 {% endfor %}
+
+              {% endfor %}
             </div>
-            <button type="submit" class="btn custom-btn" style="margin-right: 5px; margin-top: 5px;">Filter</button>
+              </div>
+            <button type="submit" class="btn custom-btn" style="margin-right: 5px; margin-top: 10px;">Filter</button>
             <!-- Retaining the location type -->
             <input type="hidden" name="type" value="{{ request.GET.type }}">
         </form>
@@ -112,9 +127,11 @@
         <form action="{% url 'nearby' %}" method="GET">
             <!-- Allowing for filters to be removed -->
             <input type="hidden" name="type" value="{{ request.GET.type }}">
-            <button type="submit" class="btn custom-btn" style="margin-top: 5px;">Remove Filter</button>
+            <button type="submit" class="btn custom-btn" style="margin-top: 10px;">Remove Filter</button>
         </form>
           </div>
+      </div>
+      
         </div>
     </div>
     </div>
