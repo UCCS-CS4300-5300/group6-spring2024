@@ -43,7 +43,7 @@ def get_distance(address1, address2):
     print(f"An error occured: {err}")
     return None
 
-# Created a function to create tag objects (trying tags as seperate model)
+# Created a function to create tag objects. If tag obj already exists its not created again.
 def init_tags():
   food_cat, created = TagCategory.objects.get_or_create(name='Food')
   cuisine_cat, created  = TagCategory.objects.get_or_create(name='Cuisine')
@@ -55,6 +55,7 @@ def init_tags():
   store_cat, created  = TagCategory.objects.get_or_create(name='Store')
   other_cat, created  = TagCategory.objects.get_or_create(name='Other')
 
+  # This is where you add tags for a category!!!
   tags = [
     (food_cat, "Pizza"),
     (food_cat, "Chicken"),
@@ -108,6 +109,3 @@ def init_tags():
 
   for category, tag_name in tags:
     TagItem.objects.get_or_create(category=category, name=tag_name)
-  
-  
-  
