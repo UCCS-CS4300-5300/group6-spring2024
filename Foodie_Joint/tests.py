@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse, resolve
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
-from Foodie_Joint.models import Item, Location, Account, LocationTag
+from Foodie_Joint.models import Item, Location, Account, TagCategory, TagItem
 from Foodie_Joint.views import show_location_items
 
 # For reference: https://docs.djangoproject.com/en/5.0/topics/testing/tools/
@@ -21,30 +21,43 @@ class NearbyViewTest(TestCase):
         last_name='lastName',
     )
     self.account = Account.objects.create(user=self.user,
-                                          address="123 Test Street")
+                                          address="123 Test Street",
+                                          state="Test State",
+                                          city="Test City",
+                                          bio="Test Bio")
     self.client.login(username="testUsername", password="testPass")
 
+    self.tag_category = TagCategory.objects.create(name="testCat")
+    self.tag_item = TagItem.objects.create(category=self.tag_category, name="testName")
+    
     self.restaurant = Location.objects.create(
         name="Albertacos",
         description="Taco joint",
         location_type=Location.RESTAURANT,
-        address="4494 Austin Bluffs Pkwy")
+        address="4494 Austin Bluffs Pkwy",
+        created_by=self.account)
+    
     self.store = Location.objects.create(name="Family Dollar",
                                          description="Dollar store",
                                          location_type=Location.STORE,
-                                         address="4609 Austin Bluffs Pkwy")
-
-    self.tag_mexican = LocationTag.objects.create(name="Mexican")
-    self.tag_local = LocationTag.objects.create(name="Locally Owned")
-    self.tag_supermarket = LocationTag.objects.create(name="Supermarket")
-
-    self.restaurant.tags.add(self.tag_mexican, self.tag_local)
-    self.store.tags.add(self.tag_supermarket)
+                                         address="4609 Austin Bluffs Pkwy",
+                                         created_by=self.account)
+    
+    self.restaurant.tags.add(self.tag_item)
 
   # Ensuring that the nearby.html template is used/returned by the nearby view
   def test_nearby_view_renders_proper_template(self):
     response = self.client.get(reverse('nearby'))
     self.assertTemplateUsed(response, 'templates/nearby.html')
+
+  # Testing that the nearby view returns the proper (created) tags
+  def test_nearby_view_renders_template_with_created_tags(self):
+    response = self.client.get(reverse('nearby'))
+    # Ensuring the proper tags and categories are shown
+    self.assertContains(response, self.tag_item.name)
+    self.assertContains(response, self.tag_category.name)
+    self.assertNotContains(response, "Not A Tag!")
+    self.assertNotContains(response, "Not A Tag Category!")
 
   # Testing that a Restuarant object is shown on the 'nearby' page when 'Restaurant' selected in navbar
   def test_nearby_view_with_restaurant_nearby_page(self):
@@ -55,8 +68,7 @@ class NearbyViewTest(TestCase):
     self.assertContains(response, self.restaurant.description)
     self.assertContains(response, self.restaurant.address)
     self.assertNotContains(response, self.store.name)
-    self.assertContains(response, self.user.account.address
-                        )  # Ensuring user address is shown on nearby page
+    self.assertContains(response, self.user.account.address)  # Ensuring user address is shown on nearby page
 
   # Testing that a Store object is shown on the 'nearby' page when 'Store' selected in navbar
   def test_nearby_view_with_store_nearby_page(self):
@@ -68,7 +80,6 @@ class NearbyViewTest(TestCase):
     self.assertNotContains(response, self.restaurant.name)
 
   # Testing that both Store and Restaurant objects are shown on the 'nearby' page when nearby page is accessed without type parameter
-  # Potentially remove this test if a different page is used to show all Location objects
   def test_nearby_view_with_both_nearby_page(self):
     response = self.client.get('/nearby')
     self.assertEqual(response.status_code, 200)
@@ -88,10 +99,10 @@ class NearbyViewTest(TestCase):
         response,
         "No locations found! Please add some locations to get started.")
 
-  # Testing that when on the Restaurant page, only the restaurant obj is shown with all filters applied
+  # Testing that when on the Restaurant page, only the restaurant obj is shown when its tag is selected
   def test_nearby_view_with_all_filters(self):
     response = self.client.get(
-        '/nearby?tag=Mexican&tag=Supermarket&tag=Locally+Owned&type=Restaurant'
+        '/nearby?tag=testName&type=Restaurant'
     )
     self.assertEqual(response.status_code, 200)
     self.assertContains(response, self.restaurant.name)
@@ -112,7 +123,18 @@ class NearbyViewTest(TestCase):
     self.assertNotContains(response, self.store.description)
     self.assertNotContains(response, self.store.address)
 
-  # Add test, testing user logged in and gets user address (when implemented)
+  # Testing that the user's address is shown on the 'nearby' page when user logged in
+  def test_nearby_view_renders_template_with_user_address_user_loggedIn(self):
+    response = self.client.get(reverse('nearby'))
+    self.assertContains(response, self.user.account.address)
+
+  # Testing that the static address is shown on the 'nearby' page when user NOT logged in
+  def test_nearby_view_renders_template_with_static_address_user_notLoggedIn(self):
+    self.client.logout()
+    response = self.client.get(reverse('nearby'))
+    self.assertContains(response, "1420 Austin Bluffs Pkwy")
+    self.assertNotContains(response, self.user.account.address)
+
 
 
 ############# END OF TYLER CARROLL TESTS #############
