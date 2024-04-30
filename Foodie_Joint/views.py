@@ -267,11 +267,15 @@ def show_location_items(request, location_id):
   location = get_object_or_404(Location, pk=location_id)
   items = location.item_set.all()
   reviews = Review.objects.filter(location=location)
+  top_reviews = Review.objects.filter(
+      location=location).order_by('-num_stars')[:2]
+
   reviews_filter = ReviewFilter(request.GET, queryset=reviews)
   reviews = reviews_filter.qs
   fav = bool
   if location.favorites.filter(id=request.user.id).exists():
     fav = True
+
   if items.exists():
     item_list = []
     for item in items:
@@ -289,6 +293,7 @@ def show_location_items(request, location_id):
         'reviews': reviews,
         'reviews_filter': reviews_filter,
         'id': location.id,
+        'top_reviews': top_reviews,
     }
   else:
     context = {
@@ -298,7 +303,9 @@ def show_location_items(request, location_id):
         'reviews_filter': reviews_filter,
         'fav': fav,
         'id': location.id,
+        'top_reviews': top_reviews,
     }
+
   return render(request, 'templates/location_item_info.html', context)
 
 
@@ -406,17 +413,19 @@ def recommend_location(request, location_id):
   location.save()
   return redirect('index')
 
+
 @login_required(login_url='/login_user')
 def profile(request):
   if request.method == 'POST':
-    account_form = UpdateAccountForm(request.POST, instance = request.user.account)
-    
+    account_form = UpdateAccountForm(request.POST,
+                                     instance=request.user.account)
+
     if account_form.is_valid():
       account_form.save()
       messages.success(request, "Account updated successfully")
       return redirect('index')
   else:
-    account_form = UpdateAccountForm(instance = request.user.account)
-  
-  return render(request, 'templates/profile.html', {'account_form': account_form})
-      
+    account_form = UpdateAccountForm(instance=request.user.account)
+
+  return render(request, 'templates/profile.html',
+                {'account_form': account_form})
