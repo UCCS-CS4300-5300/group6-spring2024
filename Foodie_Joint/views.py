@@ -18,18 +18,33 @@ from .utils import init_tags, get_distance
 
 
 def index(request):
-  # Since only one item can be recommended for now, we can just get the first item marked as recommended from the database.
   carousel_restaurants = Location.objects.filter(
       location_type='Restaurant')[:3]
   carousel_stores = Location.objects.filter(location_type='Store')[:3]
   recommended_item = Item.objects.filter(is_recommended=True).first()
   recommended_location = Location.objects.filter(is_recommended=True).first()
+
+  top_two_location_reviews = []
+  top_two_item_reviews = []
+
+  if recommended_location:
+    location_review_queryset = Review.objects.filter(
+        location=recommended_location)
+    top_two_location_reviews = location_review_queryset.order_by(
+        '-num_stars')[:2]
+
+  if recommended_item:
+    item_review_queryset = ItemReview.objects.filter(item=recommended_item)
+    top_two_item_reviews = item_review_queryset.order_by('-num_stars')[:2]
+
   return render(
       request, 'templates/index.html', {
           'recommended_item': recommended_item,
           'carousel_restaurants': carousel_restaurants,
           'carousel_stores': carousel_stores,
-          'recommended_location': recommended_location
+          'recommended_location': recommended_location,
+          'location_reviews': top_two_location_reviews,
+          'item_reviews': top_two_item_reviews,
       })
 
 
@@ -184,7 +199,7 @@ def add_location(request):
       location = form.save(commit=False)
       location.created_by = request.user.account
       form.save()
-      form.save_m2m() # Saving the many to many relationship (tags)
+      form.save_m2m()  # Saving the many to many relationship (tags)
       return HttpResponseRedirect('/add_location?submitted=True')
   else:
     form = LocationForm()
@@ -226,7 +241,8 @@ def add_item(request, location_id):
       item.created_by = request.user.account
       item.location = Location.objects.get(id=location_id)
       form.save()
-      return HttpResponseRedirect('/add_item/'+str(location_id)+'?submitted=True')
+      return HttpResponseRedirect('/add_item/' + str(location_id) +
+                                  '?submitted=True')
   else:
     form = ItemForm
     if 'submitted' in request.GET:
@@ -402,15 +418,15 @@ def profile(request, account_id):
   return render(request, 'templates/user_profile.html', context)
 
 
-
-
 @login_required(login_url='/login_user')
 def update_profile(request):
   context = {}
   user = request.user
   email = user.email
   if request.method == 'POST':
-    account_form = UpdateAccountForm(request.POST, request.FILES, instance=user.account)
+    account_form = UpdateAccountForm(request.POST,
+                                     request.FILES,
+                                     instance=user.account)
     if account_form.is_valid():
       new_email = account_form.cleaned_data['email']
       user.email = new_email
