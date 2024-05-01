@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 
 # Register your models here.
-from .models import Location, Item, LocationTag, Account, Review, ItemReview, Tag, ItemTag
+from .models import Location, Item, TagItem, TagCategory, Account, Review, ItemReview
 
 
 # Create an Item Update Action and Interface for the Admin to Mark an Item as Recommended
@@ -32,11 +32,12 @@ class CustomUserAdmin(UserAdmin):
   inlines = (AccountInline, )
 
 admin.site.register(Location)
-admin.site.register(LocationTag)
+admin.site.register(TagCategory)
+admin.site.register(TagItem)
 admin.site.register(Item, ItemAdmin)
 admin.site.unregister(User)  # Unregistering the default Django User model
 admin.site.register(User, CustomUserAdmin)  # Registering the Custom User model
 admin.site.register(Review)
 admin.site.register(ItemReview)
-admin.site.register(Tag)
-admin.site.register(ItemTag)
+#admin.site.register(Tag)
+#admin.site.register(ItemTag)

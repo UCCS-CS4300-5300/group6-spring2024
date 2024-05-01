@@ -1,10 +1,8 @@
-import requests  # Used to request info from API
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
-from geopy.distance import distance
 
 from .filters import ItemReviewFilter, ReviewFilter
 from .forms import (
@@ -15,8 +13,8 @@ from .forms import (
     ReviewForm,
     UpdateAccountForm,
 )
-from .models import Item, ItemReview, Location, LocationTag, Review, Account, User
-from .utils import instantiate_tags
+from .models import Item, ItemReview, Location, Review, Account, User, TagItem, TagCategory
+from .utils import init_tags, get_distance
 
 
 def index(request):
@@ -39,52 +37,12 @@ def base(request):
   return render(request, 'templates/base_template.html')
 
 
-# References:
-# https://geopy.readthedocs.io/en/stable/#module-geopy.distance
-# https://nominatim.org/release-docs/latest/api/Search/
-BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json'
-# Added user-agent to request header to avoid 403 error
-# https://operations.osmfoundation.org/policies/nominatim/
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Foodie_Joint/1.0 (tcarroll@uccs.edu)"
-
-
-# Potentially move out of views.py
-def get_distance(address1, address2):
-  try:
-    headers = {'User-Agent': USER_AGENT}
-
-    response1 = requests.get(f"{BASE_URL}&street={address1}", headers=headers)
-    response2 = requests.get(f"{BASE_URL}&street={address2}", headers=headers)
-
-    # Error handling: https://requests.readthedocs.io/en/latest/user/quickstart/#errors-and-exceptions
-    response1.raise_for_status()
-    response2.raise_for_status()
-
-    data1 = response1.json()
-    data2 = response2.json()
-
-    lat1 = float(data1[0]['lat'])
-    lon1 = float(data1[0]['lon'])
-
-    lat2 = float(data2[0]['lat'])
-    lon2 = float(data2[0]['lon'])
-
-    location1 = (lat1, lon1)
-    location2 = (lat2, lon2)
-
-    return distance(location1, location2).miles
-
-  # In case request fails an error is printed to console
-  except requests.exceptions.RequestException as err:
-    print(f"An error occured: {err}")
-    return None
-
-
-#@login_required(login_url='/login_user')
+# View to get geographical info of Locations from API and sort by distamce from user
 def nearby(request):
   context = {}
   locations = Location.objects.all()
-  all_tags = LocationTag.objects.all()
+  all_tags = TagItem.objects.all()
+  categories = TagCategory.objects.all()
 
   # Providing static address in case of user not logged in
   if request.user.is_authenticated:
@@ -113,7 +71,7 @@ def nearby(request):
     sorted_locations = []
     for location in locations:
       distance = get_distance(user_address, location.address)
-      # Checking get_distance request went through/didnt return None
+      # Ensuring get_distance request went through/didnt return None
       if distance is not None:
         rounded_distance = round(distance, 2)
         sorted_locations.append({
@@ -125,7 +83,8 @@ def nearby(request):
             'rounded_distance': rounded_distance,
             'id': location.id,  # needed for location_item_info template
             'tags': location.tags.all(),
-            'image': location.image
+            'image': location.image,
+            'created_by': location.created_by,
         })
 
     # Sorting in ascending order of distance (https://blogboard.io/blog/knowledge/python-sorted-lambda/)
@@ -137,12 +96,15 @@ def nearby(request):
         'user_address': user_address,
         'sorted_locations': sorted_locations,
         'all_tags': all_tags,
+        'categories': categories,
         'selected_tags':
         selected_tags,  # Added this to have checkboxes stay marked in template
         'search_name': search_name,
     }
     return render(request, 'templates/nearby.html', context)
   else:
+    # Case where no locations exist, uses static address
+    context['user_address'] = user_address
     context['no_locations'] = True
     return render(request, 'templates/nearby.html', context)
 
@@ -174,7 +136,7 @@ def logout_user(request):
 
 def register_user(request):
   if request.method == "POST":
-    form = RegistrationForm(request.POST)
+    form = RegistrationForm(request.POST, request.FILES)
     if form.is_valid():
       username = form.cleaned_data['username']
       if User.objects.filter(username=username).exists():
@@ -183,6 +145,7 @@ def register_user(request):
             "Username already exists. Please choose another username.")
         return render(request, 'templates/register_user.html', {'form': form})
 
+      # Creating the user and account objects. Associating them to each other
       user = User.objects.create_user(
           username=username,
           password=form.cleaned_data['password'],
@@ -190,10 +153,11 @@ def register_user(request):
           last_name=form.cleaned_data['last_name'],
           email=form.cleaned_data['email'],
       )
-      account = Account.objects.create(
-          user=user,
-          address=form.cleaned_data['address'],
-      )
+
+      account = form.save(commit=False)
+      account.user = user
+      account.save()
+
       user = authenticate(request,
                           username=user.username,
                           password=form.cleaned_data['password'])
@@ -210,20 +174,27 @@ def register_user(request):
 @login_required(login_url='/login_user')
 def add_location(request):
   # Calling function to create tag objects if they dont exist
-  instantiate_tags()
+  init_tags()
+  categories = TagCategory.objects.all()
+  tags = TagItem.objects.all()
   submitted = False
   if request.method == 'POST':
     form = LocationForm(request.POST, request.FILES)
     if form.is_valid():
+      location = form.save(commit=False)
+      location.created_by = request.user.account
       form.save()
+      form.save_m2m() # Saving the many to many relationship (tags)
       return HttpResponseRedirect('/add_location?submitted=True')
   else:
-    form = LocationForm
+    form = LocationForm()
     if 'submitted' in request.GET:
       submitted = True
   return render(request, 'templates/add_location.html', {
       'form': form,
-      'submitted': submitted
+      'submitted': submitted,
+      'categories': categories,
+      'tags': tags
   })
 
 
@@ -245,18 +216,23 @@ def favorite_list(request):
 
 
 @login_required(login_url='/login_user')
-def add_item(request):
+def add_item(request, location_id):
   submitted = False
+  location = get_object_or_404(Location, id=location_id)
   if request.method == 'POST':
     form = ItemForm(request.POST, request.FILES)
     if form.is_valid():
+      item = form.save(commit=False)
+      item.created_by = request.user.account
+      item.location = Location.objects.get(id=location_id)
       form.save()
-      return HttpResponseRedirect('/add_item?submitted=True')
+      return HttpResponseRedirect('/add_item/'+str(location_id)+'?submitted=True')
   else:
     form = ItemForm
     if 'submitted' in request.GET:
       submitted = True
   return render(request, 'templates/add_item.html', {
+      'location': location,
       'form': form,
       'submitted': submitted
   })
@@ -267,15 +243,11 @@ def show_location_items(request, location_id):
   location = get_object_or_404(Location, pk=location_id)
   items = location.item_set.all()
   reviews = Review.objects.filter(location=location)
-  top_reviews = Review.objects.filter(
-      location=location).order_by('-num_stars')[:2]
-
   reviews_filter = ReviewFilter(request.GET, queryset=reviews)
   reviews = reviews_filter.qs
   fav = bool
   if location.favorites.filter(id=request.user.id).exists():
     fav = True
-
   if items.exists():
     item_list = []
     for item in items:
@@ -285,7 +257,8 @@ def show_location_items(request, location_id):
           'location': item.location,
           'is_recommended': item.is_recommended,
           'id': item.id,
-          'image': item.image.url
+          'image': item.image.url,
+          'created_by': item.created_by
       })
     context = {
         'location': location,
@@ -293,7 +266,6 @@ def show_location_items(request, location_id):
         'reviews': reviews,
         'reviews_filter': reviews_filter,
         'id': location.id,
-        'top_reviews': top_reviews,
     }
   else:
     context = {
@@ -303,9 +275,7 @@ def show_location_items(request, location_id):
         'reviews_filter': reviews_filter,
         'fav': fav,
         'id': location.id,
-        'top_reviews': top_reviews,
     }
-
   return render(request, 'templates/location_item_info.html', context)
 
 
@@ -372,6 +342,7 @@ def item_info(request, item_id):
       'reviews': reviews,
       'item_filter': item_filter,
       'id': item.id,
+      'created_by': item.created_by
   }
   return render(request, 'templates/item_info.html', context)
 
@@ -414,18 +385,45 @@ def recommend_location(request, location_id):
   return redirect('index')
 
 
-@login_required(login_url='/login_user')
-def profile(request):
-  if request.method == 'POST':
-    account_form = UpdateAccountForm(request.POST,
-                                     instance=request.user.account)
+# View to display a user's PUBLIC profile
+def profile(request, account_id):
+  context = {}
+  account = get_object_or_404(Account, id=account_id)
+  favorites = Location.objects.filter(favorites=account.user.id)
+  created_locations = Location.objects.filter(created_by=account)
+  created_items = Item.objects.filter(created_by=account)
 
+  context = {
+      'account': account,
+      'favorites': favorites,
+      'created_locations': created_locations,
+      'created_items': created_items,
+  }
+  return render(request, 'templates/user_profile.html', context)
+
+
+
+
+@login_required(login_url='/login_user')
+def update_profile(request):
+  context = {}
+  user = request.user
+  email = user.email
+  if request.method == 'POST':
+    account_form = UpdateAccountForm(request.POST, request.FILES, instance=user.account)
     if account_form.is_valid():
+      new_email = account_form.cleaned_data['email']
+      user.email = new_email
+      user.save()
       account_form.save()
       messages.success(request, "Account updated successfully")
       return redirect('index')
   else:
-    account_form = UpdateAccountForm(instance=request.user.account)
+    account_form = UpdateAccountForm(instance=user.account)
+    account_form.fields['email'].initial = email
 
-  return render(request, 'templates/profile.html',
-                {'account_form': account_form})
+  context = {
+      'account_form': account_form,
+      'user': user,
+  }
+  return render(request, 'templates/update_profile.html', context)
