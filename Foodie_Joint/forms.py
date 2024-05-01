@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Location, Item, Account, Review, ItemReview#, Tag, ItemTag
+from .models import Location, Item, Account, Review, ItemReview, TagCategory, TagItem
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
@@ -53,6 +53,7 @@ class RegistrationForm(ModelForm):
 
 
 class LocationForm(ModelForm):
+  tags = forms.ModelMultipleChoiceField(queryset=TagItem.objects.all(), widget=forms.CheckboxSelectMultiple)
   
   class Meta:
     model = Location
@@ -71,8 +72,9 @@ class LocationForm(ModelForm):
       'location_type': forms.Select(attrs={'class': 'form-control'}),
       'address': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '1111 A Place Lane'}),
       'image': forms.FileInput(attrs={'class': 'form-control'}),
-      'tags': forms.CheckboxSelectMultiple
     }
+    
+
 
 
 class ItemForm(forms.ModelForm):
