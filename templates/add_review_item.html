@@ -17,7 +17,7 @@
           <div class="card-body" style="display:flex; margin: auto;">
             <div style="text-align: center">
               <h2>Review Added Successfully!</h2>
-              <button class="btn custom-btn"><a href="/add_location">Add Another Review</a></button>
+              <a class="btn custom-btn" href="{% url 'item_info' item.id %}">Return to Item </a>
               <button class="btn custom-btn"><a href="/nearby">Return to List of Locations</a></button>
             </div>
           </div>
@@ -30,6 +30,8 @@
         <div class="card">
           <div class="card-body" style="display:flex; margin: auto;">
             <form action="" method=POST>
+              <p>User: {{ user }}</p>
+              <p>Location: {{item.name}}</p>
               {% csrf_token %}
               {{ form.as_p }}
               <input type="submit" value="Submit" class="btn btn-secondary">

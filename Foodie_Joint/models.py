@@ -47,7 +47,7 @@ class Location(models.Model):
   name = models.CharField(max_length=50)
   description = models.CharField(max_length=500)
   location_type = models.CharField(max_length=10, choices=LOCATION_CHOICES)
-  address = models.CharField(max_length=50)
+  address = models.CharField(max_length=50, unique=True, error_messages={'unique':"This address is already in use"})
   tags = models.ManyToManyField(TagItem)
   image = models.ImageField(upload_to='images/',
                             blank=True,

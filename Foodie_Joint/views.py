@@ -299,24 +299,21 @@ def show_location_items(request, location_id):
 def add_review(request, location_id):
   submitted = False
   if request.method == 'POST':
-    form = ReviewForm(request.POST,
-                      initial={
-                          'user': request.user.username,
-                          'location': Location.objects.get(id=location_id)
-                      })
+    form = ReviewForm(request.POST)
     if form.is_valid():
+      review = form.save(commit=False)
+      review.user = request.user.account
+      review.location = Location.objects.get(id=location_id)
       form.save()
       return HttpResponseRedirect('/add_review/%d?submitted=True' %
                                   location_id)
   else:
-    form = ReviewForm(
-        initial={
-            'user': request.user.username,
-            'location': Location.objects.get(id=location_id)
-        })
+    form = ReviewForm
     if 'submitted' in request.GET:
       submitted = True
   return render(request, 'templates/add_review.html', {
+      'user': request.user.account,
+      'location': get_object_or_404(Location, pk=location_id),
       'form': form,
       'submitted': submitted
   })
@@ -326,23 +323,21 @@ def add_review(request, location_id):
 def add_review_item(request, item_id):
   submitted = False
   if request.method == 'POST':
-    form = ItemReviewForm(request.POST,
-                          initial={
-                              'user': request.user.username,
-                              'item': Item.objects.get(id=item_id)
-                          })
+    form = ItemReviewForm(request.POST)
     if form.is_valid():
+      review = form.save(commit=False)
+      review.user = request.user.account
+      review.item = Item.objects.get(id=item_id)
       form.save()
       return HttpResponseRedirect('/add_review_item/%d?submitted=True' %
                                   item_id)
   else:
-    form = ItemReviewForm(initial={
-        'user': request.user.username,
-        'item': Item.objects.get(id=item_id)
-    })
+    form = ItemReviewForm
     if 'submitted' in request.GET:
       submitted = True
   return render(request, 'templates/add_review_item.html', {
+      'user' : request.user.account,
+      'item' : get_object_or_404(Item, pk=item_id),
       'form': form,
       'submitted': submitted
   })
