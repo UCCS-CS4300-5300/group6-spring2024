@@ -77,6 +77,9 @@
   <!-- Added a block to contain custom styling on a per-template basis -->
   {% block additional_styles %}{% endblock %}
 </head>
+
+
+
   
 <body style="background-color: #F2D8C2;">
   <!-- Added navbar-light so the dropdown shows when viewport narrows (Tyler) -->
@@ -133,7 +136,7 @@
               <a button class="btn btn-success" href = "{% url 'logout' %}">Logout</a></button>
             </li>
             <li class="nav-item">
-              <a button class="btn btn-success" href = "{% url 'user_profile' %}">{{request.user.username}} <span class = "bi-person-fill"></span></a></button>
+              <a button class="btn btn-success" href = "{% url 'update_profile' %}">{{request.user.username}} <span class = "bi-person-fill"></span></a></button>
         </li>
           {% else %}
           <li class="nav-item px-2">
@@ -149,6 +152,14 @@
     </div>
   </nav>
 
+  {% if messages %}
+  {% for message in messages %}
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type = "button" class = "btn-close" data-bs-dismiss = "alert" aria-label = "Close">
+  </div>
+  {% endfor %}
+  {% endif %}
 
     {% block content %}
     {% endblock %}
