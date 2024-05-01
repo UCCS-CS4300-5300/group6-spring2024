@@ -3,23 +3,22 @@
 {% load bootstrap5 %}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
+<head></head>
 
-<head>
-</head>
 <body>
   {% block content %}
   <div style="margin-top: 65px;"></div>
   {% if request.GET.type == 'Store' %}
-    <h1 style="text-align: center">Stores Nearby {{user_address}}</h1>
+  <h1 style="text-align: center">Stores Nearby {{user_address}}</h1>
   {% elif request.GET.type == 'Restaurant' %}
-    <h1 style="text-align: center">Restaurants Nearby {{user_address}}</h1>
+  <h1 style="text-align: center">Restaurants Nearby {{user_address}}</h1>
   {% else %}
   <h1 style = "text-align: center" >Locations Near {{user_address}}</h1>
   {% endif %}
   
   <!-- Parent container -->
   <div class="container">
-      <!--Container for 'Add Location Button'-->
+    <!--Container for 'Add Location Button'-->
     <div class="row">
       <div class="col-md-9">
         <div class="card">
@@ -31,92 +30,105 @@
             </ul>
           </div>
         </div>
-
-
-
-      {% if no_locations %}
-      <div class="card">
-        <div class="card-body justify-content-center" style="display:flex;">
-          <div>
-            <h4>No locations found! Please add some locations to get started.</h4>
+        {% if no_locations %}
+        <div class="card">
+          <div class="card-body justify-content-center" style="display:flex;">
+            <div>
+              <h4>No locations found! Please add some locations to get started.</h4>
+            </div>
           </div>
         </div>
-      </div>
-      {% else %}
-      {% for location in sorted_locations %}
-      <!-- Can use name, description, location_type, address, distance, rounded_distance, id -->
-      <div class="card">
-        <div class="card-body" style="display:flex;">
-          <div>
-            <h3>{{location.name}}</h3>
-            <p>{{location.description}}</p>
-            <p>{{location.address}} ({{location.rounded_distance}} mi)</p>
-            <!-- Possibly make tags colored bubbles?? -->
-            <p>Tags:
-              {% for tag in location.tags %}
-              <!-- Add comma between tags if not last object -->
+        {% else %}
+        {% for location in sorted_locations %}
+        <!-- Can use name, description, location_type, address, distance, rounded_distance, id -->
+        <div class="card">
+          <div class="card-body" style="display:flex;">
+            <div>
+              <h3>{{location.name}}</h3>
+              <p>{{location.description}}</p>
+              <p>{{location.address}} ({{location.rounded_distance}} mi)</p>
+              <!-- Possibly make tags colored bubbles?? -->
+              <p>
+                Tags:
+                {% for tag in location.tags.all %}
+                <!-- Add comma between tags if not last object -->
                 {{ tag.name }}{% if not forloop.last %},{% endif %}
-              {% endfor %}
-            </p>
-            <p>Created by <a href="{% url 'profile' location.created_by.user.account.id %}" style="color: blue !important;">
-                {{location.created_by}}</a></p> <!-- Clickable - brings to user's public profile -->
-          </div>
-          <div style="margin-left: auto;">
-            <ul class="navbar-nav" style="gap:.5rem;">
-              <li class="nav-item">
+                {% endfor %}
+              </p>
+              <!-- Clickable - brings to user's public profile -->
+              <p>Created by <a href="{% url 'profile' location.created_by.user.account.id %}" style="color: blue !important;">
+                {{location.created_by}}</a>
+              </p>
+            </div>
+            <div style="margin-left: auto;">
+              <ul class="navbar-nav" style="gap:.5rem;">
+                <li class="nav-item">
                   <a class="btn custom-btn" href="{% url 'location_details' location.id %}">View</a>
-              </li>
-              <li class="nav-item">
-                <a class="btn custom-btn" href="{% url 'add_item' location.id %}">Add Item</a>
-              </li>
-            </ul>
+                </li>
+                <li class="nav-item">
+                  <a class="btn custom-btn" href="{% url 'add_item' location.id %}">Add Item</a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
+        {%endfor%}
+        {% endif %}
       </div>
-      {%endfor%}
-      {% endif %}
-      </div>
-    
-  <!-- Container for filtering locations via tags -->
-    <div class="col-md-3">
-    <div class="card">
-      <div class="card-body">
-        <form action="{% url 'nearby' %}" method="GET" style="display:flex;">
-          <div class="form-group">
-            <label for="search"><strong>Search:</strong></label>
-            <input type="text" class="form-control" name="search_name" placeholder="Enter location name..."
-                    value="{{ search_name|default_if_none:'' }}">
-          </div>
-          <input type="hidden" name="type" value="{{ request.GET.type }}">
-          <button type="submit" class="btn custom-btn" style="margin-left: 5px; align-self: flex-end;">Search</button>
-        </form>
-          <hr>
-        <form action="{% url 'nearby' %}" method="GET">
-            <div class="form-group">
+      
+      <!-- Container for filtering locations via tags -->
+      <div class="col-md-3">
+        <div class="card">
+          <div class="card-body">
+            <form action="{% url 'nearby' %}" method="GET" style="display:flex;">
+              <div class="form-group">
+                <label for="search"><strong>Search:</strong></label>
+                <input type="text" class="form-control" name="search_name" placeholder="Enter location name..."
+                  value="{{ search_name|default_if_none:'' }}">
+              </div>
+              <input type="hidden" name="type" value="{{ request.GET.type }}">
+              <button type="submit" class="btn custom-btn" style="margin-left: 5px; align-self: flex-end;">Search</button>
+            </form>
+            <hr>
+            
+            <form action="{% url 'nearby' %}" method="GET">
+              <div class="form-group">
                 <label for="tag"><strong>Filter by Tag:</strong></label>
                 <!-- https://www.w3schools.com/tags/att_input_type_checkbox.asp -->
-                {% for tag in all_tags %}
-                <div class="form-check">
-                    <!-- Checks the boxes if the filter was applied in the request -->
-                    <input class="form-check-input" type="checkbox" name="tag" value="{{ tag.name }}" id="{{ tag.name }}"
-                        {% if tag.name in selected_tags %} checked {% endif %}>
-                    <label class="form-check-label" for="{{ tag.name }}">{{ tag.name }}</label>
+                <div class="card">
+                  <div class="card-body">
+                    {% for category in categories %}
+                    <p><strong>{{ category.name }}</strong></p>
+                    {% for tag in all_tags %}
+                    {% if tag.category == category %}
+                    <div class="form-check">
+                      <!-- Checks the boxes if the filter was applied in the request -->
+                      <input class="form-check-input" type="checkbox" name="tag" value="{{ tag.name }}" id="{{ tag.name }}"
+                      {% if tag.name in selected_tags %} checked {% endif %}>
+                      <label class="form-check-label" for="{{ tag.name }}">{{ tag.name }}</label>
+                    </div>
+                    {% endif %}
+                    {% if forloop.last and not forloop.parentloop.last %}
+                    <hr>
+                    {% endif %}
+                    {% endfor %}
+                    {% endfor %}
+                  </div>
                 </div>
-                {% endfor %}
-            </div>
-            <button type="submit" class="btn custom-btn" style="margin-right: 5px; margin-top: 5px;">Filter</button>
-            <!-- Retaining the location type -->
-            <input type="hidden" name="type" value="{{ request.GET.type }}">
-        </form>
-
-        <form action="{% url 'nearby' %}" method="GET">
+                <button type="submit" class="btn custom-btn" style="margin-right: 5px; margin-top: 10px;">Filter</button>
+                <!-- Retaining the location type -->
+                <input type="hidden" name="type" value="{{ request.GET.type }}">
+            </form>
+            
+            <form action="{% url 'nearby' %}" method="GET">
             <!-- Allowing for filters to be removed -->
             <input type="hidden" name="type" value="{{ request.GET.type }}">
-            <button type="submit" class="btn custom-btn" style="margin-top: 5px;">Remove Filter</button>
-        </form>
+            <button type="submit" class="btn custom-btn" style="margin-top: 10px;">Remove Filter</button>
+            </form>
+            </div>
           </div>
         </div>
-    </div>
+      </div>
     </div>
   </div>
   {% endblock content %}

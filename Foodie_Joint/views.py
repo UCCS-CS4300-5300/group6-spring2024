@@ -1,4 +1,3 @@
-import requests  # Used to request info from API
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -14,8 +13,8 @@ from .forms import (
     ReviewForm,
     UpdateAccountForm,
 )
-from .models import Item, ItemReview, Location, LocationTag, Review, Account, User
-from .utils import instantiate_tags, get_distance
+from .models import Item, ItemReview, Location, Review, Account, User, TagItem, TagCategory
+from .utils import init_tags, get_distance
 
 
 def index(request):
@@ -42,7 +41,8 @@ def base(request):
 def nearby(request):
   context = {}
   locations = Location.objects.all()
-  all_tags = LocationTag.objects.all()
+  all_tags = TagItem.objects.all()
+  categories = TagCategory.objects.all()
 
   # Providing static address in case of user not logged in
   if request.user.is_authenticated:
@@ -96,6 +96,7 @@ def nearby(request):
         'user_address': user_address,
         'sorted_locations': sorted_locations,
         'all_tags': all_tags,
+        'categories': categories,
         'selected_tags':
         selected_tags,  # Added this to have checkboxes stay marked in template
         'search_name': search_name,
@@ -173,7 +174,9 @@ def register_user(request):
 @login_required(login_url='/login_user')
 def add_location(request):
   # Calling function to create tag objects if they dont exist
-  instantiate_tags()
+  init_tags()
+  categories = TagCategory.objects.all()
+  tags = TagItem.objects.all()
   submitted = False
   if request.method == 'POST':
     form = LocationForm(request.POST, request.FILES)
@@ -181,14 +184,17 @@ def add_location(request):
       location = form.save(commit=False)
       location.created_by = request.user.account
       form.save()
+      form.save_m2m() # Saving the many to many relationship (tags)
       return HttpResponseRedirect('/add_location?submitted=True')
   else:
-    form = LocationForm
+    form = LocationForm()
     if 'submitted' in request.GET:
       submitted = True
   return render(request, 'templates/add_location.html', {
       'form': form,
-      'submitted': submitted
+      'submitted': submitted,
+      'categories': categories,
+      'tags': tags
   })
 
 
