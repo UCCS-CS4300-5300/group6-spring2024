@@ -99,14 +99,14 @@ class ReviewForm(forms.ModelForm):
 
   class Meta:
     model = Review
-    fields = ['user', 'location', 'review', 'num_stars']
+    fields = ['review', 'num_stars']
 
 
 class ItemReviewForm(forms.ModelForm):
 
   class Meta:
     model = ItemReview
-    fields = ['user', 'item', 'review', 'num_stars']
+    fields = ['review', 'num_stars']
     
 
 class UpdateAccountForm(forms.ModelForm):
