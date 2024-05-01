@@ -1,6 +1,6 @@
-{% extends 'templates/base_template.html' %} 
-{% load static %} 
-{% load bootstrap5 %} 
+{% extends 'templates/base_template.html' %}
+{% load static %}
+{% load bootstrap5 %}
 {% block title %}Foodie Joint{% endblock %}
 
 <!-- Template specific CSS -->
@@ -35,16 +35,24 @@
     0% {
       opacity: 0;
     }
+
     100% {
       opacity: 1;
     }
   }
 
+  .checked {
+    color: orange;
+    margin-right: 2px;
+  }
   /* Styling for carousel images */
   .carousel .carousel-inner .carousel-item img {
-    width: 100%;    /* Ensure the image fills the width of the carousel */
-    height: 303px;  /* Fixed height */
-    object-fit: cover; /* Cover ensures that the aspect ratio is maintained while filling the area */
+    width: 100%;
+    /* Ensure the image fills the width of the carousel */
+    height: 303px;
+    /* Fixed height */
+    object-fit: cover;
+    /* Cover ensures that the aspect ratio is maintained while filling the area */
   }
 
   .carousel-item {
@@ -57,7 +65,9 @@
     margin-bottom: 15px;
   }
 </style>
-{% endblock additional_styles%} 
+
+<script src="https://kit.fontawesome.com/52ddef816e.js" crossorigin="anonymous"></script>
+{% endblock additional_styles%}
 
 {% block content %}
 <div class="container text-center">
@@ -72,29 +82,27 @@
 
       <!-- Carousel within Card Section (Restaurants and Stores Showcase) -->
       <div class="row">
-        <div class="col-sm-6 mb-3 mb-sm-0 px-1">
+        <div class="col-md-6 mb-3 mb-md-0 px-1">
           <!-- Restaurants Card -->
           <div class="card">
             <h3 class="card-title text-center pt-3">Restaurants</h3>
 
             <!-- Card -> Restaurants Carousel -->
-            <div
-              id="carouselExampleIndicators1"
-              class="carousel slide"
-              data-bs-ride="carousel"
-            >
+            <div id="carouselExampleIndicators1" class="carousel slide" data-bs-ride="carousel">
               <!-- Card -> Carousel -> Restaurant Images -- (2 Slides) -->
               <!-- Image Attribution: Eric Lumsden (CC BY-ND 2.0) -->
               <div class="carousel-inner">
                 {% for restaurant in carousel_restaurants %}
                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
                   <a href="{% url 'location_details' restaurant.id %}">
-                  {% if restaurant.image %}
-                  <img src="{{ restaurant.image.url }}" class="d-block w-100" alt="{{ restaurant.name }}" />
-                  {% else %}
-                  <!-- Placeholder -->
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png" class="d-block w-100" alt="No Image Available" />
-                  {% endif %}
+                    {% if restaurant.image %}
+                    <img src="{{ restaurant.image.url }}" class="d-block w-100" alt="{{ restaurant.name }}" />
+                    {% else %}
+                    <!-- Placeholder -->
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png"
+                      class="d-block w-100" alt="No Image Available" />
+                    {% endif %}
                 </div>
                 {% endfor %}
               </div>
@@ -109,16 +117,12 @@
         </div>
 
         <!-- Stores Card -->
-        <div class="col-sm-6 px-1">
+        <div class="col-md-6 px-1">
           <div class="card">
             <h3 class="card-title text-center pt-3">Stores</h3>
 
             <!-- Card -> Stores Carousel -->
-            <div
-              id="carouselExampleIndicators2"
-              class="carousel slide"
-              data-bs-ride="carousel"
-            >
+            <div id="carouselExampleIndicators2" class="carousel slide" data-bs-ride="carousel">
 
               <!-- Image Attribution: Xnatedawgx, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0, via Wikimedia Commons -->
               <!-- Card -> Carousel -> Store Images -- (2 Slides) -->
@@ -126,12 +130,14 @@
                 {% for store in carousel_stores %}
                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
                   <a href="{% url 'location_details' store.id %}">
-                  {% if store.image %}
-                  <img src="{{ store.image.url }}" class="d-block w-100" alt="{{ store.name }}" />
-                  {% else %}
-                  <!-- Placeholder -->
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png" class="d-block w-100" alt="No Image Available" />
-                  {% endif %}
+                    {% if store.image %}
+                    <img src="{{ store.image.url }}" class="d-block w-100" alt="{{ store.name }}" />
+                    {% else %}
+                    <!-- Placeholder -->
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png"
+                      class="d-block w-100" alt="No Image Available" />
+                    {% endif %}
                 </div>
                 {% endfor %}
               </div>
@@ -148,73 +154,118 @@
 
       <!-- Item Recommendation Card Section -->
       <div class="row mt-4 px-0">
-          <div class="col-12 gb-0 pb-0 mb-0 px-0">
-              <div class="card mb-4">
-                  <div class="card-header" style="background-color: #F27E63; p-0">
-                      <h5 style="color: white; font-size: 1.5em; margin: 0;">Recommended Item</h5>
+        <div class="col-12 gb-0 pb-0 mb-0 px-0">
+          <div class="card mb-4">
+            <div class="card-header" style="background-color: #F27E63; p-0">
+              <h5 style="color: white; font-size: 1.5em; margin: 0;">Recommended Item</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4 col-12">
+                  {% if recommended_item %}
+                  <h3 class="card-title">{{ recommended_item.name }}</h3>
+                  {% if recommended_item.image and recommended_item.image.url %}
+                  <a href="{% url 'item_info' recommended_item.id %}">
+                    <img src="{{ recommended_item.image.url }}" alt="{{ recommended_item.name }}" class="img-fluid"
+                      style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+                  </a>
+                  {% else %}
+                  <p>No image available</p>
+                  {% endif %}
+                  {% else %}
+                  <h3 class="card-title">No recommended items</h3>
+                  {% endif %}
+                </div>
+                <div class="col-md-8 col-12">
+                  {% if recommended_item %}
+                  <p class="mt-4 ms-0 card-text lead text-start" style="padding-top:10px;">
+                    {{recommended_item.description|default:"No description available."}}</p>
+                  <h3 class="card-title lead mt-5 border-bottom border-opacity-10">Top Reviews</h3>
+                  {% if item_reviews %}
+                  <div class="mt-3 text-start">
+                    {% for review in item_reviews %}
+                    <div class="mb-3">
+                      <p class="mb-1">
+                        <span class="fa fa-star {% if review.num_stars >= 1 %}checked{% endif %}"></span>
+                        <span class="fa fa-star {% if review.num_stars >= 2 %}checked{% endif %}"></span>
+                        <span class="fa fa-star {% if review.num_stars >= 3 %}checked{% endif %}"></span>
+                        <span class="fa fa-star {% if review.num_stars >= 4 %}checked{% endif %}"></span>
+                        <span class="fa fa-star {% if review.num_stars >= 5 %}checked{% endif %}"></span>
+                        <strong>{{ review.user }}</strong> - {{ review.review }}</p>
+                    </div>
+                    {% empty %}
+                    <p>No reviews available.</p>
+                    {% endfor %}
                   </div>
-                  <div class="card-body">
-                      {% if recommended_item %}
-                      <a href="{% url 'item_info' recommended_item.id %}">
-                          <img src="{{ recommended_item.image.url }}" alt="{{ recommended_item.name }}" 
-                               style="max-width: 20%; height: auto;">
-                      </a>
-                      <h3 class="card-title">{{ recommended_item.name }}</h3>
-                      <p class="card-text">{{ recommended_item.description }}</p>
-                      {% else %}
-                      <p>No recommended items at the moment.</p>
-                      {% endif %}
+                  {% else %}
+                  <div class="mt-3">
+                    <p>No reviews available.</p>
                   </div>
+                  {% endif %}
+                  {% else %}
+                  <p>No recommended items at the moment.</p>
+                  {% endif %}
+                </div>
               </div>
+            </div>
           </div>
+        </div>
       </div>
 
       <!-- Store Recommendation Card Section -->
       <div class="row px-0 mt-0">
-        <div class="col-12 px-0">
-          <div class="card mb-3 pb-5">
+        <div class="col-12 gb-0 pb-0 mb-0 px-0">
+          <div class="card mb-3">
             <div class="card-header" style="background-color: #F27E63; p-0">
               <h5 style="color: white; font-size: 1.5em; margin: 0;">Recommended Location</h5>
             </div>
             <div class="card-body">
               <div class="row">
-                <div class="col-6">
+                <div class="col-md-4 col-12">
                   {% if recommended_location %}
                   <h3 class="card-title">{{ recommended_location.name }}</h3>
+                  {% if recommended_location.image and recommended_location.image.url %}
                   <a href="{% url 'location_details' recommended_location.id %}">
-                    <img src="{{ recommended_location.image.url }}" alt="{{ recommended_item.name }}" class="img-fluid">
+                    <img src="{{ recommended_location.image.url }}" alt="{{ recommended_location.name }}"
+                      class="img-fluid" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
                   </a>
                   {% else %}
                   <p>No image available</p>
                   {% endif %}
+                  {% else %}
+                  <h3 class="card-title">No recommended location</h3>
+                  {% endif %}
                 </div>
-                <div class="col-6">
+                <div class="col-md-8 col-12">
                   {% if recommended_location %}
-                  <p class="card-text lead">{{ recommended_location.description }}</p>
+                  <p class="mt-4 ms-0 card-text lead text-start" style="padding-top:10px;">{{recommended_location.description|default:"No description available."}}</p>
                   {% else %}
                   <p>No recommended location at the moment.</p>
                   {% endif %}
-                </div>
-              </div>
-              {% if reviews_exist %}
-              <div class="row mt-3">
-                <div class="col-12">
-                  <h4>Top Reviews</h4>
-                  {% for review in top_reviews %}
-                  <div class="mb-3">
-                    <p class="mb-1"><strong>{{ review.user }}</strong> ({{ review.num_stars }} stars)</p>
-                    <p>{{ review.review }}</p>
+                  <h3 class="card-title lead mt-5 border-bottom border-opacity-10">Top Reviews</h3>
+                  {% if location_reviews %}
+                  <div class="mt-3 text-start">
+                    {% for review in location_reviews %}
+                    <div class="mb-3">
+                      <p class="mb-1">
+                        <span class="fa fa-star {% if review.num_stars >= 1 %}checked{% endif %}"></span>
+                        <span class="fa fa-star {% if review.num_stars >= 2 %}checked{% endif %}"></span>
+                        <span class="fa fa-star {% if review.num_stars >= 3 %}checked{% endif %}"></span>
+                        <span class="fa fa-star {% if review.num_stars >= 4 %}checked{% endif %}"></span>
+                        <span class="fa fa-star {% if review.num_stars >= 5 %}checked{% endif %}"></span>
+                        <strong>{{ review.user }}</strong> - {{ review.review }}</p>
+                    </div>
+                    {% empty %}
+                    <p>No reviews available.</p>
+                    {% endfor %}
                   </div>
-                  {% endfor %}
+                  {% else %}
+                  <div class="mt-3">
+                    <p>No reviews available.</p>
+                  </div>
+                  {% endif %}
                 </div>
               </div>
-              {% else %}
-              <div class="row mt-3">
-                <div class="col-12">
-                  <p>No reviews available.</p>
-                </div>
-              </div>
-              {% endif %}
             </div>
           </div>
         </div>
