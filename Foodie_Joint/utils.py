@@ -2,7 +2,6 @@ import requests  # Used to request info from API
 from geopy.distance import distance
 from .models import TagCategory, TagItem
 
-
 # References:
 # https://geopy.readthedocs.io/en/stable/#module-geopy.distance
 # https://nominatim.org/release-docs/latest/api/Search/
@@ -43,68 +42,95 @@ def get_distance(address1, address2):
     print(f"An error occured: {err}")
     return None
 
+
+def verify_address(address):
+  headers = {'User-Agent': USER_AGENT}
+  params = {'format': 'json', 'q': address, 'addressdetails': 1, 'limit': 1}
+  try:
+    response = requests.get(BASE_URL, headers=headers, params=params)
+    response.raise_for_status()
+    data = response.json()
+
+    print("API Response Data:", data)
+
+    if data:
+      address_components = data[0].get('address', {})
+
+      print("Address Components:", address_components)
+
+      city = address_components.get('city', '')
+      state = address_components.get('state', '')
+
+      print("City found:", city)
+      print("State found:", state)
+
+      print("City check:", 'Colorado Springs' in city)
+      print("State check:", 'Colorado' in state)
+
+      return 'Colorado Springs' in city and 'Colorado' in state
+    else:
+      print("No data returned from API.")
+      return False
+  except requests.exceptions.RequestException as err:
+    print(f"Error verifying address: {err}")
+    return False
+
+
 # Created a function to create tag objects. If tag obj already exists its not created again.
 def init_tags():
   food_cat, created = TagCategory.objects.get_or_create(name='Food')
-  cuisine_cat, created  = TagCategory.objects.get_or_create(name='Cuisine')
-  drink_cat, created  = TagCategory.objects.get_or_create(name='Drink')
-  dietary_cat, created  = TagCategory.objects.get_or_create(name='Dietary')
-  meal_cat, created  = TagCategory.objects.get_or_create(name='Meal')
-  dining_cat, created  = TagCategory.objects.get_or_create(name='Dining')
-  accomodations_cat, created  = TagCategory.objects.get_or_create(name='Accomodations')
-  store_cat, created  = TagCategory.objects.get_or_create(name='Store')
-  other_cat, created  = TagCategory.objects.get_or_create(name='Other')
+  cuisine_cat, created = TagCategory.objects.get_or_create(name='Cuisine')
+  drink_cat, created = TagCategory.objects.get_or_create(name='Drink')
+  dietary_cat, created = TagCategory.objects.get_or_create(name='Dietary')
+  meal_cat, created = TagCategory.objects.get_or_create(name='Meal')
+  dining_cat, created = TagCategory.objects.get_or_create(name='Dining')
+  accomodations_cat, created = TagCategory.objects.get_or_create(
+      name='Accomodations')
+  store_cat, created = TagCategory.objects.get_or_create(name='Store')
+  other_cat, created = TagCategory.objects.get_or_create(name='Other')
 
   # This is where you add tags for a category!!!
   tags = [
-    (food_cat, "Pizza"),
-    (food_cat, "Chicken"),
-    (food_cat, "Burgers"),
-    (food_cat, "Sandwiches"),
-    (food_cat, "Salads"),
-    (food_cat, "Fish"),
-    (food_cat, "Steak"),
-    (food_cat, "Pasta"),
-    (food_cat, "Soup"),
-
-    (cuisine_cat, "American"),
-    (cuisine_cat, "Mexican"),
-    (cuisine_cat, "Chinese"),
-    (cuisine_cat, "Japanese"),
-    (cuisine_cat, "French"),
-    (cuisine_cat, "Indian"),
-    (cuisine_cat, "Italian"),
-
-    (drink_cat, "Coffee"),
-    (drink_cat, "Beer"),
-    (drink_cat, "Wine"),
-
-    (dietary_cat, "Vegetarian"),
-    (dietary_cat, "Vegan"),
-    (dietary_cat, "Gluten Free"),
-    (dietary_cat, "Kosher"),
-    (dietary_cat, "Halal"),
-
-    (meal_cat, "Breakfast"),
-    (meal_cat, "Lunch"),
-    (meal_cat, "Dinner"),
-    (meal_cat, "Snacks"),
-    (meal_cat, "Dessert"),
-
-    (dining_cat, "Bar"),
-    (dining_cat, "Café"),
-    (dining_cat, "Fast Food"),
-    (dining_cat, "Fine Dining"),
-    (dining_cat, "Casual Dining"),
-    
-    (accomodations_cat, "Pet Friendly"),
-    (accomodations_cat, "Wheelchair Accessible"),
-
-    (store_cat, "Gas Station"),
-    (store_cat, "Grocery Store"),
-    (store_cat, "Specialty Store"),   
-
-    (other_cat, "Other"),
+      (food_cat, "Pizza"),
+      (food_cat, "Chicken"),
+      (food_cat, "Burgers"),
+      (food_cat, "Sandwiches"),
+      (food_cat, "Salads"),
+      (food_cat, "Fish"),
+      (food_cat, "Steak"),
+      (food_cat, "Pasta"),
+      (food_cat, "Soup"),
+      (cuisine_cat, "American"),
+      (cuisine_cat, "Mexican"),
+      (cuisine_cat, "Chinese"),
+      (cuisine_cat, "Japanese"),
+      (cuisine_cat, "French"),
+      (cuisine_cat, "Indian"),
+      (cuisine_cat, "Italian"),
+      (drink_cat, "Coffee"),
+      (drink_cat, "Beer"),
+      (drink_cat, "Wine"),
+      (dietary_cat, "Vegetarian"),
+      (dietary_cat, "Vegan"),
+      (dietary_cat, "Gluten Free"),
+      (dietary_cat, "Kosher"),
+      (dietary_cat, "Halal"),
+      (meal_cat, "Breakfast"),
+      (meal_cat, "Lunch"),
+      (meal_cat, "Dinner"),
+      (meal_cat, "Snacks"),
+      (meal_cat, "Dessert"),
+      (dining_cat, "Bar"),
+      (dining_cat, "Café"),
+      (dining_cat, "Fast Food"),
+      (dining_cat, "Fine Dining"),
+      (dining_cat, "Casual Dining"),
+      (accomodations_cat, "Pet Friendly"),
+      (accomodations_cat, "Wheelchair Accessible"),
+      (store_cat, "Gas Station"),
+      (store_cat, "Grocery Store"),
+      (store_cat, "Specialty Store"),
+      (other_cat, "Other"),
   ]
 
   for category, tag_name in tags:

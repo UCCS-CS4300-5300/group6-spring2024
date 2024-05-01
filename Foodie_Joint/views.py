@@ -14,7 +14,7 @@ from .forms import (
     UpdateAccountForm,
 )
 from .models import Item, ItemReview, Location, Review, Account, User, TagItem, TagCategory
-from .utils import init_tags, get_distance
+from .utils import init_tags, get_distance, verify_address
 
 
 def index(request):
@@ -188,23 +188,29 @@ def register_user(request):
 
 @login_required(login_url='/login_user')
 def add_location(request):
-  # Calling function to create tag objects if they dont exist
-  init_tags()
+  init_tags()  # ensure tags are initialized
   categories = TagCategory.objects.all()
   tags = TagItem.objects.all()
   submitted = False
   if request.method == 'POST':
     form = LocationForm(request.POST, request.FILES)
     if form.is_valid():
-      location = form.save(commit=False)
-      location.created_by = request.user.account
-      form.save()
-      form.save_m2m()  # Saving the many to many relationship (tags)
-      return HttpResponseRedirect('/add_location?submitted=True')
+      location_address = form.cleaned_data['address']
+      if verify_address(location_address):
+        location = form.save(commit=False)
+        location.created_by = request.user.account
+        form.save()
+        form.save_m2m()  # Saving the many to many relationship (tags)
+        return HttpResponseRedirect('/add_location?submitted=True')
+      else:
+        messages.error(request, "Address is not valid in Colorado Springs.")
+    else:
+      messages.error(request, "Form is not valid.")
   else:
     form = LocationForm()
     if 'submitted' in request.GET:
       submitted = True
+
   return render(request, 'templates/add_location.html', {
       'form': form,
       'submitted': submitted,
@@ -311,12 +317,13 @@ def add_review(request, location_id):
     form = ReviewForm
     if 'submitted' in request.GET:
       submitted = True
-  return render(request, 'templates/add_review.html', {
-      'user': request.user.account,
-      'location': get_object_or_404(Location, pk=location_id),
-      'form': form,
-      'submitted': submitted
-  })
+  return render(
+      request, 'templates/add_review.html', {
+          'user': request.user.account,
+          'location': get_object_or_404(Location, pk=location_id),
+          'form': form,
+          'submitted': submitted
+      })
 
 
 @login_required(login_url='/login_user')
@@ -335,12 +342,13 @@ def add_review_item(request, item_id):
     form = ItemReviewForm
     if 'submitted' in request.GET:
       submitted = True
-  return render(request, 'templates/add_review_item.html', {
-      'user' : request.user.account,
-      'item' : get_object_or_404(Item, pk=item_id),
-      'form': form,
-      'submitted': submitted
-  })
+  return render(
+      request, 'templates/add_review_item.html', {
+          'user': request.user.account,
+          'item': get_object_or_404(Item, pk=item_id),
+          'form': form,
+          'submitted': submitted
+      })
 
 
 def item_info(request, item_id):

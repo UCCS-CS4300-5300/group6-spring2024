@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from Foodie_Joint.models import Item, Location, Account, TagCategory, TagItem
 from Foodie_Joint.views import show_location_items
+from unittest.mock import patch, Mock
+from Foodie_Joint.utils import verify_address
 
 # For reference: https://docs.djangoproject.com/en/5.0/topics/testing/tools/
 # Run these tests with 'python manage.py test'
@@ -329,6 +331,48 @@ class StoreRemovalTest(TestCase):
         reverse('remove_store', kwargs={'location_id': self.location.id}))
     locations_after = Location.objects.count()
     self.assertEqual(locations_before - 1, locations_after)
+
+
+class VerifyAddressTest(TestCase):
+
+  def setUp(self):
+    self.valid_address = "802 E Rio Grande St, Colorado Springs, CO"
+    self.invalid_address = "400 Yo Mama Ave, Denver, CO"
+
+    self.valid_response = [{
+        'address': {
+            'city': 'Colorado Springs',
+            'state': 'Colorado'
+        }
+    }]
+
+    self.invalid_response = [{
+        'address': {
+            'city': 'Denver',
+            'state': 'Colorado'
+        }
+    }]
+
+  @patch('Foodie_Joint.utils.requests.get')
+  def test_verify_address_valid(self, mock_get):
+    mock_get.return_value = Mock(status_code=200)
+    mock_get.return_value.json.return_value = self.valid_response
+
+    self.assertTrue(verify_address(self.valid_address))
+
+  @patch('Foodie_Joint.utils.requests.get')
+  def test_verify_address_invalid(self, mock_get):
+    mock_get.return_value = Mock(status_code=200)
+    mock_get.return_value.json.return_value = self.invalid_response
+
+    self.assertFalse(verify_address(self.invalid_address))
+
+  @patch('Foodie_Joint.utils.requests.get')
+  def test_verify_address_no_data(self, mock_get):
+    mock_get.return_value = Mock(status_code=200)
+    mock_get.return_value.json.return_value = []
+
+    self.assertFalse(verify_address(self.valid_address))
 
 
 class StoreRecommendationTest(TestCase):
