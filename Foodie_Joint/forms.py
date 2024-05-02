@@ -100,6 +100,9 @@ class ReviewForm(forms.ModelForm):
   class Meta:
     model = Review
     fields = ['review', 'num_stars']
+    labels = {
+      'num_stars': 'Stars',
+    }
 
 
 class ItemReviewForm(forms.ModelForm):
@@ -107,6 +110,9 @@ class ItemReviewForm(forms.ModelForm):
   class Meta:
     model = ItemReview
     fields = ['review', 'num_stars']
+    labels = {
+      'num_stars': 'Stars',
+    }
     
 
 class UpdateAccountForm(forms.ModelForm):
