@@ -14,7 +14,7 @@ from .forms import (
     UpdateAccountForm,
 )
 from .models import Item, ItemReview, Location, Review, Account, User, TagItem, TagCategory
-from .utils import init_tags, get_distance, verify_address
+from .utils import init_tags, get_distance
 
 
 def index(request):
@@ -179,6 +179,7 @@ def register_user(request):
       login(request, user)
       messages.success(request, ("Registration successful"))
       return redirect('index')
+
   else:
     form = RegistrationForm()
   return render(request, 'templates/register_user.html', {
@@ -196,14 +197,11 @@ def add_location(request):
     form = LocationForm(request.POST, request.FILES)
     if form.is_valid():
       location_address = form.cleaned_data['address']
-      if verify_address(location_address):
-        location = form.save(commit=False)
-        location.created_by = request.user.account
-        form.save()
-        form.save_m2m()  # Saving the many to many relationship (tags)
-        return HttpResponseRedirect('/add_location?submitted=True')
-      else:
-        messages.error(request, "Address is not valid in Colorado Springs.")
+      location = form.save(commit=False)
+      location.created_by = request.user.account
+      form.save()
+      form.save_m2m()  # Saving the many to many relationship (tags)
+      return HttpResponseRedirect('/add_location?submitted=True')
     else:
       messages.error(request, "Form is not valid.")
   else:
@@ -437,6 +435,11 @@ def update_profile(request):
       account_form.save()
       messages.success(request, "Account updated successfully")
       return redirect('index')
+    else:
+      messages.error(
+          request,
+          "Form is not valid. Please verify the Address is within Colorado Springs."
+      )
   else:
     account_form = UpdateAccountForm(instance=user.account)
     account_form.fields['email'].initial = email
