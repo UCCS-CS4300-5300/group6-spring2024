@@ -198,7 +198,6 @@ class UpdateAccountForm(forms.ModelForm):
   def clean_address(self):
     address = self.cleaned_data.get('address')
     if not verify_address(address):
-      raise ValidationError(
-          'Please enter a valid Colorado Springs address. (Ex: 802 E Rio Grande St, APT 42)'
-      )
+        raise ValidationError('Please enter a valid Colorado Springs address. (Ex: 802 E Rio Grande St, APT 42)')
     return address
+

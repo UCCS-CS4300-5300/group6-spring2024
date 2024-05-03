@@ -1,0 +1,14 @@
+[run]
+branch = False
+source = .
+
+[report]
+exclude_lines =
+    if __name__ == .__main__.:
+ignore_errors = False
+omit =
+    */cron.py
+    */__init__.py
+    */asgi.py
+    */wsgi.py
+    */nix/*

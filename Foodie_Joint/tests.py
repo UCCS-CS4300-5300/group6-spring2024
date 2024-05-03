@@ -2,10 +2,12 @@ from django.test import TestCase
 from django.urls import reverse, resolve
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
-from Foodie_Joint.models import Item, Location, Account, TagCategory, TagItem
+from Foodie_Joint.models import Item, Location, Account, TagCategory, TagItem, ItemReview
 from Foodie_Joint.views import show_location_items
 from unittest.mock import patch, Mock
 from Foodie_Joint.utils import verify_address
+from Foodie_Joint.forms import LocationForm
+from django.contrib.messages import get_messages
 
 # For reference: https://docs.djangoproject.com/en/5.0/topics/testing/tools/
 # Run these tests with 'python manage.py test'
@@ -47,6 +49,23 @@ class NearbyViewTest(TestCase):
                                          created_by=self.account)
 
     self.restaurant.tags.add(self.tag_item)
+
+  # Test to ensure that the Location Search is working
+  class LocationSearchTestCase(TestCase):
+
+    def setUp(self):
+      Location.objects.create(name="Test Store",
+                              address="123 Example St",
+                              location_type="Store")
+      Location.objects.create(name="Test Restaurant",
+                              address="456 Sample Rd",
+                              location_type="Restaurant")
+
+    def test_search_locations(self):
+      response = self.client.get(reverse('location_list'),
+                                 {'search_name': 'store'})
+      self.assertContains(response, "Test Store")
+      self.assertNotContains(response, "Test Restaurant")
 
   # Ensuring that the nearby.html template is used/returned by the nearby view
   def test_nearby_view_renders_proper_template(self):
@@ -243,8 +262,53 @@ class ProfileViewTest(TestCase):
 
 ############# END OF TYLER CARROLL TESTS #############
 
-
 ############# START OF DEREK GARY TESTS #############
+
+
+######### UNIT TESTS #########
+
+class VerifyAddressTest(TestCase):
+
+  def setUp(self):
+    self.valid_address = "802 E Rio Grande St"
+    self.invalid_address = "999 Fake St"
+
+    self.valid_response = [{
+        'address': {
+            'city': 'Colorado Springs',
+            'state': 'Colorado'
+        }
+    }]
+
+    self.invalid_response = [{
+        # Should be empty in the case of malformed input
+        'address': {}
+    }]
+
+  @patch('Foodie_Joint.utils.requests.get')
+  def test_verify_address_valid(self, mock_get):
+    mock_get.return_value = Mock(status_code=200)
+    mock_get.return_value.json.return_value = self.valid_response
+
+    self.assertTrue(verify_address(self.valid_address))
+
+  @patch('Foodie_Joint.utils.requests.get')
+  def test_verify_address_invalid(self, mock_get):
+    mock_get.return_value = Mock(status_code=200)
+    mock_get.return_value.json.return_value = self.invalid_response
+
+    self.assertFalse(verify_address(self.invalid_address))
+
+  @patch('Foodie_Joint.utils.requests.get')
+  def test_verify_address_no_data(self, mock_get):
+    mock_get.return_value = Mock(status_code=200)
+    mock_get.return_value.json.return_value = []
+
+    self.assertFalse(verify_address(self.valid_address))
+
+
+######### INTEGRATION TESTS #########
+
 class LocationItemResponseTest(TestCase):
 
   def setUp(self):
@@ -281,6 +345,227 @@ class LocationItemResponseTest(TestCase):
     self.assertContains(response, "A test Description")
     self.assertContains(response, "207 N Wahsatch Ave")
 
+
+class StoreRecommendationTest(TestCase):
+
+  def setUp(self):
+    self.user = get_user_model().objects.create_superuser(
+        'admin', 'admin@adminStuff.com', 'uniquePW1')
+    self.client.login(username='admin', password='uniquePW1')
+
+    self.location1 = Location.objects.create(name="Test Location 1",
+                                             address="207 N Wahsatch Ave",
+                                             description="A test Description",
+                                             location_type=Location.RESTAURANT,
+                                             is_recommended=False)
+
+    self.location2 = Location.objects.create(name="Test Location 2",
+                                             address="208 N Wahsatch Ave",
+                                             description="A test Description",
+                                             location_type=Location.RESTAURANT,
+                                             is_recommended=False)
+
+  def test_recommend_location(self):
+    self.assertFalse(Location.objects.filter(is_recommended=True).exists())
+    response = self.client.post(
+        reverse('recommend_location', args=[self.location1.id]))
+    self.assertTrue(Location.objects.get(id=self.location1.id).is_recommended)
+    self.assertFalse(Location.objects.get(id=self.location2.id).is_recommended)
+    self.assertRedirects(response, reverse('index'))
+
+    self.client.post(reverse('recommend_location', args=[self.location2.id]))
+    self.assertFalse(Location.objects.get(id=self.location1.id).is_recommended)
+    self.assertTrue(Location.objects.get(id=self.location2.id).is_recommended)
+
+
+class IndexViewTest(TestCase):
+
+  def setUp(self):
+    # Create a test user
+    self.test_user = User.objects.create_user(username='testuser',
+                                              email='testuser@example.com',
+                                              password='testpassword')
+
+    # Create an Account
+    self.test_account = Account.objects.create(user=self.test_user,
+                                               address="806 E Rio Grande St",
+                                               city="Colorado Springs",
+                                               state="Colorado",
+                                               bio="Test Bio")
+
+    # Create a location
+    self.location = Location.objects.create(
+        name="Test Location",
+        description="This is a test location",
+        location_type="Restaurant",
+        address="803 E Rio Grande St.")
+
+    # Create a recommended item
+    self.recommended_item = Item.objects.create(
+        name="Recommended Item",
+        description="This is a recommended item",
+        is_recommended=True,
+        location=self.location)
+
+    # Create item reviews with the test account
+    self.item_review1 = ItemReview.objects.create(item=self.recommended_item,
+                                                  user=self.test_account,
+                                                  review="Great item!",
+                                                  num_stars=5)
+    self.item_review2 = ItemReview.objects.create(item=self.recommended_item,
+                                                  user=self.test_account,
+                                                  review="Average item",
+                                                  num_stars=3)
+    self.item_review3 = ItemReview.objects.create(item=self.recommended_item,
+                                                  user=self.test_account,
+                                                  review="Poor item",
+                                                  num_stars=1)
+
+  # Happy path test
+  def test_index_view_with_recommended_item_and_reviews(self):
+    response = self.client.get(reverse('index'))
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'templates/index.html')
+    self.assertEqual(response.context['recommended_item'],
+                     self.recommended_item)
+    self.assertQuerysetEqual(response.context['item_reviews'],
+                             [self.item_review1, self.item_review2],
+                             ordered=False)
+
+  # Sad path test
+  def test_index_view_with_recommended_item_and_no_reviews(self):
+    ItemReview.objects.all().delete()
+    response = self.client.get(reverse('index'))
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'templates/index.html')
+    self.assertEqual(response.context['recommended_item'],
+                     self.recommended_item)
+    self.assertQuerysetEqual(response.context['item_reviews'], [])
+
+
+class UpdateProfileViewTest(TestCase):
+
+  def setUp(self):
+    self.user = User.objects.create_user(
+        username='testUsername',
+        email='user@test.com',
+        password='testPass',
+        first_name='firstName',
+        last_name='lastName',
+    )
+    self.account = Account.objects.create(user=self.user,
+                                          address="802 E Rio Grande St.",
+                                          state="Test State",
+                                          city="Test City",
+                                          bio="Test Bio")
+
+    self.url = reverse('update_profile')
+    self.login_url = reverse('login')
+    self.client.login(username="testUsername", password="testPass")
+
+  # Test User Auth
+  def test_redirect_if_not_logged_in(self):
+    self.client.logout()
+    response = self.client.get(self.url)
+    self.assertRedirects(response, f'{self.login_url}?next={self.url}')
+
+  # Test invalid form post request
+  def test_post_invalid_form(self):
+    self.client.login(username='testUsername', password='testPass')
+    form_data = {
+        'email': 'invalidemail',
+        'address': '802 E Rio Grande St.',
+    }
+    response = self.client.post(self.url, form_data)
+    self.assertEqual(response.status_code, 200)
+
+    messages = [
+        str(message) for message in get_messages(response.wsgi_request)
+    ]
+    print("Messages: ", messages)
+    self.assertTrue(
+        'Form is not valid. Please verify the address is within Colorado Springs.'
+        in messages)
+
+  def test_invalid_address(self):
+    self.client.login(username='testUsername', password='testPass')
+    form_data = {
+        'email': 'user@example.com',
+        'address': 'Invalid address',
+        'city': 'Colorado Springs',
+        'state': 'CO'
+    }
+    response = self.client.post(self.url, form_data)
+    messages = [
+        str(message) for message in get_messages(response.wsgi_request)
+    ]
+    self.assertIn(
+        'Form is not valid. Please verify the address is within Colorado Springs.',
+        messages)
+
+
+class AddLocationViewTest(TestCase):
+
+  def setUp(self):
+    self.user = User.objects.create_user(
+        username='testUsername',
+        email='user@test.com',
+        password='testPass',
+        first_name='firstName',
+        last_name='lastName',
+    )
+    self.account = Account.objects.create(user=self.user,
+                                          address="802 E Rio Grande St.",
+                                          state="Test State",
+                                          city="Test City",
+                                          bio="Test Bio")
+
+    self.client.login(username="testUsername", password="testPass")
+
+    # Create sample tags and categories
+    self.tag_category = TagCategory.objects.create(name='Test Category')
+    self.tag = TagItem.objects.create(category=self.tag_category,
+                                      name='Test Tag')
+
+    # URL for the add_location view
+    self.url = reverse('add_location')
+
+  def test_get_add_location(self):
+    response = self.client.get(self.url)
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'templates/add_location.html')
+    self.assertIsInstance(response.context['form'], LocationForm)
+    self.assertFalse(response.context['submitted'])
+
+  def test_post_valid_add_location(self):
+    form_data = {
+        'name': 'New Location',
+        'description': 'A great place to visit.',
+        'location_type': 'Restaurant',
+        'address': '806 E Rio Grande St',
+        'tags': [self.tag.id]
+    }
+    response = self.client.post(self.url, form_data)
+    self.assertEqual(response.status_code, 302)
+    self.assertTrue(Location.objects.filter(name='New Location').exists())
+
+  def test_post_invalid_add_location(self):
+    response = self.client.post(self.url, {})
+    self.assertEqual(response.status_code, 200)
+    self.assertFormError(response, 'form', 'name', 'This field is required.')
+    self.assertFalse(Location.objects.exists())
+
+  def test_post_invalid_add_location(self):
+    response = self.client.post(self.url, {})
+    self.assertEqual(response.status_code, 200)
+    form = response.context['form']
+    self.assertFalse(form.is_valid())
+    self.assertTrue('name' in form.errors)
+    self.assertIn('This field is required.', form.errors['name'])
+    self.assertFalse(Location.objects.exists())
+
+
+######### FUNCTIONAL TESTS #########
 
 # Tests the removal of an item by a superuser and verifies the redirect to the 'nearby' page.
 class ItemRemovalTest(TestCase):
@@ -320,9 +605,9 @@ class StoreRemovalTest(TestCase):
                                                     'admin@adminStuff.com',
                                                     'uniquePW1')
     self.account = Account.objects.create(user=self.admin_user,
-                                          address="123 Test Street")
+                                          address="802 E Rio Grande St.")
     self.location = Location.objects.create(name="Test Location",
-                                            address="123 Test Street")
+                                            address="805 E Rio Grande St.")
 
   def test_remove_store(self):
     self.client.login(username='admin', password='uniquePW1')
@@ -333,78 +618,70 @@ class StoreRemovalTest(TestCase):
     self.assertEqual(locations_before - 1, locations_after)
 
 
-class VerifyAddressTest(TestCase):
+class UserRegistrationTest(TestCase):
 
-  def setUp(self):
-    self.valid_address = "802 E Rio Grande St, Colorado Springs, CO"
-    self.invalid_address = "400 Yo Mama Ave, Denver, CO"
-
-    self.valid_response = [{
-        'address': {
-            'city': 'Colorado Springs',
-            'state': 'Colorado'
-        }
-    }]
-
-    self.invalid_response = [{
-        'address': {
-            'city': 'Denver',
-            'state': 'Colorado'
-        }
-    }]
-
-  @patch('Foodie_Joint.utils.requests.get')
-  def test_verify_address_valid(self, mock_get):
-    mock_get.return_value = Mock(status_code=200)
-    mock_get.return_value.json.return_value = self.valid_response
-
-    self.assertTrue(verify_address(self.valid_address))
-
-  @patch('Foodie_Joint.utils.requests.get')
-  def test_verify_address_invalid(self, mock_get):
-    mock_get.return_value = Mock(status_code=200)
-    mock_get.return_value.json.return_value = self.invalid_response
-
-    self.assertFalse(verify_address(self.invalid_address))
-
-  @patch('Foodie_Joint.utils.requests.get')
-  def test_verify_address_no_data(self, mock_get):
-    mock_get.return_value = Mock(status_code=200)
-    mock_get.return_value.json.return_value = []
-
-    self.assertFalse(verify_address(self.valid_address))
-
-
-class StoreRecommendationTest(TestCase):
-
-  def setUp(self):
-    self.user = get_user_model().objects.create_superuser(
-        'admin', 'admin@adminStuff.com', 'uniquePW1')
-    self.client.login(username='admin', password='uniquePW1')
-
-    self.location1 = Location.objects.create(name="Test Location 1",
-                                             address="207 N Wahsatch Ave",
-                                             description="A test Description",
-                                             location_type=Location.RESTAURANT,
-                                             is_recommended=False)
-
-    self.location2 = Location.objects.create(name="Test Location 2",
-                                             address="208 N Wahsatch Ave",
-                                             description="A test Description",
-                                             location_type=Location.RESTAURANT,
-                                             is_recommended=False)
-
-  def test_recommend_location(self):
-    self.assertFalse(Location.objects.filter(is_recommended=True).exists())
+  def test_valid_registration(self):
     response = self.client.post(
-        reverse('recommend_location', args=[self.location1.id]))
-    self.assertTrue(Location.objects.get(id=self.location1.id).is_recommended)
-    self.assertFalse(Location.objects.get(id=self.location2.id).is_recommended)
+        reverse('register'), {
+            'username': 'newuser',
+            'password': 'password123',
+            'email': 'newuser@example.com',
+            'first_name': 'New',
+            'last_name': 'User',
+            'address': '802 E Rio Grande St',
+            'state': 'CO',
+            'city': 'Colorado Springs',
+            'profile_picture': '',
+            'bio': 'Test bio',
+        })
     self.assertRedirects(response, reverse('index'))
+    self.assertTrue(User.objects.filter(username='newuser').exists())
+    self.assertTrue(Account.objects.filter(user__username='newuser').exists())
 
-    self.client.post(reverse('recommend_location', args=[self.location2.id]))
-    self.assertFalse(Location.objects.get(id=self.location1.id).is_recommended)
-    self.assertTrue(Location.objects.get(id=self.location2.id).is_recommended)
+  def test_taken_username_registration(self):
+    User.objects.create_user(username='existinguser',
+                             email='existinguser@example.com',
+                             password='password123',
+                             first_name='Existing',
+                             last_name='User')
+    Account.objects.create(user=User.objects.get(username='existinguser'),
+                           address='802 E Rio Grande St',
+                           state='CO',
+                           city='Colorado Springs',
+                           bio='Test bio')
+
+    response = self.client.post(
+        reverse('register'), {
+            'username': 'existinguser',
+            'password': 'password123',
+            'email': 'existinguser@example.com',
+            'first_name': 'Existing',
+            'last_name': 'User',
+            'address': '802 E Rio Grande St',
+            'state': 'CO',
+            'city': 'Colorado Springs',
+            'profile_picture': '',
+            'bio': 'Test bio',
+        })
+
+    # Trying to figure out wtf is going on here
+    # print("Response content:", response.content.decode())
+
+    self.assertContains(
+        response, "Username already exists. Please choose another username.")
+    self.assertEqual(User.objects.filter(username='existinguser').count(), 1)
+    self.assertEqual(
+        Account.objects.filter(user__username='existinguser').count(), 1)
+
+
+######### VIEW TESTS #########
+
+class BaseViewTest(TestCase):
+
+  def test_base_view_200_response(self):
+    response = self.client.get(reverse('base_template'))
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'templates/base_template.html')
 
 
 ############# END OF DEREK GARY TESTS ############

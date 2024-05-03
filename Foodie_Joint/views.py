@@ -436,10 +436,7 @@ def update_profile(request):
       messages.success(request, "Account updated successfully")
       return redirect('index')
     else:
-      messages.error(
-          request,
-          "Form is not valid. Please verify the Address is within Colorado Springs."
-      )
+       messages.error(request, "Form is not valid. Please verify the address is within Colorado Springs.")
   else:
     account_form = UpdateAccountForm(instance=user.account)
     account_form.fields['email'].initial = email
