@@ -27,11 +27,10 @@
     {%else%}
     <div class="container">
         <h1 style="text-align: center">Fill Out the Form to Add a Review!</h1>
+        <h2 style="text-align: center">Location: {{location.name}}</h2>
         <div class="card">
           <div class="card-body" style="display:flex; margin: auto;">
             <form action="" method=POST>
-              <p>User: {{ user }}</p>
-              <p>Location: {{location.name}}</p>
               {% csrf_token %}
               {{ form.as_p }}
               <input type="submit" value="Submit" class="btn btn-secondary">
