@@ -1,4 +1,5 @@
 import requests  # Used to request info from API
+import re  # Used for regex
 from geopy.distance import distance
 from .models import TagCategory, TagItem
 
@@ -43,34 +44,40 @@ def get_distance(address1, address2):
     return None
 
 
-def verify_address(address):
+def verify_address(street):
+  # We are only going to grab the street from the user since the city and state
+  # should always be the same. Also, allowing the user to specify city and state
+  # bricked get_distance.
+  address = f"{street}, Colorado Springs, CO"
+
+  # I was having issues ensuring users could enter extra address details and have
+  # it count; think apartment number, floor, unit, etc. This pattern ensures these
+  # details can remain.
+  pattern = r'^(\d+)\s+([a-zA-Z]+\s)*([a-zA-Z]+\.?|\d+[a-zA-Z]?|\d+)(?:\s+([NSEW]{1,2}))?(?:,?\s+(?:APT|BLDG|DEPT|FL|HNGR|LOT|PIER|RM|S?SPC|STOP|STE|TRLR|UNIT|#)\.?\s+(\w+))?$'
+
+  if not re.match(pattern, street):
+    print("Invalid street format.")
+    return False
+    
+  # Resources used: https://nominatim.org/release-docs/latest/api/Search/#parameters
+  # https://realpython.com/python-requests/#query-string-parameters
   headers = {'User-Agent': USER_AGENT}
   params = {'format': 'json', 'q': address, 'addressdetails': 1, 'limit': 1}
   try:
     response = requests.get(BASE_URL, headers=headers, params=params)
     response.raise_for_status()
     data = response.json()
-
-    print("API Response Data:", data)
-
-    if data:
-      address_components = data[0].get('address', {})
-
-      print("Address Components:", address_components)
-
-      city = address_components.get('city', '')
-      state = address_components.get('state', '')
-
-      print("City found:", city)
-      print("State found:", state)
-
-      print("City check:", 'Colorado Springs' in city)
-      print("State check:", 'Colorado' in state)
-
-      return 'Colorado Springs' in city and 'Colorado' in state
-    else:
+    #print("Raw Data Returned: " + data)
+    if not data:
       print("No data returned from API.")
       return False
+    address_components = data[0].get('address', {})
+    #print("Address component: ", address_components)
+    city = address_components.get('city', '')
+    state = address_components.get('state', '')
+    #print("City: ", city)
+    #print("State: ", state)
+    return 'Colorado Springs' in city and 'Colorado' in state
   except requests.exceptions.RequestException as err:
     print(f"Error verifying address: {err}")
     return False
